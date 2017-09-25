@@ -63,13 +63,16 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# Azure specific
+.idea/azureSettings.xml
+
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
 *.iml
-# modules.xml
-# .idea/misc.xml
-# *.ipr
+modules.xml
+.idea/misc.xml
+*.ipr
 
 # Sonarlint plugin
 .idea/sonarlint
