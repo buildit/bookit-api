@@ -14,7 +14,7 @@ object PingControllerTests : Spek({
             it("should return UP")
             {
                 val pingController = PingController()
-                expect(pingController.ping()).to.be.equal("UP")
+                expect(pingController.ping().status).to.be.equal("UP")
             }
         }
     }

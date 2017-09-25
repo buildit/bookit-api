@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/v1/ping")
 class PingController {
     @GetMapping
-    fun ping(): String {
-        return "UP"
+    fun ping(): Ping {
+        return Ping()
     }
+
+    data class Ping (val status: String = "UP")
 }
