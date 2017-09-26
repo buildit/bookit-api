@@ -5,6 +5,7 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
+import java.time.ZonedDateTime
 
 object BookingControllerTests : Spek(
     {
@@ -14,8 +15,9 @@ object BookingControllerTests : Spek(
             {
                 it("should create a booking")
                 {
-                    val booking = BookingController().createBooking()
-                    expect(booking.subject).to.be.equal("The best booking ever")
+                    val request = BookingRequest(1, "MyRequest", ZonedDateTime.now(), ZonedDateTime.now())
+                    val booking = BookingController().createBooking(request)
+                    expect(booking.subject).to.be.equal("MyRequest")
                     expect(booking.bookableId).to.be.equal(1)
                     expect(booking.bookingId).to.be.equal(1)
                 }

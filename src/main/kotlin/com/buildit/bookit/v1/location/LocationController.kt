@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+// /v1/location/id/bookable/id/booking
+
 @RestController
 @RequestMapping("/v1/location")
 class LocationController

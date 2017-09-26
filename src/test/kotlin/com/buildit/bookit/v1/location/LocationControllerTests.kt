@@ -1,6 +1,5 @@
 package com.buildit.bookit.v1.location
 
-
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import com.winterbe.expekt.expect
