@@ -12,5 +12,7 @@ class PingController {
         return Ping()
     }
 
-    data class Ping (val status: String = "UP")
+    class Ping {
+        val status: String = "UP"
+    }
 }
