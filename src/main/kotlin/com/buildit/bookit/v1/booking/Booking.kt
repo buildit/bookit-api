@@ -1,4 +1,4 @@
-package com.buildit.bookit.booking.v1
+package com.buildit.bookit.v1.booking
 
 import java.time.ZonedDateTime
 

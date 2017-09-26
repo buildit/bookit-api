@@ -1,4 +1,4 @@
-package com.buildit.bookit.bookable.v1
+package com.buildit.bookit.v1.bookable
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus

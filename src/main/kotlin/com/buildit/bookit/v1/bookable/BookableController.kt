@@ -1,4 +1,4 @@
-package com.buildit.bookit.location.v1
+package com.buildit.bookit.v1.bookable
 
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -6,20 +6,19 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/v1/location")
-class LocationController
+@RequestMapping("/v1/booking")
+class BookableController
 {
-    val theLocation = Location(1, "The best location ever")
+    val theBookable = Bookable(1, 1, "The best bookable ever")
 
     @GetMapping(value = "/{id}")
-    fun getLocation(@PathVariable("id") locationId: Int): Location
+    fun getBookable(@PathVariable("id") bookableId: Int): Bookable
     {
-        if (locationId == 1)
+        if (bookableId == 1)
         {
-            return theLocation
+            return theBookable
         }
 
-        throw LocationNotFound()
+        throw BookableNotFound()
     }
-
 }

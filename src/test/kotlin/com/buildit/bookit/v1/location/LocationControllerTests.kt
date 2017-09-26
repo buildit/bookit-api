@@ -1,5 +1,7 @@
-package com.buildit.bookit.location.v1
+package com.buildit.bookit.v1.location
 
+import com.buildit.bookit.v1.location.LocationController
+import com.buildit.bookit.v1.location.LocationNotFound
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import com.winterbe.expekt.expect
@@ -28,7 +30,7 @@ object LocationControllerTests : Spek(
             {
                 it("should throw an exception")
                 {
-                    assertThat({LocationController().getLocation(2) }, throws<LocationNotFound>())
+                    assertThat({ LocationController().getLocation(2) }, throws<LocationNotFound>())
                 }
             }
         }
