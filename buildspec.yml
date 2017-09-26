@@ -3,7 +3,7 @@ version: 0.2
 phases:
   build:
     commands:
-      - chmod a+x ./gradlew
+      - chmod +x ./gradlew
       - ./gradlew build
 
 artifacts:
