@@ -5,6 +5,7 @@ buildscript {
         junit_version = '5.0.0'
         junit_gradle_version = '1.0.0'
         expekt_version = '0.5.0'
+        hamkrest_version = '1.4.2.0'
 	}
 	repositories {
 		mavenCentral()
@@ -60,8 +61,10 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
     testCompile("com.winterbe:expekt:$expekt_version")
+    testCompile("com.winterbe:expekt:$expekt_version")
     testCompile("org.jetbrains.spek:spek-api:$spek_version")
     testCompile("org.junit.jupiter:junit-jupiter-api:$junit_version")
+    testCompile("com.natpryce:hamkrest:$hamkrest_version")
 
     testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit_version")
     testRuntime("org.jetbrains.spek:spek-junit-platform-engine:$spek_version")
