@@ -1,7 +1,5 @@
 package com.buildit.bookit.v1.bookable
 
-import com.buildit.bookit.v1.bookable.BookableController
-import com.buildit.bookit.v1.bookable.BookableNotFound
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import com.winterbe.expekt.expect

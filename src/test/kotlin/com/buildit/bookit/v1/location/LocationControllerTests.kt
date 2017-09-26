@@ -1,7 +1,6 @@
 package com.buildit.bookit.v1.location
 
-import com.buildit.bookit.v1.location.LocationController
-import com.buildit.bookit.v1.location.LocationNotFound
+
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import com.winterbe.expekt.expect

@@ -1,6 +1,5 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.v1.booking.BookingController
 import com.winterbe.expekt.expect
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
