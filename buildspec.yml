@@ -4,11 +4,10 @@ phases:
   install:
     commands:
       - apt-get update -y
-      - apt-get install -y default-jdk
-#      - apt-get install -y software-properties-common
-#      - add-apt-repository ppa:openjdk-r/ppa
-#      - apt-get update -y
-#      - apt-get install -y openjdk-8-jdk
+      - apt-get install -y software-properties-common
+      - add-apt-repository ppa:openjdk-r/ppa
+      - apt-get update -y
+      - apt-get install -y openjdk-8-jdk
 
   build:
     commands:
