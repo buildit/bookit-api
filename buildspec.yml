@@ -5,6 +5,7 @@ phases:
     commands:
       - chmod +x ./gradlew
       - ./gradlew build
+      - docker build -t bookit-api:build .
 
 artifacts:
   files:
