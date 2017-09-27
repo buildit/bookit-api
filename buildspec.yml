@@ -9,11 +9,20 @@ phases:
       - apt-get update -y
       - apt-get install -y openjdk-8-jdk
 
+  pre_build:
+    commands:
+      - echo -n "$CODEBUILD_BUILD_ID" | sed "s/.*:\([[:xdigit:]]\{7\}\).*/\1/" > /tmp/build_id.out
+      - printf "%s:%s" "$REPOSITORY_URI" "$(cat /tmp/build_id.out)" > /tmp/build_tag.out
+
   build:
     commands:
       - chmod +x ./gradlew
       - ./gradlew build
-      - docker build -t bookit-api:build .
+
+  post_build:
+    commands:
+      - docker build -t "$(cat /tmp/build_tag.out)" .
+      - docker push "$(cat /tmp/build_tag.out)"
 
 artifacts:
   files:
