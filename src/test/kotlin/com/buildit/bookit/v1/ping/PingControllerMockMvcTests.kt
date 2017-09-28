@@ -23,7 +23,7 @@ class PingControllerMockMvcTests {
     fun ping() {
         // arrange
         // act
-        val result = mockMvc.perform(get("/v1/ping2"))
+        val result = mockMvc.perform(get("/v1/ping"))
 
         // assert
         result.andExpect(status().isOk)
