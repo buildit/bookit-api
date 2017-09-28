@@ -12,19 +12,19 @@ phases:
   pre_build:
     commands:
       - $(aws ecr get-login --region us-east-1)
-      - echo -n "$CODEBUILD_BUILD_ID" | sed "s/.*:\([[:xdigit:]]\{7\}\).*/\1/" > /tmp/build_id.out
-      - printf "%s:%s" "$REPOSITORY_URI" "$(cat /tmp/build_id.out)" > /tmp/build_tag.out
+      - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
 
   build:
     commands:
       - chmod +x ./gradlew
       - ./gradlew build
+      - docker build --tag "${REPOSITORY_URI}:${TAG}" .
 
   post_build:
     commands:
-      - docker build -t "$(cat /tmp/build_tag.out)" .
-      - docker push "$(cat /tmp/build_tag.out)"
+      - docker push "${REPOSITORY_URI}:${TAG}"
+      - printf '{"tag":"%s"}' $TAG > build.json
 
 artifacts:
   files:
-    - build/libs/bookit-api-0.0.1-SNAPSHOT.jar
+    - build.json
