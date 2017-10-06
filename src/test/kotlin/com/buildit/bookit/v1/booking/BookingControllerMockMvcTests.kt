@@ -11,8 +11,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import java.math.BigDecimal
 import java.time.ZonedDateTime
-import java.util.*
 
 /*
  data class BookingRequest(
@@ -22,7 +22,6 @@ import java.util.*
  val endDateTime: ZonedDateTime
  )
   */
-
 
 @ExtendWith(SpringExtension::class)
 @WebMvcTest(BookingController::class)
@@ -44,7 +43,6 @@ class BookingControllerMockMvcTests {
         result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase("The Booking")))
     }
 
-
     @Test
     fun createBookingTest() {
         // arrange
@@ -60,7 +58,7 @@ class BookingControllerMockMvcTests {
         // assert
         result.andExpect(MockMvcResultMatchers.status().`is`(201))
         result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase("New Meeting")))
-        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.startDateTime", Matchers.equalToIgnoringCase("New Meeting")))
-        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.endDateTime", Matchers.equalToIgnoringCase("New Meeting")))
+        result.andExpect(MockMvcResultMatchers.jsonPath<BigDecimal>("$.startDateTime", Matchers.equalTo(BigDecimal("1506430800.000000000"))))
+        result.andExpect(MockMvcResultMatchers.jsonPath<BigDecimal>("$.endDateTime", Matchers.equalTo(BigDecimal("1506434400.000000000"))))
     }
 }
