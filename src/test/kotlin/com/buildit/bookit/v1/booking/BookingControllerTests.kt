@@ -16,7 +16,9 @@ object BookingControllerTests : Spek(
                 it("should create a booking")
                 {
                     val request = BookingRequest(1, "MyRequest", ZonedDateTime.now(), ZonedDateTime.now())
-                    val booking = BookingController().createBooking(request)
+                    val response = BookingController().createBooking(request)
+                    val booking = response.body
+
                     expect(booking.subject).to.be.equal("MyRequest")
                     expect(booking.bookableId).to.be.equal(1)
                     expect(booking.bookingId).to.be.equal(1)
