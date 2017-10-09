@@ -16,20 +16,25 @@ dependencies.
 
 ## Quick start
 
-If you have gradle installed, you can simply run the following commands with gradle.  
-Otherwise, we have bundled a gradle wrapper so you can substitute that in the below commands.
+We have bundled a gradle wrapper so you can run the below commands.  Alternatively, you can use gradle if you have it installed.
 
-You can run build the project by running:
+You can build the project by running:
 ```$xslt
-gradle
+./gradlew
 ```  
 
 You can run tests by running the following:
 ```$xslt
-gradle test
+./gradlew test
 ```
 
 You can run the web server by running the following:
 ```$xslt
-gradle bootRun
+./gradlew bootRun
 ```
+
+##
+
+Build information:
+
+https://console.aws.amazon.com/codebuild/home?region=us-east-1#/projects/buildit-bookit-bookit-api-master-build/view
