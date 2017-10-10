@@ -37,4 +37,4 @@ You can run the web server by running the following:
 
 Build information:
 
-https://console.aws.amazon.com/codebuild/home?region=us-east-1#/projects/buildit-bookit-bookit-api-master-build/view
+https://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/buildit-bookit-build-bookit-api-master-Pipeline-UQC3AP7IZMK7
