@@ -1,6 +1,5 @@
 package com.buildit.bookit.v1.location
 
-import com.buildit.bookit.v1.ping.PingController
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
