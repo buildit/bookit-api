@@ -1,17 +1,17 @@
 buildscript {
     ext {
-		kotlin_version = '1.1.50'
+        kotlin_version = '1.1.51'
         spek_version = '1.1.5'
-        junit_version = '5.0.0'
-        junit_gradle_version = '1.0.0'
+        junit_version = '5.0.1'
+        junit_gradle_version = '1.0.1'
         expekt_version = '0.5.0'
         hamkrest_version = '1.4.2.0'
         springfox_version = '2.7.0'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
         classpath("org.junit.platform:junit-platform-gradle-plugin:$junit_gradle_version")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -19,9 +19,10 @@ buildscript {
 
 plugins {
     id 'org.springframework.boot' version '1.5.7.RELEASE'
-    id 'org.jetbrains.kotlin.jvm' version '1.1.50'
-    id 'org.jetbrains.kotlin.plugin.spring' version '1.1.50'
+    id 'org.jetbrains.kotlin.jvm' version '1.1.51'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.1.51'
     id 'org.jmailen.kotlinter' version '1.3.1'
+    id 'com.gorylenko.gradle-git-properties' version '1.4.17'
 }
 
 repositories {
@@ -30,39 +31,59 @@ repositories {
 
 
 apply plugin: 'org.junit.platform.gradle.plugin'
-//apply plugin: 'kotlin'
+apply plugin: 'idea'
 
 group = 'com.buildit'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
-compileKotlin {
-	kotlinOptions.jvmTarget = "1.8"
+sourceSets {
+    'test-e2e' {
+        kotlin {
+            srcDir files('src/test-e2e/kotlin')
+        }
+        resources.srcDir files('src/test-e2e/resources')
+    }
 }
+
+idea {
+    module {
+        testSourceDirs += files('src/test-e2e/kotlin')
+    }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
 compileTestKotlin {
-	kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+}
+
+springBoot {
+    buildInfo()
+}
+
+configurations {
+    testE2eCompile.extendsFrom testCompile
+    testE2eRuntime.extendsFrom testRuntime
 }
 
 junitPlatform {
     platformVersion junit_gradle_version
-    filters {
-        engines {
-            include 'spek', 'junit-jupiter'
-        }
-    }
 }
 
 dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-actuator-docs')
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
-	compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-actuator-docs')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
+    compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
     // for kotlin data classes
     compile("com.fasterxml.jackson.module:jackson-module-kotlin")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
@@ -73,11 +94,11 @@ dependencies {
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
 
-	runtime('org.springframework.boot:spring-boot-devtools')
+    runtime('org.springframework.boot:spring-boot-devtools')
 
-    testCompile("junit:junit")
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
+    testCompile('junit:junit')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
     testCompile("com.winterbe:expekt:$expekt_version")
     testCompile("org.jetbrains.spek:spek-api:$spek_version")
     testCompile("org.junit.jupiter:junit-jupiter-api:$junit_version")
@@ -85,5 +106,23 @@ dependencies {
     testCompile("com.github.sbrannen:spring-test-junit5:1.0.0")
 
     testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit_version")
+    testRuntime("org.junit.platform:junit-platform-console:$junit_gradle_version")
     testRuntime("org.jetbrains.spek:spek-junit-platform-engine:$spek_version")
+}
+
+// https://stackoverflow.com/questions/45297339/junit-5-under-gradle-with-multiple-source-sets
+task 'test-e2e'(
+    type: JavaExec,
+    description: 'Runs the e2e tests.',
+    group: 'Verification'
+) {
+    dependsOn testE2eClasses
+
+    outputs.upToDateWhen { false }
+    classpath = sourceSets.'test-e2e'.runtimeClasspath
+
+    main = 'org.junit.platform.console.ConsoleLauncher'
+    args = ['--scan-class-path',
+            sourceSets.'test-e2e'.output.getClassesDirs().asPath,
+            '--reports-dir', "${buildDir}/test-results/test-e2e"]
 }
