@@ -12,7 +12,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder
 
 object PingTests : Spek(
     {
-        val uri : String = System.getenv("ENDPOINT_URI") ?: "https://localhost:8080"
+        val uri : String = System.getenv("ENDPOINT_URI") ?: "http://localhost:8080"
         val restTemplate = TestRestTemplate(RestTemplateBuilder().rootUri(uri).build())
         describe("/v1/ping")
         {
