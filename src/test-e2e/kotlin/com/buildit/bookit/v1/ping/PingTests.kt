@@ -10,7 +10,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder
 
-object PingControllerTests : Spek(
+object PingTests : Spek(
     {
         val restTemplate = TestRestTemplate(RestTemplateBuilder().rootUri("https://integration-bookit-api.buildit.tools").build())
         describe("/v1/ping")

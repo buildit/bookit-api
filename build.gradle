@@ -30,25 +30,31 @@ repositories {
 
 
 apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: 'idea'
 
 group = 'com.buildit'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 sourceSets {
-    testE2E {
+    'test-e2e' {
         kotlin {
-            compileClasspath += test.compileClasspath
-            runtimeClasspath += test.runtimeClasspath
             srcDir files('src/test-e2e/kotlin')
         }
         resources.srcDir files('src/test-e2e/resources')
     }
 }
 
+idea {
+    module {
+        testSourceDirs += files('src/test-e2e/kotlin')
+    }
+}
+
 compileKotlin {
 	kotlinOptions.jvmTarget = "1.8"
 }
+
 compileTestKotlin {
 	kotlinOptions.jvmTarget = "1.8"
 }
@@ -57,13 +63,13 @@ repositories {
 	mavenCentral()
 }
 
+configurations {
+    testE2eCompile.extendsFrom testCompile
+    testE2eRuntime.extendsFrom testRuntime
+}
+
 junitPlatform {
     platformVersion junit_gradle_version
-    filters {
-        engines {
-            include 'spek', 'junit-jupiter'
-        }
-    }
 }
 
 dependencies {
@@ -95,5 +101,23 @@ dependencies {
     testCompile("com.github.sbrannen:spring-test-junit5:1.0.0")
 
     testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit_version")
+    testRuntime("org.junit.platform:junit-platform-console:$junit_gradle_version")
     testRuntime("org.jetbrains.spek:spek-junit-platform-engine:$spek_version")
+}
+
+// https://stackoverflow.com/questions/45297339/junit-5-under-gradle-with-multiple-source-sets
+task 'test-e2e'(
+    type: JavaExec,
+    description: 'Runs the e2e tests.',
+    group: 'Verification'
+) {
+    dependsOn testE2eClasses
+
+    outputs.upToDateWhen { false }
+    classpath = sourceSets.'test-e2e'.runtimeClasspath
+
+    main = 'org.junit.platform.console.ConsoleLauncher'
+    args = ['--scan-class-path',
+            sourceSets.'test-e2e'.output.getClassesDirs().asPath,
+            '--reports-dir', "${buildDir}/test-results/test-e2e"]
 }
