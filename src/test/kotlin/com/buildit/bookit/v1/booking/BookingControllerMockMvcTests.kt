@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -23,15 +24,19 @@ import java.time.ZonedDateTime
  )
   */
 
+/**
+ * Booking Contoller spring mvc integration tests
+ */
 @ExtendWith(SpringExtension::class)
 @WebMvcTest(BookingController::class)
-class BookingControllerMockMvcTests {
-    @Autowired
-    private lateinit var mockMvc: MockMvc
-
-    @Autowired
-    private lateinit var mapper: ObjectMapper
-
+class BookingControllerMockMvcTests @Autowired constructor(
+    private val mockMvc: MockMvc,
+    private val mapper: ObjectMapper
+)
+{
+    /**
+     * Get a booking
+     */
     @Test
     fun getExistingBookingTest() {
         // arrange
@@ -43,6 +48,9 @@ class BookingControllerMockMvcTests {
         result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase("The Booking")))
     }
 
+    /**
+     * Create a booking
+     */
     @Test
     fun createBookingTest() {
         // arrange
@@ -56,7 +64,7 @@ class BookingControllerMockMvcTests {
             .content(mapper.writeValueAsString(request)))
 
         // assert
-        result.andExpect(MockMvcResultMatchers.status().`is`(201))
+        result.andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.CREATED.value()))
         result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase("New Meeting")))
         result.andExpect(MockMvcResultMatchers.jsonPath<BigDecimal>("$.startDateTime", Matchers.equalTo(BigDecimal("1506430800.000000000"))))
         result.andExpect(MockMvcResultMatchers.jsonPath<BigDecimal>("$.endDateTime", Matchers.equalTo(BigDecimal("1506434400.000000000"))))

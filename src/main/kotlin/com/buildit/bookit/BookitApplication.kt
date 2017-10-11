@@ -10,14 +10,24 @@ import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2
 
+/**
+ * Main class (needed for spring boot integration)
+ */
 @SpringBootApplication
 @EnableSwagger2
 class BookitApplication
 
+/**
+ * Main entry point of the application
+ */
+@Suppress("SpreadOperator")
 fun main(args: Array<String>) {
     SpringApplication.run(BookitApplication::class.java, *args)
 }
 
+/**
+ * Swagger configuration
+ */
 @Bean
 fun api(): Docket {
     return Docket(DocumentationType.SWAGGER_2)

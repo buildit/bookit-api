@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.CrossOrigin
 import java.time.ZonedDateTime
 
+/**
+ * Endpoint to manage bookings
+ */
 @CrossOrigin(origins = arrayOf("*"))
 @RestController
 @RequestMapping("/v1/booking")
@@ -19,6 +22,9 @@ class BookingController
 {
     val theBooking = Booking(2, 1, "The Booking", ZonedDateTime.now(), ZonedDateTime.now())
 
+    /**
+     * Get a booking
+     */
     @GetMapping(value = "/{id}")
     fun getBookable(@PathVariable("id") bookableId: Int): ResponseEntity<Booking>
     {
@@ -30,6 +36,9 @@ class BookingController
         throw BookableNotFound()
     }
 
+    /**
+     * Create a booking
+     */
     @PostMapping()
     fun createBooking(@RequestBody bookingRequest: BookingRequest): ResponseEntity<Booking>
     {

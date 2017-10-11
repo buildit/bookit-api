@@ -7,6 +7,9 @@ import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import java.time.ZonedDateTime
 
+/**
+ * Booking controller unit tests
+ */
 object BookingControllerTests : Spek(
     {
         describe("create a booking")
