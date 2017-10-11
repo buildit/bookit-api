@@ -43,12 +43,12 @@ You can run the web server by running the following:
 ./gradlew bootRun
 ```
 
-## REST API (Swagger) documentation:
+## REST API (Swagger) documentation
 
 https://bookit-api.buildit.tools/swagger-ui.html
 
 
-## Build information:
+## Build information
 
 https://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/buildit-bookit-build-bookit-api-master-Pipeline-UQC3AP7IZMK7
 
