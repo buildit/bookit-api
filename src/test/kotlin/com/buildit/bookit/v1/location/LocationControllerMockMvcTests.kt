@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.location
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -10,13 +11,18 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
+/**
+ * Tests the /location endpoint
+ */
 @ExtendWith(SpringExtension::class)
 @WebMvcTest(LocationController::class)
-class LocationControllerMockMvcTests
+class LocationControllerMockMvcTests @Autowired constructor(
+    private val mockMvc: MockMvc
+)
 {
-    @Autowired
-    private lateinit var mockMvc: MockMvc
-
+    /**
+     * Get location has a name
+     */
     @Test
     fun location() {
         // arrange
