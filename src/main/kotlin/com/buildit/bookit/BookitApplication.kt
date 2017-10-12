@@ -9,6 +9,9 @@ import springfox.documentation.builders.RequestHandlerSelectors
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 /**
  * Main class (needed for spring boot integration)
@@ -35,4 +38,15 @@ fun api(): Docket {
         .apis(RequestHandlerSelectors.any())
         .paths(PathSelectors.any())
         .build()
+}
+
+@Bean
+fun corsConfigurer(): WebMvcConfigurer {
+    return object : WebMvcConfigurerAdapter() {
+        override fun addCorsMappings(registry: CorsRegistry) {
+            registry
+                .addMapping("/**")
+                .allowedOrigins("*")
+        }
+    }
 }
