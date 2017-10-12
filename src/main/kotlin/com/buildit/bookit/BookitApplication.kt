@@ -40,6 +40,9 @@ fun api(): Docket {
         .build()
 }
 
+/**
+ * CORS configuration
+ */
 @Bean
 fun corsConfigurer(): WebMvcConfigurer {
     return object : WebMvcConfigurerAdapter() {
