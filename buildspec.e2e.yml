@@ -12,4 +12,4 @@ phases:
   build:
     commands:
       - chmod +x ./gradlew
-      - ./gradlew test-e2e
+      - ./gradlew -Dorg.gradle.daemon=false test-e2e
