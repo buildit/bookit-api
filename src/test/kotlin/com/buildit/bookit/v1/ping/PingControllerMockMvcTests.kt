@@ -11,12 +11,19 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
+/**
+ * Tests PingController spring integration
+ */
 @ExtendWith(SpringExtension::class)
 @WebMvcTest(PingController::class)
-class PingControllerMockMvcTests {
-    @Autowired
-    private lateinit var mockMvc: MockMvc
+class PingControllerMockMvcTests @Autowired constructor(
+    private val mockMvc: MockMvc
+)
+{
 
+    /**
+     * ensure ping serialization works
+     */
     @Test
     fun ping() {
         // arrange

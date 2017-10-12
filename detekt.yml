@@ -1,0 +1,5 @@
+build:
+  warningThreshold: 1
+  failThreshold: 1
+  weights:
+    MaxLineLength: 0

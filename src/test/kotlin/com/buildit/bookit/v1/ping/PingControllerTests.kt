@@ -6,6 +6,9 @@ import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 
+/**
+ * Ping controller unit tests
+ */
 object PingControllerTests : Spek(
 {
     describe("/v1/ping")

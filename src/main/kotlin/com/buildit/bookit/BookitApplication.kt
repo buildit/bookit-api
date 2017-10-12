@@ -13,14 +13,24 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
+/**
+ * Main class (needed for spring boot integration)
+ */
 @SpringBootApplication
 @EnableSwagger2
 class BookitApplication
 
+/**
+ * Main entry point of the application
+ */
+@Suppress("SpreadOperator")
 fun main(args: Array<String>) {
     SpringApplication.run(BookitApplication::class.java, *args)
 }
 
+/**
+ * Swagger configuration
+ */
 @Bean
 fun api(): Docket {
     return Docket(DocumentationType.SWAGGER_2)
@@ -30,6 +40,9 @@ fun api(): Docket {
         .build()
 }
 
+/**
+ * CORS configuration
+ */
 @Bean
 fun corsConfigurer(): WebMvcConfigurer {
     return object : WebMvcConfigurerAdapter() {

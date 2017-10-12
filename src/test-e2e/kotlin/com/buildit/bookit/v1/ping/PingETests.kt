@@ -10,7 +10,10 @@ import org.skyscreamer.jsonassert.JSONCompareMode
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder
 
-object PingE2ETests : Spek(
+/**
+ * Test /v1/ping like a black box
+ */
+object PingETests : Spek(
     {
         val uri : String = System.getenv("ENDPOINT_URI") ?: "http://localhost:8080"
         val restTemplate = TestRestTemplate(RestTemplateBuilder().rootUri(uri).build())

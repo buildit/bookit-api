@@ -8,6 +8,9 @@ import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 
+/**
+ * Bookable controller unit tests
+ */
 object BookableControllerTests : Spek(
     {
         describe("get known location")
