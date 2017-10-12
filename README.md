@@ -33,9 +33,14 @@ You can run tests by running the following:
 ./gradlew test
 ```
 
-You can run all checks (linting, tests, static analysis) by running the following:
+You can run all checks (linting, unit tests, static analysis) by running the following:
 ```$sh
 ./gradlew check
+```
+
+You can run e2e tests by running the following:
+```$sh
+./gradlew test-e2e
 ```
 
 You can run the web server by running the following:

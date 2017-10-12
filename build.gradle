@@ -110,6 +110,7 @@ dependencies {
     testRuntime("org.jetbrains.spek:spek-junit-platform-engine:$spek_version")
 }
 
+
 // https://stackoverflow.com/questions/45297339/junit-5-under-gradle-with-multiple-source-sets
 task 'test-e2e'(
     type: JavaExec,
