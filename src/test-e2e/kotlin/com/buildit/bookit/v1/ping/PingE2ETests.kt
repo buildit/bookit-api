@@ -10,7 +10,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder
 
-object PingTests : Spek(
+object PingE2ETests : Spek(
     {
         val uri : String = System.getenv("ENDPOINT_URI") ?: "http://localhost:8080"
         val restTemplate = TestRestTemplate(RestTemplateBuilder().rootUri(uri).build())
