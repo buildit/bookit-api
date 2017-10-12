@@ -18,7 +18,33 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  */
 @SpringBootApplication
 @EnableSwagger2
-class BookitApplication
+class BookitApplication {
+    /**
+     * Swagger configuration
+     */
+    @Bean
+    fun api(): Docket {
+        return Docket(DocumentationType.SWAGGER_2)
+            .select()
+                .apis(RequestHandlerSelectors.basePackage(BookitApplication::class.java.`package`.name))
+                .build()
+    }
+
+    /**
+     * CORS configuration
+     */
+    @Bean
+    fun corsConfigurer(): WebMvcConfigurer {
+        return object : WebMvcConfigurerAdapter() {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry
+                    .addMapping("/**")
+                    .allowedOrigins("*")
+            }
+        }
+    }
+
+}
 
 /**
  * Main entry point of the application
@@ -26,30 +52,4 @@ class BookitApplication
 @Suppress("SpreadOperator")
 fun main(args: Array<String>) {
     SpringApplication.run(BookitApplication::class.java, *args)
-}
-
-/**
- * Swagger configuration
- */
-@Bean
-fun api(): Docket {
-    return Docket(DocumentationType.SWAGGER_2)
-        .select()
-        .apis(RequestHandlerSelectors.any())
-        .paths(PathSelectors.any())
-        .build()
-}
-
-/**
- * CORS configuration
- */
-@Bean
-fun corsConfigurer(): WebMvcConfigurer {
-    return object : WebMvcConfigurerAdapter() {
-        override fun addCorsMappings(registry: CorsRegistry) {
-            registry
-                .addMapping("/**")
-                .allowedOrigins("*")
-        }
-    }
 }
