@@ -92,6 +92,7 @@ junitPlatform {
 afterEvaluate {
     jacoco {
         applyTo junitPlatformTest
+        toolVersion = "0.7.9"
     }
 
     task junit5CodeCoverageReport(type:JacocoReport){
@@ -120,7 +121,9 @@ afterEvaluate {
     }
 
     test.dependsOn junit5CodeCoverageReport
-    check.dependsOn junit5CodeCoverageVerification
+    // can't really enforce this until we have a way to ignore data classes and the things they generate
+    // https://github.com/jacoco/jacoco/issues/552
+    // check.dependsOn junit5CodeCoverageVerification
 }
 
 
