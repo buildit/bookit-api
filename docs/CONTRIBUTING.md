@@ -4,6 +4,9 @@ Please adhere to standards where possible, and when not possible, submit a pull 
 
 ## General Notes
 
+### Architecture decisions
+We're using [adr-tools](https://github.com/npryce/adr-tools) to document our decisions.  See [README.md](architecture/decisions/README.md)
+
 #### Commit messages
 Please include the JIRA ID in your commit messages (or GitHub issue if tracked that way)
 
