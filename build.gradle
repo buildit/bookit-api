@@ -7,6 +7,7 @@ buildscript {
         expekt_version = '0.5.0'
         hamkrest_version = '1.4.2.0'
         springfox_version = '2.7.0'
+        jackson_version = '2.9.0'
     }
     repositories {
         mavenCentral()
@@ -90,15 +91,15 @@ junitPlatform {
 
 dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
+    compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-actuator-docs')
     compile('org.springframework.boot:spring-boot-starter-web')
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
-    compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
     // for kotlin data classes
-    compile("com.fasterxml.jackson.module:jackson-module-kotlin")
-    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
-    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    compile("com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jackson_version")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version")
     compile("io.springfox:springfox-swagger2:$springfox_version")
     compile("io.springfox:springfox-bean-validators:$springfox_version")
     compile("io.springfox:springfox-swagger-ui:$springfox_version")

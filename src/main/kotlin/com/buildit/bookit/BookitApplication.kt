@@ -4,6 +4,7 @@ package com.buildit.bookit
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import springfox.documentation.builders.RequestHandlerSelectors
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
@@ -16,8 +17,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  * Main class (needed for spring boot integration)
  */
 @SpringBootApplication
+class BookitApplication
+
+/**
+ * Swagger configuration
+ */
+@Configuration
 @EnableSwagger2
-class BookitApplication {
+class SwaggerConfiguration {
     /**
      * Swagger configuration
      */
@@ -25,10 +32,17 @@ class BookitApplication {
     fun api(): Docket {
         return Docket(DocumentationType.SWAGGER_2)
             .select()
-                .apis(RequestHandlerSelectors.basePackage(BookitApplication::class.java.`package`.name))
-                .build()
+            .apis(RequestHandlerSelectors.basePackage(BookitApplication::class.java.`package`.name))
+            .build()
     }
 
+}
+
+/**
+ * CORS configuration
+ */
+@Configuration
+class WebMvcConfiguration {
     /**
      * CORS configuration
      */
