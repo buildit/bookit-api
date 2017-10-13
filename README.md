@@ -48,16 +48,21 @@ You can run the web server by running the following:
 ./gradlew bootRun
 ```
 
-## REST API (Swagger) documentation
-
-https://bookit-api.buildit.tools/swagger-ui.html
-
-
 ## Build information
 
 https://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/buildit-bookit-build-bookit-api-master-Pipeline-UQC3AP7IZMK7
 
-## Operational information
+## Deployment information
+
+### Deployments
+* [Integration](https://integration-bookit-api.buildit.tools)
+* [Staging](https://staging-bookit-api.buildit.tools)
+* [Production](https://bookit-api.buildit.tools)
+
+### Swagger Docs
+* [Integration](https://integration-bookit-api.buildit.tools/swagger-ui.html)
+* [Staging](https://staging-bookit-api.buildit.tools/swagger-ui.html)
+* [Production](https://bookit-api.buildit.tools/swagger-ui.html)
 
 ### Logging
 
@@ -65,3 +70,6 @@ https://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/buildit-
 * [Staging](https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=buildit-bookit-staging-app-bookit-api-master)
 * [Production](https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=buildit-bookit-production-app-bookit-api-master)
 
+## Contributing
+
+See [Contributing](./docs/CONTRIBUTING.md)
