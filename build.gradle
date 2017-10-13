@@ -15,6 +15,7 @@ buildscript {
     dependencies {
         classpath("org.junit.platform:junit-platform-gradle-plugin:$junit_gradle_version")
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.0'
     }
 }
 
@@ -35,6 +36,7 @@ repositories {
 apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'idea'
 apply plugin: 'jacoco'
+apply plugin: 'com.kncept.junit5.reporter'
 
 group = 'com.buildit'
 version = '0.0.1-SNAPSHOT'
