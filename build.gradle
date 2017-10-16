@@ -14,7 +14,6 @@ buildscript {
     }
     dependencies {
         classpath("org.junit.platform:junit-platform-gradle-plugin:$junit_gradle_version")
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.0'
     }
 }
@@ -23,6 +22,7 @@ plugins {
     id 'org.springframework.boot' version '1.5.7.RELEASE'
     id 'org.jetbrains.kotlin.jvm' version '1.1.51'
     id 'org.jetbrains.kotlin.plugin.spring' version '1.1.51'
+    id "org.jetbrains.kotlin.plugin.allopen" version "1.1.51"
     id 'org.jmailen.kotlinter' version '1.3.1'
 //    id 'com.gorylenko.gradle-git-properties' version '1.4.17'
     id "io.gitlab.arturbosch.detekt" version "1.0.0.RC4-3"
@@ -82,7 +82,7 @@ detekt {
     profile("main") {
         input = "$projectDir/src"
         config = "$projectDir/detekt.yml"
-        output = "$projectDir/reports/detekt.xml"
+        output = "$buildDir/reports/detekt"
     }
 }
 
@@ -131,7 +131,6 @@ afterEvaluate {
 
 
 dependencies {
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
     compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
     compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
     compile('org.springframework.boot:spring-boot-starter-actuator')

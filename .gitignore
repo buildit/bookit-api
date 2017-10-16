@@ -2,9 +2,6 @@
 /build/
 !gradle/wrapper/gradle-wrapper.jar
 
-### Ignore reports directory ###
-reports
-
 ### STS ###
 .apt_generated
 .classpath

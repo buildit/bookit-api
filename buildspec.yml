@@ -1,5 +1,9 @@
 version: 0.2
 
+#env:
+#  parameter-store:
+#    GRGIT_USER: "${SSM_BUILD_NAMESPACE}/REPO_TOKEN"
+
 phases:
   install:
     commands:
@@ -22,10 +26,11 @@ phases:
 
   post_build:
     commands:
+      - aws s3 cp --recursive --acl public-read ./build/reports ${REPORTS_BUCKET}/
+      - aws s3 cp --acl public-read ./reports/index.html ${REPORTS_BUCKET}/index.html
       - test $CODEBUILD_BUILD_SUCCEEDING -eq 0 || docker push "${REPOSITORY_URI}:${TAG}"
       - printf '{"tag":"%s"}' $TAG > build.json
 
 artifacts:
   files:
     - build.json
-    - 'build/reports/**'
