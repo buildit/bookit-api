@@ -10,18 +10,15 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/v1/bookable")
-class BookableController
-{
+class BookableController {
     val theBookable = Bookable(1, 1, "The best bookable ever")
 
     /**
      * Get a bookable
      */
     @GetMapping(value = "/{id}")
-    fun getBookable(@PathVariable("id") bookableId: Int): Bookable
-    {
-        if (bookableId == 1)
-        {
+    fun getBookable(@PathVariable("id") bookableId: Int): Bookable {
+        if (bookableId == 1) {
             return theBookable
         }
 

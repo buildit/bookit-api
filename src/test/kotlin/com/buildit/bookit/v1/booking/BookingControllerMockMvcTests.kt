@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.math.BigDecimal
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 /*
  data class BookingRequest(
@@ -48,14 +48,28 @@ class BookingControllerMockMvcTests @Autowired constructor(
         result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase("The Booking")))
     }
 
+
+    /**
+     * Fail to get a booking
+     */
+    @Test
+    fun getNonexistentBookingTest() {
+        // arrange
+        // act
+        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/booking/999"))
+
+        // assert
+        result.andExpect(MockMvcResultMatchers.status().isNotFound)
+    }
+
     /**
      * Create a booking
      */
     @Test
     fun createBookingTest() {
         // arrange
-        val startDateTime = ZonedDateTime.parse("2017-09-26T09:00:00.000-04:00")
-        val endDateTime = ZonedDateTime.parse("2017-09-26T10:00:00.000-04:00")
+        val startDateTime = LocalDateTime.parse("2017-09-26T09:00:00")
+        val endDateTime = LocalDateTime.parse("2017-09-26T10:00:00")
         val request = BookingRequest(1, "New Meeting", startDateTime, endDateTime)
 
         // act
@@ -63,10 +77,9 @@ class BookingControllerMockMvcTests @Autowired constructor(
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(request)))
 
+        println(MockMvcResultMatchers.content())
         // assert
         result.andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.CREATED.value()))
         result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase("New Meeting")))
-        result.andExpect(MockMvcResultMatchers.jsonPath<BigDecimal>("$.startDateTime", Matchers.equalTo(BigDecimal("1506430800.000000000"))))
-        result.andExpect(MockMvcResultMatchers.jsonPath<BigDecimal>("$.endDateTime", Matchers.equalTo(BigDecimal("1506434400.000000000"))))
     }
 }

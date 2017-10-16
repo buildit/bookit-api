@@ -9,25 +9,22 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestBody
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 /**
  * Endpoint to manage bookings
  */
 @RestController
 @RequestMapping("/v1/booking")
-class BookingController
-{
-    val theBooking = Booking(2, 1, "The Booking", ZonedDateTime.now(), ZonedDateTime.now())
+class BookingController {
+    val theBooking = Booking(1, 1000, "The Booking", LocalDateTime.now(), LocalDateTime.now())
 
     /**
      * Get a booking
      */
     @GetMapping(value = "/{id}")
-    fun getBookable(@PathVariable("id") bookableId: Int): ResponseEntity<Booking>
-    {
-        if (bookableId == 1)
-        {
+    fun getBooking(@PathVariable("id") bookingId: Int): ResponseEntity<Booking> {
+        if (bookingId == 1) {
             return ResponseEntity.ok(theBooking)
         }
 
@@ -38,10 +35,12 @@ class BookingController
      * Create a booking
      */
     @PostMapping()
-    fun createBooking(@RequestBody bookingRequest: BookingRequest): ResponseEntity<Booking>
-    {
+    fun createBooking(@RequestBody bookingRequest: BookingRequest): ResponseEntity<Booking> {
+        println(bookingRequest)
+
+        val bookingId = 1 + (Math.random() * 999999).toInt()
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(Booking(1, 1, bookingRequest.subject, bookingRequest.startDateTime, bookingRequest.endDateTime))
+            .body(Booking(bookingId, bookingRequest.bookableId, bookingRequest.subject, bookingRequest.startDateTime, bookingRequest.endDateTime))
     }
 }
