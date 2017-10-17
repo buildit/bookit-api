@@ -24,6 +24,7 @@ class PingController {
      * Gets ping information
      */
     @GetMapping("error")
+    @Suppress("TooGenericExceptionThrown")
     fun error(): Ping {
         logger.error("PING ERROR")
         throw RuntimeException("PING EXCEPTION")
