@@ -102,7 +102,12 @@ afterEvaluate {
         executionData junitPlatformTest
         sourceSets sourceSets.main
         sourceDirectories = files(project.sourceSets.main.allSource.srcDirs)
-        classDirectories = files(project.sourceSets.main.output)
+        classDirectories = files(files(project.sourceSets.main.output).collect {
+            fileTree(dir: it, exclude: [
+                '**/dto',
+                'com/buildit/bookit/*'
+            ])
+        })
         reports {
             xml.enabled = true
             html.enabled = true
@@ -113,7 +118,12 @@ afterEvaluate {
         executionData junitPlatformTest
         sourceSets sourceSets.main
         sourceDirectories = files(project.sourceSets.main.allSource.srcDirs)
-        classDirectories = files(project.sourceSets.main.output)
+        classDirectories = files(files(project.sourceSets.main.output).collect {
+            fileTree(dir: it, exclude: [
+                '**/dto',
+                'com/buildit/bookit/*'
+            ])
+        })
         violationRules {
             rule {
                 limit {
@@ -126,7 +136,7 @@ afterEvaluate {
     test.dependsOn junit5CodeCoverageReport
     // can't really enforce this until we have a way to ignore data classes and the things they generate
     // https://github.com/jacoco/jacoco/issues/552
-    // check.dependsOn junit5CodeCoverageVerification
+    check.dependsOn junit5CodeCoverageVerification
 }
 
 

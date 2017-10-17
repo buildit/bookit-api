@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.booking
 
+import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test

@@ -1,6 +1,8 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.v1.bookable.BookableNotFound
+import com.buildit.bookit.v1.bookable.dto.BookableNotFound
+import com.buildit.bookit.v1.booking.dto.Booking
+import com.buildit.bookit.v1.booking.dto.BookingRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping

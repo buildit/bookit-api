@@ -1,4 +1,4 @@
-package com.buildit.bookit.v1.location
+package com.buildit.bookit.v1.location.dto
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus

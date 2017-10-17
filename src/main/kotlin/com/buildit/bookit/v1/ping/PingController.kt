@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.ping
 
+import com.buildit.bookit.v1.ping.dto.Ping
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -30,8 +31,4 @@ class PingController {
         throw RuntimeException("PING EXCEPTION")
     }
 
-    /**
-     * Ping response
-     */
-    data class Ping(val status: String = "UP")
 }
