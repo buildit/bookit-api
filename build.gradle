@@ -104,8 +104,7 @@ afterEvaluate {
         sourceDirectories = files(project.sourceSets.main.allSource.srcDirs)
         classDirectories = files(files(project.sourceSets.main.output).collect {
             fileTree(dir: it, exclude: [
-                '**/dto',
-                'com/buildit/bookit/*'
+                '**/dto'
             ])
         })
         reports {
@@ -120,14 +119,13 @@ afterEvaluate {
         sourceDirectories = files(project.sourceSets.main.allSource.srcDirs)
         classDirectories = files(files(project.sourceSets.main.output).collect {
             fileTree(dir: it, exclude: [
-                '**/dto',
-                'com/buildit/bookit/*'
+                '**/dto'
             ])
         })
         violationRules {
             rule {
                 limit {
-                    minimum = 0.75
+                    minimum = 0.60
                 }
             }
         }
