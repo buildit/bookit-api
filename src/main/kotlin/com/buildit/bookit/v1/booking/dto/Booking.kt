@@ -1,4 +1,4 @@
-package com.buildit.bookit.v1.booking
+package com.buildit.bookit.v1.booking.dto
 
 import java.time.LocalDateTime
 
