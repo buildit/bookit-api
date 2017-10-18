@@ -22,7 +22,7 @@ object BookableControllerTests : Spek({
             }
         }
 
-        describe("get unknown location") {
+        describe("get unknown bookable") {
             on("GET") {
                 it("should throw an exception") {
                     assertThat({ BookableController().getBookable(2) }, throws<BookableNotFound>())
