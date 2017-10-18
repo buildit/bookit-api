@@ -19,6 +19,7 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping("/v1/booking")
 class BookingController {
+    @Suppress("MagicNumber")
     val theBooking = Booking(1, 1000, "The Booking", LocalDateTime.now(), LocalDateTime.now())
 
     /**
@@ -26,7 +27,7 @@ class BookingController {
      */
     @GetMapping(value = "/{id}")
     fun getBooking(@PathVariable("id") bookingId: Int): ResponseEntity<Booking> {
-        if (bookingId == 1) {
+        if (bookingId == theBooking.bookingId) {
             return ResponseEntity.ok(theBooking)
         }
 
@@ -38,11 +39,18 @@ class BookingController {
      */
     @PostMapping()
     fun createBooking(@RequestBody bookingRequest: BookingRequest): ResponseEntity<Booking> {
-        println(bookingRequest)
-
+        @Suppress("MagicNumber")
         val bookingId = 1 + (Math.random() * 999999).toInt()
+
+        val booking = Booking(
+            bookingId,
+            bookingRequest.bookableId,
+            bookingRequest.subject,
+            bookingRequest.startDateTime,
+            bookingRequest.endDateTime)
+
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(Booking(bookingId, bookingRequest.bookableId, bookingRequest.subject, bookingRequest.startDateTime, bookingRequest.endDateTime))
+            .body(booking)
     }
 }

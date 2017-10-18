@@ -20,7 +20,7 @@ class BookableController {
      */
     @GetMapping(value = "/{id}")
     fun getBookable(@PathVariable("id") bookableId: Int): Bookable {
-        if (bookableId == 1) {
+        if (bookableId == theBookable.bookableId) {
             return theBookable
         }
 

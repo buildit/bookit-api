@@ -8,6 +8,7 @@ buildscript {
         hamkrest_version = '1.4.2.0'
         springfox_version = '2.7.0'
         jackson_version = '2.9.0'
+        derby_version = '10.13.1.1'
     }
     repositories {
         mavenCentral()
@@ -141,16 +142,25 @@ afterEvaluate {
 dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
     compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
+
+    //spring boot
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-actuator-docs')
     compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+
     // for kotlin data classes
     compile("com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jackson_version")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version")
+
+    // swagger
     compile("io.springfox:springfox-swagger2:$springfox_version")
     compile("io.springfox:springfox-bean-validators:$springfox_version")
     compile("io.springfox:springfox-swagger-ui:$springfox_version")
+
+    //derby
+    compile("org.apache.derby:derby:$derby_version")
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
 

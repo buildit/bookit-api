@@ -22,7 +22,7 @@ class LocationController {
      */
     @GetMapping(value = "/{id}")
     fun getLocation(@PathVariable("id") locationId: Int): Location {
-        if (locationId == 1) {
+        if (locationId == theLocation.locationId) {
             return theLocation
         }
 

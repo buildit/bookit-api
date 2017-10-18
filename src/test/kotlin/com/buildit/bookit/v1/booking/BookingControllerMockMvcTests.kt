@@ -13,7 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import java.math.BigDecimal
 import java.time.LocalDateTime
 
 /*
@@ -33,8 +32,7 @@ import java.time.LocalDateTime
 class BookingControllerMockMvcTests @Autowired constructor(
     private val mockMvc: MockMvc,
     private val mapper: ObjectMapper
-)
-{
+) {
     /**
      * Get a booking
      */
@@ -49,7 +47,6 @@ class BookingControllerMockMvcTests @Autowired constructor(
         result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase("The Booking")))
     }
 
-
     /**
      * Fail to get a booking
      */
@@ -61,6 +58,19 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         // assert
         result.andExpect(MockMvcResultMatchers.status().isNotFound)
+    }
+
+    /**
+     * Fail to get a booking
+     */
+    @Test
+    fun getMalformedURITest() {
+        // arrange
+        // act
+        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/booking/notanumber"))
+
+        // assert
+        result.andExpect(MockMvcResultMatchers.status().is4xxClientError)
     }
 
     /**
