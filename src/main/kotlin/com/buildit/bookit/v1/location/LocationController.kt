@@ -14,18 +14,15 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/v1/location")
-class LocationController
-{
+class LocationController {
     val theLocation = Location(1, "The best location ever")
 
     /**
      * Get information about a location
      */
     @GetMapping(value = "/{id}")
-    fun getLocation(@PathVariable("id") locationId: Int): Location
-    {
-        if (locationId == 1)
-        {
+    fun getLocation(@PathVariable("id") locationId: Int): Location {
+        if (locationId == theLocation.locationId) {
             return theLocation
         }
 

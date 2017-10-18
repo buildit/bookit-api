@@ -18,8 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @WebMvcTest(PingController::class)
 class PingControllerMockMvcTests @Autowired constructor(
     private val mockMvc: MockMvc
-)
-{
+) {
 
     /**
      * ensure ping serialization works

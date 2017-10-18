@@ -17,13 +17,39 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 @WebMvcTest(LocationController::class)
 class LocationControllerMockMvcTests @Autowired constructor(
     private val mockMvc: MockMvc
-)
-{
+) {
+    /**
+     * Fail to get a location
+     */
+    @Test
+    fun getValidLocationURITest() {
+        // arrange
+        // act
+        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/1"))
+
+        // assert
+        result.andExpect(MockMvcResultMatchers.status().isOk)
+        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.locationName", Matchers.equalToIgnoringCase("The best location ever")))
+    }
+
+    /**
+     * Fail to get a location
+     */
+    @Test
+    fun getMalformedURITest() {
+        // arrange
+        // act
+        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/notanumber"))
+
+        // assert
+        result.andExpect(MockMvcResultMatchers.status().is4xxClientError)
+    }
+
     /**
      * Get location has a name
      */
     @Test
-    fun location() {
+    fun getValidLocationTest() {
         // arrange
         // act
         val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/1"))
