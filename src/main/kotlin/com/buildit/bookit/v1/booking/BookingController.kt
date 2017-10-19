@@ -21,7 +21,6 @@ import java.time.LocalDateTime
 class BookingController {
     val eastern = "america/new_york"
 
-    @Suppress("MagicNumber")
     val theBooking = Booking(1, 1000, "The Booking", eastern, LocalDateTime.now(), LocalDateTime.now())
 
     /**
@@ -41,7 +40,6 @@ class BookingController {
      */
     @PostMapping()
     fun createBooking(@RequestBody bookingRequest: BookingRequest): ResponseEntity<Booking> {
-        @Suppress("MagicNumber")
         val bookingId = 1 + (Math.random() * 999999).toInt()
 
         val booking = Booking(
