@@ -26,14 +26,12 @@ object BookingControllerTests : Spek({
         describe("create a booking") {
             on("POST") {
                 it("should create a booking") {
-                    @Suppress("MagicNumber")
-                    val request = BookingRequest(998, "MyRequest", LocalDateTime.now(), LocalDateTime.now())
+                    val request = BookingRequest(999999, "MyRequest", LocalDateTime.now(), LocalDateTime.now())
                     val response = BookingController().createBooking(request)
                     val booking = response.body
 
                     expect(booking.subject).to.be.equal("MyRequest")
-                    @Suppress("MagicNumber")
-                    expect(booking.bookableId).to.be.equal(998)
+                    expect(booking.bookableId).to.be.equal(999999)
                     expect(booking.bookingId).to.be.above(0)
                 }
             }
