@@ -2,6 +2,7 @@
 package com.buildit.bookit
 
 import com.buildit.bookit.database.BookItDBConnectionProvider
+import org.jboss.logging.Logger
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
@@ -13,14 +14,24 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import java.sql.Connection
-import java.sql.DriverManager
 
 /**
  * Main class (needed for spring boot integration)
  */
 @SpringBootApplication
-class BookitApplication
+class BookitApplication {
+    companion object {
+        val logger = Logger.getLogger(BookitApplication::class.java.simpleName)
+
+        fun initializeDriver(): Unit {
+            val driverName = "org.apache.derby.jdbc.EmbeddedDriver"
+            Class.forName(driverName).newInstance()
+            logger.info("Initialized driver: $driverName")
+        }
+
+    }
+}
+
 
 /**
  * Swagger configuration
@@ -63,9 +74,6 @@ class WebMvcConfiguration {
 }
 
 
-fun initializeDriver(): Unit {
-    Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance()
-}
 
 /**
  * Main entry point of the application
@@ -73,7 +81,10 @@ fun initializeDriver(): Unit {
  */
 @Suppress("SpreadOperator")
 fun main(args: Array<String>) {
-    initializeDriver()
+    BookitApplication.initializeDriver()
+    BookItDBConnectionProvider.dropSchema()
     BookItDBConnectionProvider.initializeSchema()
+    BookItDBConnectionProvider.initializeTables()
+
     SpringApplication.run(BookitApplication::class.java, *args)
 }

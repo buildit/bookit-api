@@ -15,7 +15,13 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/v1/location")
 class LocationController {
-    val theLocation = Location(1, "The best location ever")
+    val theLocation = Location(1, "The best location ever", "Y")
+
+
+    @GetMapping
+    fun getLocations(): Collection<Any> {
+        return LocationRepository().getLocations()
+    }
 
     /**
      * Get information about a location
