@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.location
 
+import com.buildit.bookit.database.BookItDBConnectionProvider
 import com.buildit.bookit.v1.location.dto.Location
 import com.buildit.bookit.v1.location.dto.LocationNotFound
 import org.springframework.web.bind.annotation.GetMapping
@@ -14,13 +15,12 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/v1/location")
-class LocationController {
+class LocationController(private val locationRepo: LocationRepository = LocationStorageRepository(BookItDBConnectionProvider)) {
     val theLocation = Location(1, "The best location ever", "Y")
-
 
     @GetMapping
     fun getLocations(): Collection<Any> {
-        return LocationRepository().getLocations()
+        return locationRepo.getLocations()
     }
 
     /**

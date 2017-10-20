@@ -150,7 +150,7 @@ complexity:
   LongMethod:
     threshold: 20
   LongParameterList:
-    threshold: 5
+    threshold: 8
   LargeClass:
     threshold: 150
   ComplexMethod:

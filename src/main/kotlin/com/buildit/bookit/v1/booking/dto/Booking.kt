@@ -16,4 +16,4 @@ data class Booking (
     val bookableId: Int,
     val subject: String,
     val startDateTime: LocalDateTime,
-    val endDateTime: LocalDateTime): DataRecord()
+    val endDateTime: LocalDateTime) : DataRecord()

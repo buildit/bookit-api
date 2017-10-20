@@ -13,20 +13,21 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.util.*
+import java.util.LinkedList
 import java.util.logging.Level
 import java.util.logging.Logger
 
 abstract class DataRecord
 
-object BookItDBConnectionProvider {
+interface ConnectionProvider {
+    fun <T> fetch(sql: String, mapRecord: (ResultSet) -> T): Collection<T> where T: DataRecord
+    fun insert(sql: String, applyParameters: (PreparedStatement) -> Unit)
+}
+
+object BookItDBConnectionProvider : ConnectionProvider {
     private val logger = Logger.getLogger(BookItDBConnectionProvider::class.java.simpleName)
 
-    fun execute(sql: String) {
-        withConnection { conn -> execute(conn, sql) }
-    }
-
-    fun <T> fetch(sql: String, mapRecord: (ResultSet) -> T): Collection<T> where T: DataRecord {
+    override fun <T> fetch(sql: String, mapRecord: (ResultSet) -> T): Collection<T> where T: DataRecord {
         val records = LinkedList<T>()
         withConnection { conn ->
             val resultSet = executeQuery(conn, sql)
@@ -40,14 +41,14 @@ object BookItDBConnectionProvider {
         return records
     }
 
-    fun insert(sql: String, applyParameters: (PreparedStatement) -> Unit) {
+    override fun insert(sql: String, applyParameters: (PreparedStatement) -> Unit) {
         withConnection { conn ->
+            logger.info("Running insert: '$sql'")
             val ps = conn.prepareStatement(sql)
             applyParameters(ps)
             ps.executeUpdate()
         }
     }
-
 
     fun initializeSchema() {
         withConnection { conn ->
@@ -102,6 +103,7 @@ object BookItDBConnectionProvider {
     }
 
     private fun execute(conn: Connection?, sql: String) {
+        logger.info("Running statement: '$sql'")
         conn?.prepareStatement(sql)?.execute()
     }
 

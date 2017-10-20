@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.booking
 
+import com.buildit.bookit.database.BookItDBConnectionProvider
 import com.buildit.bookit.v1.bookable.dto.BookableNotFound
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
@@ -22,11 +23,12 @@ class BookingController {
     @Suppress("MagicNumber")
     val theBooking = Booking(1, 1000, "The Booking", LocalDateTime.now(), LocalDateTime.now())
 
+    val bookingRepo = BookingRepository(BookItDBConnectionProvider)
     /**
      */
     @GetMapping
     fun getAllBookings(): ResponseEntity<Collection<Booking>> {
-        return ResponseEntity.ok(BookingRepository().getAllBookings())
+        return ResponseEntity.ok(BookingRepository(BookItDBConnectionProvider).getAllBookings())
     }
 
     /**
@@ -46,16 +48,7 @@ class BookingController {
      */
     @PostMapping()
     fun createBooking(@RequestBody bookingRequest: BookingRequest): ResponseEntity<Booking> {
-        BookingRepository().insertBooking(bookingRequest.bookableId, bookingRequest.subject, bookingRequest.startDateTime, bookingRequest.endDateTime)
-        @Suppress("MagicNumber")
-        val bookingId = 1 + (Math.random() * 999999).toInt()
-
-        val booking = Booking(
-            bookingId,
-            bookingRequest.bookableId,
-            bookingRequest.subject,
-            bookingRequest.startDateTime,
-            bookingRequest.endDateTime)
+        val booking = bookingRepo.insertBooking(bookingRequest.bookableId, bookingRequest.subject, bookingRequest.startDateTime, bookingRequest.endDateTime)
 
         return ResponseEntity
             .status(HttpStatus.CREATED)

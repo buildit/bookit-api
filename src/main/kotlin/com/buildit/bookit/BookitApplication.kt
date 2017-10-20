@@ -21,9 +21,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @SpringBootApplication
 class BookitApplication {
     companion object {
-        val logger = Logger.getLogger(BookitApplication::class.java.simpleName)
+        private val logger = Logger.getLogger(BookitApplication::class.java.simpleName)
 
-        fun initializeDriver(): Unit {
+        fun initializeDriver() {
             val driverName = "org.apache.derby.jdbc.EmbeddedDriver"
             Class.forName(driverName).newInstance()
             logger.info("Initialized driver: $driverName")
@@ -31,7 +31,6 @@ class BookitApplication {
 
     }
 }
-
 
 /**
  * Swagger configuration
@@ -49,7 +48,6 @@ class SwaggerConfiguration {
             .apis(RequestHandlerSelectors.basePackage(BookitApplication::class.java.`package`.name))
             .build()
     }
-
 }
 
 /**
@@ -70,10 +68,7 @@ class WebMvcConfiguration {
             }
         }
     }
-
 }
-
-
 
 /**
  * Main entry point of the application

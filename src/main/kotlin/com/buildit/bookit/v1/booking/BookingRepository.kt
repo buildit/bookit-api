@@ -1,44 +1,71 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.database.BookItDBConnectionProvider
+import com.buildit.bookit.database.ConnectionProvider
 import com.buildit.bookit.v1.booking.dto.Booking
+import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.concurrent.atomic.AtomicInteger
 
+val local: ZoneId = ZoneId.systemDefault()
+val utc: ZoneId = ZoneId.of("UTC") // this should be replaced with that of the bookable
 
 fun mapFromResultSet(rs: ResultSet): Booking
 {
-    return Booking(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getTimestamp(4).toLocalDateTime(), rs.getTimestamp(5).toLocalDateTime())
+    fun toLocalDateTime(ts: Timestamp) = ZonedDateTime.ofInstant(ts.toInstant(), utc).withZoneSameInstant(local).toLocalDateTime()
+
+    return Booking(
+        rs.getInt("BOOKING_ID"),
+        rs.getInt("BOOKABLE_ID"),
+        rs.getString("SUBJECT"),
+        toLocalDateTime(rs.getTimestamp("START_DATE")),
+        toLocalDateTime(rs.getTimestamp("END_DATE")))
 }
 
-class BookingRepository {
-    private val fields = "BOOKING_ID, BOOKABLE_ID, SUBJECT, START_DATE, END_DATE"
-    private val baseProjection = "SELECT $fields FROM BOOKING"
+@Suppress("MagicNumber")
+fun applyParameters(ps: PreparedStatement,
+                    bookingId: Int,
+                    bookableId: Int,
+                    subject: String,
+                    startDateTime: LocalDateTime,
+                    endDateTime: LocalDateTime) {
+    ps.setInt(1, bookingId)
+    ps.setInt(2, bookableId)
+    ps.setString(3, subject)
+    ps.setTimestamp(4, Timestamp.from(startDateTime.toInstant(utc.rules.getOffset(startDateTime))))
+    ps.setTimestamp(5, Timestamp.from(endDateTime.toInstant(utc.rules.getOffset(endDateTime))))
+}
 
-    // Not thread safe and should be fetched from a sequence
-    private var bookingId = 0
+class BookingRepository(private val provider: ConnectionProvider) {
+    private val tableName = "BOOKING"
+
+    private val fields = arrayOf("BOOKING_ID", "BOOKABLE_ID", "SUBJECT", "START_DATE", "END_DATE")
+
+    private val projection = fields.joinToString()
+
+    private val parameters = (1..fields.size).map { "?" }.joinToString()
+
+    private val baseProjection = "SELECT $projection FROM $tableName"
+    private val insertStatement = "INSERT INTO $tableName VALUES ($parameters)"
+
+    // replace this with a s
+    private var bookingId = AtomicInteger(0)
 
     fun getAllBookings(): Collection<Booking> {
-        return BookItDBConnectionProvider.fetch(baseProjection, ::mapFromResultSet)
+        return provider.fetch(baseProjection, ::mapFromResultSet)
     }
 
     fun insertBooking(bookableId: Int,
                       subject: String,
                       startDateTime: LocalDateTime,
                       endDateTime: LocalDateTime): Booking {
-        bookingId++
-        BookItDBConnectionProvider.insert("", { ps ->
-            val tz = ZoneId.systemDefault() // this should be replaced with that of the bookable
+        val booking = bookingId.incrementAndGet()
 
-            ps.setInt(1, bookingId)
-            ps.setInt(2, bookableId)
-            ps.setString(3, subject)
-            ps.setTimestamp(4, Timestamp.from(startDateTime.toInstant(tz.rules.getOffset(startDateTime))))
-            ps.setTimestamp(5, Timestamp.from(endDateTime.toInstant(tz.rules.getOffset(endDateTime))))
-        })
+        provider.insert(insertStatement, { ps -> applyParameters(ps, booking, bookableId, subject, startDateTime, endDateTime) })
 
-        return Booking(bookingId, bookableId, subject, startDateTime, endDateTime)
+        return Booking(booking, bookableId, subject, startDateTime, endDateTime)
     }
 }
