@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.booking.dto
 
+import com.buildit.bookit.database.DataRecord
 import java.time.LocalDateTime
 
 /**
@@ -10,10 +11,9 @@ data class BookingRequest(val bookableId: Int, val subject: String, val startDat
 /**
  * Booking response
  */
-data class Booking(
+data class Booking (
     val bookingId: Int,
     val bookableId: Int,
     val subject: String,
-    val timeZone: String,
     val startDateTime: LocalDateTime,
-    val endDateTime: LocalDateTime)
+    val endDateTime: LocalDateTime) : DataRecord()

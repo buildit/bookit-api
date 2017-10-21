@@ -9,5 +9,9 @@ style:
   MaxLineLength:
     active: false
 
+complexity:
+  LongParameterList:
+    threshold: 8
+
 comments:
   active: false

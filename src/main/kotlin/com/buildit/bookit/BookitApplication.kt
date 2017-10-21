@@ -1,6 +1,8 @@
 /* Licensed under Apache-2.0 */
 package com.buildit.bookit
 
+import com.buildit.bookit.database.BookItDBConnectionProvider
+import org.jboss.logging.Logger
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
@@ -17,7 +19,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  * Main class (needed for spring boot integration)
  */
 @SpringBootApplication
-class BookitApplication
+class BookitApplication {
+    companion object {
+        private val logger = Logger.getLogger(BookitApplication::class.java.simpleName)
+
+        fun initializeDriver() {
+            val driverName = "org.apache.derby.jdbc.EmbeddedDriver"
+            Class.forName(driverName).newInstance()
+            logger.info("Initialized driver: $driverName")
+        }
+
+    }
+}
 
 /**
  * Swagger configuration
@@ -35,7 +48,6 @@ class SwaggerConfiguration {
             .apis(RequestHandlerSelectors.basePackage(BookitApplication::class.java.`package`.name))
             .build()
     }
-
 }
 
 /**
@@ -56,13 +68,18 @@ class WebMvcConfiguration {
             }
         }
     }
-
 }
 
 /**
  * Main entry point of the application
+ *
  */
 @Suppress("SpreadOperator")
 fun main(args: Array<String>) {
+    BookitApplication.initializeDriver()
+    BookItDBConnectionProvider.dropSchema()
+    BookItDBConnectionProvider.initializeSchema()
+    BookItDBConnectionProvider.initializeTables()
+
     SpringApplication.run(BookitApplication::class.java, *args)
 }

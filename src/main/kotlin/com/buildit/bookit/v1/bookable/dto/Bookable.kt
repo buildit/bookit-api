@@ -2,6 +2,12 @@ package com.buildit.bookit.v1.bookable.dto
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
+import java.sql.ResultSet
+
+fun mapFromResultSet(rs: ResultSet): Any {
+    @Suppress("MagicNumber")
+    return Bookable(rs.getInt(1), rs.getInt(2), rs.getString(3))
+}
 
 /**
  * Bookable resource response
