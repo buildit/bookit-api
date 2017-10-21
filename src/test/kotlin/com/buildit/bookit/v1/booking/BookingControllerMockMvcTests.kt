@@ -79,8 +79,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
     @Test
     fun createBookingTest() {
         // arrange
-        val startDateTime = LocalDateTime.parse("2017-09-26T09:00:00")
-        val endDateTime = LocalDateTime.parse("2017-09-26T10:00:00")
+        val startDateTime = LocalDateTime.now().plusHours(1)
+        val endDateTime = startDateTime.plusHours(1)
         val request = BookingRequest(1, "New Meeting", startDateTime, endDateTime)
 
         // act
@@ -88,14 +88,41 @@ class BookingControllerMockMvcTests @Autowired constructor(
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(request)))
 
-        println(MockMvcResultMatchers.content())
         // assert
         result.andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.CREATED.value()))
         result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase("New Meeting")))
-
-//        @Suppress("MagicNumber")
-//        result.andExpect(MockMvcResultMatchers.jsonPath<JSONArray>("$.startDateTime", Matchers.equalTo(JSONArray(arrayOf(2017,9,26,9,0)))))
-//        @Suppress("MagicNumber")
-//        result.andExpect(MockMvcResultMatchers.jsonPath<JSONArray>("$.endDateTime", Matchers.equalTo(JSONArray(arrayOf(2017,9,26,10,0)))))
     }
+
+    @Test
+    fun createBookingInThePastTest() {
+        // arrange
+        val startDateTime = LocalDateTime.now().minusHours(1)
+        val endDateTime = startDateTime.plusHours(1)
+        val request = BookingRequest(1, "New Meeting", startDateTime, endDateTime)
+
+        // act
+        val result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/booking")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(request)))
+
+        // assert
+        result.andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.BAD_REQUEST.value()))
+    }
+
+    @Test
+    fun createBookingWithMisOrderedDatesTest() {
+        // arrange
+        val startDateTime = LocalDateTime.now().plusHours(1)
+        val endDateTime = startDateTime.minusHours(1)
+        val request = BookingRequest(1, "New Meeting", startDateTime, endDateTime)
+
+        // act
+        val result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/booking")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(request)))
+
+        // assert
+        result.andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.BAD_REQUEST.value()))
+    }
+
 }

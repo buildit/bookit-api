@@ -42,9 +42,11 @@ object BookingControllerTests : Spek({
     }
 
     describe("create a booking") {
-        on("POST") {
+        on("createBooking()") {
             it("should create a booking") {
-                val request = BookingRequest(999999, "MyRequest", LocalDateTime.now(), LocalDateTime.now())
+                val start = LocalDateTime.now().plusHours(1)
+                val end = start.plusHours(1)
+                val request = BookingRequest(999999, "MyRequest", start, end)
                 val response = BookingController().createBooking(request)
                 val booking = response.body
 

@@ -13,7 +13,14 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.ResponseStatus
 import java.time.LocalDateTime
+
+@ResponseStatus(value= HttpStatus.BAD_REQUEST)
+class StartDateTimeInPastException : RuntimeException("StartDateTime must be in the future")
+
+@ResponseStatus(value= HttpStatus.BAD_REQUEST)
+class EndDateTimeBeforeStartTimeException : RuntimeException("EndDateTime must be after StartDateTime")
 
 /**
  * Endpoint to manage bookings
@@ -48,6 +55,15 @@ class BookingController(private val bookingRepo: BookingRepository = BookingData
      */
     @PostMapping()
     fun createBooking(@RequestBody bookingRequest: BookingRequest): ResponseEntity<Booking> {
+        val now = LocalDateTime.now()
+        if (!bookingRequest.startDateTime.isAfter(now)) {
+            throw StartDateTimeInPastException()
+        }
+
+        if (!bookingRequest.endDateTime.isAfter(bookingRequest.startDateTime)) {
+            throw EndDateTimeBeforeStartTimeException()
+        }
+
         val booking = bookingRepo.insertBooking(bookingRequest.bookableId, bookingRequest.subject, bookingRequest.startDateTime, bookingRequest.endDateTime)
 
         return ResponseEntity
