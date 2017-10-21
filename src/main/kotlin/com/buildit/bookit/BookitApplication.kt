@@ -1,8 +1,9 @@
 /* Licensed under Apache-2.0 */
 package com.buildit.bookit
 
-import com.buildit.bookit.database.BookItDBConnectionProvider
-import org.jboss.logging.Logger
+import com.buildit.bookit.database.BookItSchema
+import com.buildit.bookit.database.DefaultDataAccess
+import com.buildit.bookit.database.DerbyConnectionProvider
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
@@ -19,18 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  * Main class (needed for spring boot integration)
  */
 @SpringBootApplication
-class BookitApplication {
-    companion object {
-        private val logger = Logger.getLogger(BookitApplication::class.java.simpleName)
-
-        fun initializeDriver() {
-            val driverName = "org.apache.derby.jdbc.EmbeddedDriver"
-            Class.forName(driverName).newInstance()
-            logger.info("Initialized driver: $driverName")
-        }
-
-    }
-}
+class BookitApplication
 
 /**
  * Swagger configuration
@@ -76,10 +66,14 @@ class WebMvcConfiguration {
  */
 @Suppress("SpreadOperator")
 fun main(args: Array<String>) {
-    BookitApplication.initializeDriver()
-    BookItDBConnectionProvider.dropSchema()
-    BookItDBConnectionProvider.initializeSchema()
-    BookItDBConnectionProvider.initializeTables()
+    val connProvider = DerbyConnectionProvider()
+    connProvider.initializeDriver()
+
+    val defaultDataAccess = DefaultDataAccess(connProvider)
+    val bookItSchema = BookItSchema(defaultDataAccess)
+    bookItSchema.dropSchema()
+    bookItSchema.initializeSchema()
+    bookItSchema.initializeTables()
 
     SpringApplication.run(BookitApplication::class.java, *args)
 }

@@ -1,6 +1,8 @@
 package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.database.ConnectionProvider
+import com.buildit.bookit.database.DataAccess
+import com.buildit.bookit.database.DefaultDataAccess
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
@@ -62,7 +64,7 @@ object BookingRepositoryTests : Spek({
     describe("get all bookings") {
         on("invoking getAllBookings()") {
             it("should get all bookings") {
-                val connProvider = mock<ConnectionProvider> {
+                val dataAccess = mock<DataAccess> {
                     val start = LocalDateTime.parse("2017-03-21T10:00:00")
                     val end = LocalDateTime.parse("2017-03-21T11:00:00")
 
@@ -71,7 +73,7 @@ object BookingRepositoryTests : Spek({
                     }.doReturn(listOf(Booking(1, 1, "My Booking", start, end)))
                 }
 
-                val bookingRepo = BookingRepository(connProvider)
+                val bookingRepo = BookingDatabaseRepository(dataAccess)
                 val bookings = bookingRepo.getAllBookings()
                 expect(bookings.size).to.be.equal(1)
 
@@ -88,7 +90,7 @@ object BookingRepositoryTests : Spek({
                 @Suppress("MagicNumber")
                 val connProvider = mock<ConnectionProvider> {}
 
-                val bookingRepo = BookingRepository(connProvider)
+                val bookingRepo = BookingDatabaseRepository(DefaultDataAccess(connProvider))
                 val booking = bookingRepo.insertBooking(1, "My Inserted", start, end)
                 expect(booking.bookingId).to.be.equal(1)
                 expect(booking.bookableId).to.be.equal(1)

@@ -1,6 +1,6 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.database.ConnectionProvider
+import com.buildit.bookit.database.DataAccess
 import com.buildit.bookit.v1.booking.dto.Booking
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -39,7 +39,12 @@ fun applyParameters(ps: PreparedStatement,
     ps.setTimestamp(5, Timestamp.from(endDateTime.toInstant(utc.rules.getOffset(endDateTime))))
 }
 
-class BookingRepository(private val provider: ConnectionProvider) {
+interface BookingRepository {
+    fun getAllBookings(): Collection<Booking>
+    fun insertBooking(bookableId: Int, subject: String, startDateTime: LocalDateTime, endDateTime: LocalDateTime): Booking
+}
+
+class BookingDatabaseRepository(private val dataAccess: DataAccess) : BookingRepository {
     private val tableName = "BOOKING"
 
     private val fields = arrayOf("BOOKING_ID", "BOOKABLE_ID", "SUBJECT", "START_DATE", "END_DATE")
@@ -54,17 +59,17 @@ class BookingRepository(private val provider: ConnectionProvider) {
     // replace this with a s
     private var bookingId = AtomicInteger(0)
 
-    fun getAllBookings(): Collection<Booking> {
-        return provider.fetch(baseProjection, ::mapFromResultSet)
+    override fun getAllBookings(): Collection<Booking> {
+        return dataAccess.fetch(baseProjection, ::mapFromResultSet)
     }
 
-    fun insertBooking(bookableId: Int,
-                      subject: String,
-                      startDateTime: LocalDateTime,
-                      endDateTime: LocalDateTime): Booking {
+    override fun insertBooking(bookableId: Int,
+                               subject: String,
+                               startDateTime: LocalDateTime,
+                               endDateTime: LocalDateTime): Booking {
         val booking = bookingId.incrementAndGet()
 
-        provider.insert(insertStatement, { ps -> applyParameters(ps, booking, bookableId, subject, startDateTime, endDateTime) })
+        dataAccess.insert(insertStatement, { ps -> applyParameters(ps, booking, bookableId, subject, startDateTime, endDateTime) })
 
         return Booking(booking, bookableId, subject, startDateTime, endDateTime)
     }

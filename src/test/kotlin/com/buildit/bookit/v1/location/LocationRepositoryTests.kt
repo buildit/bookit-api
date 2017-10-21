@@ -1,6 +1,6 @@
 package com.buildit.bookit.v1.location
 
-import com.buildit.bookit.database.ConnectionProvider
+import com.buildit.bookit.database.DataAccess
 import com.buildit.bookit.v1.location.dto.Location
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
@@ -36,11 +36,11 @@ object LocationRepositoryTests : Spek({
     describe("get all locations") {
         on("calling get locations") {
             it("should get a list of locations") {
-                val connProvider = mock<ConnectionProvider> {
+                val dataAccess = mock<DataAccess> {
                     on { fetch("SELECT LOCATION_ID, LOCATION_NAME, LOCATION_TZ FROM LOCATION", ::mapFromResultSet) }.doReturn(listOf(Location(1, "NYC", "Americas/NewYork")))
                 }
 
-                val locationRepo = LocationStorageRepository(connProvider)
+                val locationRepo = LocationStorageRepository(dataAccess)
                 val locations = locationRepo.getLocations()
                 expect(locations.size).to.be.equal(1)
             }

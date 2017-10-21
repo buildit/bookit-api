@@ -1,6 +1,6 @@
 package com.buildit.bookit.v1.location
 
-import com.buildit.bookit.database.ConnectionProvider
+import com.buildit.bookit.database.DataAccess
 import com.buildit.bookit.v1.location.dto.Location
 import java.sql.ResultSet
 
@@ -12,11 +12,11 @@ interface LocationRepository {
     fun getLocations(): Collection<Location>
 }
 
-class LocationStorageRepository(private val provider: ConnectionProvider) : LocationRepository {
+class LocationStorageRepository(private val dataAccess: DataAccess) : LocationRepository {
     private val fields = "LOCATION_ID, LOCATION_NAME, LOCATION_TZ"
     private val baseProjection = "SELECT $fields FROM LOCATION"
 
     override fun getLocations(): Collection<Location> {
-        return provider.fetch(baseProjection, ::mapFromResultSet)
+        return dataAccess.fetch(baseProjection, ::mapFromResultSet)
     }
 }
