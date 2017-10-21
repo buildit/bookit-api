@@ -21,10 +21,10 @@ import java.time.ZoneId
 object BookingRepositoryTests : Spek({
     describe("map result set") {
         on("getting a result set") {
-            it("should throw an exception") {
+            it("should map it to a booking") {
                 val default = ZoneId.systemDefault()
-                val start = LocalDateTime.parse("2017-03-21T10:00:00")
-                val end = LocalDateTime.parse("2017-03-21T11:00:00")
+                val start = LocalDateTime.parse("2017-01-21T10:00:00")
+                val end = LocalDateTime.parse("2017-01-21T11:00:00")
 
                 val mockRS = mock<ResultSet> {
                     on { getInt("BOOKING_ID") }.doReturn(1)
@@ -46,14 +46,14 @@ object BookingRepositoryTests : Spek({
     }
 
     describe("apply parameters result set") {
-        on("getting a result set") {
-            it("should throw an exception") {
-                val start = LocalDateTime.parse("2017-03-21T10:00:00")
-                val end = LocalDateTime.parse("2017-03-21T11:00:00")
+        on("mapping parameters to an prepared statement") {
+            it("should apply them to the proper position") {
+                val start = LocalDateTime.parse("2017-02-21T10:00:00")
+                val end = LocalDateTime.parse("2017-02-21T11:00:00")
 
                 val mockRS = mock<PreparedStatement> {}
 
-                applyParameters(mockRS, 1, 1, "My Meeting", start, end)
+                applyParameters(mockRS, 1, 1, "My Meeting To Insert", start, end)
 
             }
         }
@@ -66,7 +66,9 @@ object BookingRepositoryTests : Spek({
                     val start = LocalDateTime.parse("2017-03-21T10:00:00")
                     val end = LocalDateTime.parse("2017-03-21T11:00:00")
 
-                    on { fetch("SELECT BOOKING_ID, BOOKABLE_ID, SUBJECT, START_DATE, END_DATE FROM BOOKING", ::mapFromResultSet) }.doReturn(listOf(Booking(1, 1, "My Booking", start, end)))
+                    on {
+                        fetch("SELECT BOOKING_ID, BOOKABLE_ID, SUBJECT, START_DATE, END_DATE FROM BOOKING", ::mapFromResultSet)
+                    }.doReturn(listOf(Booking(1, 1, "My Booking", start, end)))
                 }
 
                 val bookingRepo = BookingRepository(connProvider)
@@ -77,24 +79,20 @@ object BookingRepositoryTests : Spek({
         }
     }
 
-    describe("get all bookings") {
+    describe("inserting a booking") {
         on("invoking insertBookings()") {
-            it("create a booking") {
-                val start = LocalDateTime.parse("2017-03-21T10:00:00")
-                val end = LocalDateTime.parse("2017-03-21T11:00:00")
+            it("should insert a booking") {
+                val start = LocalDateTime.parse("2017-04-21T10:00:00")
+                val end = LocalDateTime.parse("2017-04-21T11:00:00")
 
                 @Suppress("MagicNumber")
-                val connProvider = mock<ConnectionProvider> {
-                    on {
-                        insert("INSERT INTO BOOKING VALUES (?, ?, ?, ?, ?)", { })
-                    }
-                }
+                val connProvider = mock<ConnectionProvider> {}
 
                 val bookingRepo = BookingRepository(connProvider)
-                val booking = bookingRepo.insertBooking(1, "My Booking", start, end)
+                val booking = bookingRepo.insertBooking(1, "My Inserted", start, end)
                 expect(booking.bookingId).to.be.equal(1)
                 expect(booking.bookableId).to.be.equal(1)
-                expect(booking.subject).to.be.equal("My Booking")
+                expect(booking.subject).to.be.equal("My Inserted")
             }
         }
     }

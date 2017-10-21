@@ -44,9 +44,9 @@ object BookItDBConnectionProvider : ConnectionProvider {
     override fun insert(sql: String, applyParameters: (PreparedStatement) -> Unit) {
         withConnection { conn ->
             logger.info("Running insert: '$sql'")
-            val ps = conn.prepareStatement(sql)
-            applyParameters(ps)
-            ps.executeUpdate()
+            val preparedStatement = conn.prepareStatement(sql)
+            applyParameters(preparedStatement)
+            preparedStatement.executeUpdate()
         }
     }
 
