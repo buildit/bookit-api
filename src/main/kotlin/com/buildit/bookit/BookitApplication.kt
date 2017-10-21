@@ -3,7 +3,6 @@ package com.buildit.bookit
 
 import com.buildit.bookit.database.BookItSchema
 import com.buildit.bookit.database.DefaultDataAccess
-import com.buildit.bookit.database.DerbyConnectionProvider
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
@@ -66,7 +65,7 @@ class WebMvcConfiguration {
  */
 @Suppress("SpreadOperator")
 fun main(args: Array<String>) {
-    val connProvider = DerbyConnectionProvider()
+    val connProvider = com.buildit.bookit.configuration.Configuration.connectionProvider()
     connProvider.initializeDriver()
 
     val defaultDataAccess = DefaultDataAccess(connProvider)
