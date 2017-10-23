@@ -18,7 +18,7 @@ class DefaultConnectionProvider(val bookitProperties: BookitProperties) : Connec
     @Suppress("TooGenericExceptionCaught")
     override fun newConnection(): Connection? {
         try {
-            return DriverManager.getConnection(bookitProperties.databaseUrl)
+            return DriverManager.getConnection(bookitProperties.databaseUrl, bookitProperties.databaseUser, bookitProperties.databasePassword)
         } catch (e: Throwable) {
             logger.error("Failed to get a connection!", e)
         }
