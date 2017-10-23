@@ -2,6 +2,9 @@
 /build/
 !gradle/wrapper/gradle-wrapper.jar
 
+derbyDB
+derby.log
+
 ### STS ###
 .apt_generated
 .classpath
