@@ -1,6 +1,5 @@
 package com.buildit.bookit.v1.location
 
-import com.buildit.bookit.database.DefaultDataAccess
 import com.buildit.bookit.v1.location.dto.Location
 import com.buildit.bookit.v1.location.dto.LocationNotFound
 import org.springframework.web.bind.annotation.GetMapping

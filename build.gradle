@@ -10,6 +10,7 @@ buildscript {
         jackson_version = '2.9.0'
         derby_version = '10.13.1.1'
         mockito_kotlin_1_1 = '1.5.0'
+        mysql_version='5.1.6'
     }
     repositories {
         mavenCentral()
@@ -160,8 +161,9 @@ dependencies {
     compile("io.springfox:springfox-bean-validators:$springfox_version")
     compile("io.springfox:springfox-swagger-ui:$springfox_version")
 
-    //derby
+    //database
     compile("org.apache.derby:derby:$derby_version")
+    compile("mysql:mysql-connector-java:$mysql_version")
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
 

@@ -1,9 +1,5 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.BookitProperties
-import com.buildit.bookit.database.ConnectionProvider
-import com.buildit.bookit.database.DataAccess
-import com.buildit.bookit.database.DefaultDataAccess
 import com.buildit.bookit.v1.bookable.dto.BookableNotFound
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest

@@ -46,16 +46,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
     @Before
     fun setupMock() {
-        mockRepository = mock {
-            val startDateTime = LocalDateTime.parse("2017-09-26T09:00:00")
-            val endDateTime = LocalDateTime.parse("2017-09-26T10:00:00")
-
-            on { getAllBookings() }.doReturn(listOf(Booking(1, 2, "The Booking", startDateTime, endDateTime)))
-            on { insertBooking(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()) }.doReturn(Booking(1, 2, "New Meeting", startDateTime, endDateTime))
-        }
+        mockRepository = mock {}
     }
-
-
     /**
      * Get a booking
      */
@@ -106,6 +98,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
         val endDateTime = startDateTime.plusHours(1)
         val request = BookingRequest(1, "New Meeting", startDateTime, endDateTime)
 
+        Mockito.`when`(mockRepository.insertBooking(1, "New Meeting", startDateTime, endDateTime)).doReturn(Booking(1, 1, "New Meeting", startDateTime, endDateTime))
         // act
         val result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/booking")
             .contentType(MediaType.APPLICATION_JSON)
