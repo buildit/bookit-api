@@ -1,10 +1,13 @@
 package com.buildit.bookit.v1.location
 
+import com.nhaarman.mockito_kotlin.mock
 import org.hamcrest.Matchers
+import org.junit.Before
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -18,6 +21,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 class LocationControllerMockMvcTests @Autowired constructor(
     private val mockMvc: MockMvc
 ) {
+
+    @MockBean
+    lateinit var mockLocationRepo: LocationRepository
+
+    @Before
+    fun setupMock() {
+        mockLocationRepo = mock {}
+    }
+
     /**
      * Fail to get a location
      */

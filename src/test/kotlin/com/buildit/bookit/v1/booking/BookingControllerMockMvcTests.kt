@@ -21,17 +21,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.time.LocalDateTime
 import org.springframework.boot.test.mock.mockito.MockBean
 
-
-
-/*
- data class BookingRequest(
- val bookableId: Int,
- val subject: String,
- val startDateTime: ZonedDateTime,
- val endDateTime: ZonedDateTime
- )
-  */
-
 /**
  * Booking Contoller spring mvc integration tests
  */
@@ -140,5 +129,4 @@ class BookingControllerMockMvcTests @Autowired constructor(
         // assert
         result.andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.BAD_REQUEST.value()))
     }
-
 }

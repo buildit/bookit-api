@@ -20,7 +20,6 @@ import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
-
 /**
  * Main class (needed for spring boot integration)
  */
