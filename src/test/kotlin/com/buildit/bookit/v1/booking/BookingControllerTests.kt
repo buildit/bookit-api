@@ -1,5 +1,8 @@
 package com.buildit.bookit.v1.booking
 
+import com.buildit.bookit.BookitProperties
+import com.buildit.bookit.database.DefaultDataAccess
+import com.buildit.bookit.database.DefaultConnectionProvider
 import com.buildit.bookit.v1.bookable.dto.BookableNotFound
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
@@ -36,7 +39,7 @@ object BookingControllerTests : Spek({
     describe("get unknown booking") {
         on("invoking getBooking()") {
             it("should throw an exception") {
-                assertThat({ BookingController().getBooking(2) }, throws<BookableNotFound>())
+                assertThat({ BookingController(BookingDatabaseRepository(DefaultDataAccess(DefaultConnectionProvider(BookitProperties())))).getBooking(2) }, throws<BookableNotFound>())
             }
         }
     }
@@ -47,7 +50,7 @@ object BookingControllerTests : Spek({
                 val start = LocalDateTime.now().plusHours(1)
                 val end = start.plusHours(1)
                 val request = BookingRequest(999999, "MyRequest", start, end)
-                val response = BookingController().createBooking(request)
+                val response = BookingController(BookingDatabaseRepository(DefaultDataAccess(DefaultConnectionProvider(BookitProperties())))).createBooking(request)
                 val booking = response.body
 
                 expect(booking.subject).to.be.equal("MyRequest")

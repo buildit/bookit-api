@@ -1,10 +1,15 @@
 package com.buildit.bookit.v1.booking
 
+import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.mock
 import org.hamcrest.Matchers
+import org.junit.Before
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.HttpStatus
@@ -14,6 +19,9 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.time.LocalDateTime
+import org.springframework.boot.test.mock.mockito.MockBean
+
+
 
 /*
  data class BookingRequest(
@@ -33,6 +41,21 @@ class BookingControllerMockMvcTests @Autowired constructor(
     private val mockMvc: MockMvc,
     private val mapper: ObjectMapper
 ) {
+    @MockBean
+    lateinit var mockRepository: BookingRepository
+
+    @Before
+    fun setupMock() {
+        mockRepository = mock {
+            val startDateTime = LocalDateTime.parse("2017-09-26T09:00:00")
+            val endDateTime = LocalDateTime.parse("2017-09-26T10:00:00")
+
+            on { getAllBookings() }.doReturn(listOf(Booking(1, 2, "The Booking", startDateTime, endDateTime)))
+            on { insertBooking(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()) }.doReturn(Booking(1, 2, "New Meeting", startDateTime, endDateTime))
+        }
+    }
+
+
     /**
      * Get a booking
      */
