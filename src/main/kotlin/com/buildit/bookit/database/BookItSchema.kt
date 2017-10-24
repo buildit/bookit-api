@@ -18,7 +18,7 @@ val createLocationTable = """
         LOCATION_TZ VARCHAR(50) NOT NULL
     )
 """
-val insertNYCLocation = "INSERT INTO LOCATION(LOCATION_ID, LOCATION_NAME, LOCATION_TZ) VALUES(1, 'NYC', 'America/NewYork')"
+val insertNYCLocation = "INSERT INTO LOCATION(LOCATION_ID, LOCATION_NAME, LOCATION_TZ) VALUES(1, 'NYC', 'America/New_York')"
 val insertLondonLocation = "INSERT INTO LOCATION(LOCATION_ID, LOCATION_NAME, LOCATION_TZ) VALUES(2, 'LON', 'Europe/London')"
 
 val createBookingTable = """

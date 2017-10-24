@@ -23,7 +23,7 @@ object LocationControllerTests : Spek({
         on("GET") {
             it("should return the location") {
                 val connProvider = mock<LocationRepository> {
-                    on { getLocations() }.doReturn( listOf(Location(1, "NYC", "Americas/NewYork")))
+                    on { getLocations() }.doReturn( listOf(Location(1, "NYC", "Americas/New_York")))
                 }
 
                 val locationController = LocationController(connProvider)

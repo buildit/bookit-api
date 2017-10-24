@@ -37,7 +37,7 @@ object LocationRepositoryTests : Spek({
         on("calling get locations") {
             it("should get a list of locations") {
                 val dataAccess = mock<DataAccess> {
-                    on { fetch("SELECT LOCATION_ID, LOCATION_NAME, LOCATION_TZ FROM LOCATION", ::mapFromResultSet) }.doReturn(listOf(Location(1, "NYC", "Americas/NewYork")))
+                    on { fetch("SELECT LOCATION_ID, LOCATION_NAME, LOCATION_TZ FROM LOCATION", ::mapFromResultSet) }.doReturn(listOf(Location(1, "NYC", "Americas/New_York")))
                 }
 
                 val locationRepo = LocationStorageRepository(dataAccess)

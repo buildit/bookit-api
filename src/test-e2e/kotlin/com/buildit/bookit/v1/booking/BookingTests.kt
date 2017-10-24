@@ -54,15 +54,15 @@ object BookingTests : Spek(
 
         on("POSTing with a date in the past")
         {
-            val tomorrow = LocalDate.now().minusDays(1)
-            val tomorrowISO = "${tomorrow.year}-${tomorrow.monthValue}-${tomorrow.dayOfMonth}"
+            val yesterday = LocalDate.now().minusDays(1)
+            val yesterdayISO = "${yesterday.year}-${yesterday.monthValue}-${yesterday.dayOfMonth}"
             val badRequest =
                 """
                 {
                     "bookableId": 1,
                     "subject": "My meeting in the past",
-                    "startDateTime": "${tomorrowISO}T09:00:00",
-                    "endDateTime": "${tomorrowISO}T10:00:00.000"
+                    "startDateTime": "${yesterdayISO}T09:00:00",
+                    "endDateTime": "${yesterdayISO}T10:00:00.000"
                 }
                 """
 
