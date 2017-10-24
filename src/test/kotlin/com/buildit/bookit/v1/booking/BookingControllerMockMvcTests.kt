@@ -1,10 +1,15 @@
 package com.buildit.bookit.v1.booking
 
+import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.mock
 import org.hamcrest.Matchers
+import org.junit.Before
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.HttpStatus
@@ -14,15 +19,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.time.LocalDateTime
-
-/*
- data class BookingRequest(
- val bookableId: Int,
- val subject: String,
- val startDateTime: ZonedDateTime,
- val endDateTime: ZonedDateTime
- )
-  */
+import org.springframework.boot.test.mock.mockito.MockBean
 
 /**
  * Booking Contoller spring mvc integration tests
@@ -33,6 +30,13 @@ class BookingControllerMockMvcTests @Autowired constructor(
     private val mockMvc: MockMvc,
     private val mapper: ObjectMapper
 ) {
+    @MockBean
+    lateinit var mockRepository: BookingRepository
+
+    @Before
+    fun setupMock() {
+        mockRepository = mock {}
+    }
     /**
      * Get a booking
      */
@@ -83,6 +87,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
         val endDateTime = startDateTime.plusHours(1)
         val request = BookingRequest(1, "New Meeting", startDateTime, endDateTime)
 
+        Mockito.`when`(mockRepository.insertBooking(1, "New Meeting", startDateTime, endDateTime)).doReturn(Booking(1, 1, "New Meeting", startDateTime, endDateTime))
         // act
         val result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/booking")
             .contentType(MediaType.APPLICATION_JSON)
@@ -124,5 +129,4 @@ class BookingControllerMockMvcTests @Autowired constructor(
         // assert
         result.andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.BAD_REQUEST.value()))
     }
-
 }

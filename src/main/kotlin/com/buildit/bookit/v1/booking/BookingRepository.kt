@@ -2,6 +2,7 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.database.DataAccess
 import com.buildit.bookit.v1.booking.dto.Booking
+import org.springframework.stereotype.Repository
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Timestamp
@@ -44,6 +45,7 @@ interface BookingRepository {
     fun insertBooking(bookableId: Int, subject: String, startDateTime: LocalDateTime, endDateTime: LocalDateTime): Booking
 }
 
+@Repository
 class BookingDatabaseRepository(private val dataAccess: DataAccess) : BookingRepository {
     private val tableName = "BOOKING"
 

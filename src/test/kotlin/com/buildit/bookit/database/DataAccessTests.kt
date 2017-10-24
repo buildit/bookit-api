@@ -18,8 +18,8 @@ object DataAccessTests : Spek({
 //    describe("get a derby connection") {
 //        on("newConnection()") {
 //            it("should throw provide a connection") {
-//                DerbyConnectionProvider().initializeDriver()
-//                val conn = DerbyConnectionProvider().newConnection()
+//                DefaultConnectionProvider().initializeDriver()
+//                val conn = DefaultConnectionProvider().newConnection()
 //                expect(conn).to.be.not.`null`
 //            }
 //        }

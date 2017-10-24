@@ -13,6 +13,12 @@ style:
   ExpressionBodySyntax:
     active: false
     autoCorrect: false
+  PackageDeclarationStyle:
+    active: false
+
+potential-bugs:
+  LateinitUsage:
+    active: false
 
 complexity:
   LongParameterList:

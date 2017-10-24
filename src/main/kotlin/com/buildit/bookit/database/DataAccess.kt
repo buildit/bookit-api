@@ -1,6 +1,7 @@
 package com.buildit.bookit.database
 
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -17,6 +18,7 @@ interface DataAccess {
     fun execute(statements: Array<String>): Boolean?
 }
 
+@Component
 class DefaultDataAccess(private val connProvider: ConnectionProvider) : DataAccess {
 
     override fun <T> fetch(sql: String, mapRecord: (ResultSet) -> T): Collection<T> where T: DataRecord {

@@ -1,7 +1,5 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.configuration.Configuration
-import com.buildit.bookit.database.DefaultDataAccess
 import com.buildit.bookit.v1.bookable.dto.BookableNotFound
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
@@ -27,7 +25,7 @@ class EndDateTimeBeforeStartTimeException : RuntimeException("EndDateTime must b
  */
 @RestController
 @RequestMapping("/v1/booking")
-class BookingController(private val bookingRepo: BookingRepository = BookingDatabaseRepository(DefaultDataAccess(Configuration.connectionProvider()))) {
+class BookingController(private val bookingRepo: BookingRepository) {
     @Suppress("MagicNumber")
     val theBooking = Booking(1, 1000, "The Booking", LocalDateTime.now(), LocalDateTime.now())
 
