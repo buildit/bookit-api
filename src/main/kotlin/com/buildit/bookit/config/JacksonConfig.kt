@@ -1,4 +1,4 @@
-package com.buildit.bookit.v1.config
+package com.buildit.bookit.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
