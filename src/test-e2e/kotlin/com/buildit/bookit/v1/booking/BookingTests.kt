@@ -46,7 +46,7 @@ object BookingTests : Spek(
             it("should return a created meeting")
             {
                 val jsonResponse = JSONObject(response.body)
-                expect(jsonResponse.get("bookingId") as Int).to.be.above(0)
+                expect(jsonResponse.getInt("bookingId")).to.be.above(0)
                 expect(jsonResponse.get("bookableId")).to.be.equal(1)
                 expect(jsonResponse.get("subject")).to.be.equal("My new meeting")
             }
