@@ -6,6 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class BookitProperties (
     var databaseUser: String = "",
     var databasePassword: String = "",
-    var databaseUrl: String = "jdbc:derby:derbyDB;create=true",
-    var databaseDriver: String = "org.apache.derby.jdbc.EmbeddedDriver"
+    var databaseUrl: String = "jdbc:h2:./bookit-db",
+    var databaseDriver: String = "org.h2.Driver"
 )

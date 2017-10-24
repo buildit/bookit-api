@@ -4,6 +4,7 @@
 
 derbyDB
 derby.log
+*.db
 
 ### STS ###
 .apt_generated
