@@ -72,7 +72,7 @@ object BookingTests : Spek(
             val entity = HttpEntity<String>(badRequest, headers)
             val response = restTemplate.postForEntity("/v1/booking", entity, String::class.java)
 
-            it("should return a created meeting")
+            it("should return fail with 400")
             {
                 val jsonResponse = JSONObject(response.body)
 
@@ -102,13 +102,41 @@ object BookingTests : Spek(
             val entity = HttpEntity<String>(badRequest, headers)
             val response = restTemplate.postForEntity("/v1/booking", entity, String::class.java)
 
-            it("should return a created meeting")
+            it("should fail with 400")
             {
                 val jsonResponse = JSONObject(response.body)
 
                 expect(response.statusCode).to.be.equal(HttpStatus.BAD_REQUEST)
                 expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.EndDateTimeBeforeStartTimeException")
                 expect(jsonResponse.get("message")).to.be.equal("EndDateTime must be after StartDateTime")
+            }
+        }
+
+        on("POSTing with a bad formatted date")
+        {
+            val badRequest =
+                """
+                {
+                    "bookableId": 1,
+                    "subject": "My meeting in the past",
+                    "startDateTime": "foo",
+                    "endDateTime": "bar"
+                }
+                """
+
+            val headers = HttpHeaders()
+            headers.contentType = MediaType.APPLICATION_JSON
+
+            val entity = HttpEntity<String>(badRequest, headers)
+            val response = restTemplate.postForEntity("/v1/booking", entity, String::class.java)
+
+            it("should fail with 400")
+            {
+                val jsonResponse = JSONObject(response.body)
+
+                expect(response.statusCode).to.be.equal(HttpStatus.BAD_REQUEST)
+                expect(jsonResponse.getString("exception")).to.be.equal("org.springframework.http.converter.HttpMessageNotReadableException")
+                expect(jsonResponse.getString("message")).to.contain("Can not deserialize value of type java.time.LocalDateTime from String \"foo\"")
             }
         }
     }
