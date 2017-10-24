@@ -18,9 +18,7 @@ class LocationController(private val locationRepo: LocationRepository) {
     val theLocation = Location(1, "The best location ever", "Y")
 
     @GetMapping
-    fun getLocations(): Collection<Any> {
-        return locationRepo.getLocations()
-    }
+    fun getLocations(): Collection<Any> = locationRepo.getLocations()
 
     /**
      * Get information about a location

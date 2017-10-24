@@ -32,9 +32,7 @@ class BookingController(private val bookingRepo: BookingRepository) {
     /**
      */
     @GetMapping
-    fun getAllBookings(): ResponseEntity<Collection<Booking>> {
-        return ResponseEntity.ok(bookingRepo.getAllBookings())
-    }
+    fun getAllBookings(): ResponseEntity<Collection<Booking>> = ResponseEntity.ok(bookingRepo.getAllBookings())
 
     /**
      * Get a booking

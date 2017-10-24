@@ -61,9 +61,7 @@ class BookingDatabaseRepository(private val dataAccess: DataAccess) : BookingRep
     // replace this with a s
     private var bookingId = AtomicInteger(0)
 
-    override fun getAllBookings(): Collection<Booking> {
-        return dataAccess.fetch(baseProjection, ::mapFromResultSet)
-    }
+    override fun getAllBookings(): Collection<Booking> = dataAccess.fetch(baseProjection, ::mapFromResultSet)
 
     override fun insertBooking(bookableId: Int,
                                subject: String,

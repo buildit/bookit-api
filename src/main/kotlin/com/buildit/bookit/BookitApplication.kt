@@ -37,12 +37,10 @@ class SwaggerConfiguration {
      * Swagger configuration
      */
     @Bean
-    fun api(): Docket {
-        return Docket(DocumentationType.SWAGGER_2)
-            .select()
-            .apis(RequestHandlerSelectors.basePackage(BookitApplication::class.java.`package`.name))
-            .build()
-    }
+    fun api(): Docket = Docket(DocumentationType.SWAGGER_2)
+                            .select()
+                            .apis(RequestHandlerSelectors.basePackage(BookitApplication::class.java.`package`.name))
+                            .build()
 }
 
 /**
@@ -54,8 +52,7 @@ class WebMvcConfiguration {
      * CORS configuration
      */
     @Bean
-    fun corsConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurerAdapter() {
+    fun corsConfigurer(): WebMvcConfigurer = object : WebMvcConfigurerAdapter() {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry
                     .addMapping("/**")
@@ -63,7 +60,6 @@ class WebMvcConfiguration {
             }
         }
     }
-}
 
 /**
  * Main entry point of the application

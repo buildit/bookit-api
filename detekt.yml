@@ -8,17 +8,10 @@ style:
     ignoreNumbers: '0,1,2,1000,999999'
   MaxLineLength:
     active: false
-  UtilityClassWithPublicConstructor:
-    active: false
-  ExpressionBodySyntax:
-    active: false
-    autoCorrect: false
-  PackageDeclarationStyle:
-    active: false
 
 potential-bugs:
   LateinitUsage:
-    active: false
+    ignoreOnClassesPattern: "[\\w]+Tests"
 
 complexity:
   LongParameterList:

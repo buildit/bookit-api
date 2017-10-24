@@ -67,9 +67,7 @@ class DefaultDataAccess(private val connProvider: ConnectionProvider) : DataAcce
         }
     }
 
-    private fun prepareSQL(conn: Connection?, sql: String): PreparedStatement? {
-        return conn?.prepareStatement(sql)
-    }
+    private fun prepareSQL(conn: Connection?, sql: String): PreparedStatement? = conn?.prepareStatement(sql)
 
     private fun execute(conn: Connection?, sql: String): Boolean? {
         logger.info("Running statement: '$sql'")
