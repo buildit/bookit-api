@@ -10,6 +10,7 @@ The project uses:
  - web framework: SpringBoot
  - build managers: Gradle
  - testing: Spek, Jupiter
+ - database: H2 (embedded - dev & test), AWS Aurora MySql (integration/staging/prod)
 
 You will need to have a 1.8 JVM installed to run.  Gradle will take care of the 
 dependencies.
@@ -47,6 +48,22 @@ You can run the web server by running the following:
 ```$sh
 ./gradlew bootRun
 ```
+
+## Configuration Properties
+
+Following the [12 Factor App methodology](https://12factor.net) configuration is primarily driven via Environment Variables.  Spring Boot makes this quite easy via [Externalized Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html).
+
+In addition to the [common Spring Boot properties](https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html), Bookit API honors the following:
+
+| Parameter             | Description | Example |
+| :---                  | :---          | :---   |       
+| BOOKIT_DATABASE_URL    | The JDBC Connection URL | jdbc:mysql:aurora://aurora.bookit.internal/bookit  |
+| BOOKIT_DATABASE_DRIVER    | The JDBC Driver Class (can be inferred via BOOKIT_DATABASE_URL, required if using MariaDB) | org.mariadb.jdbc.Driver |
+| BOOKIT_DATABASE_USER | The username to use when logging into database | admin |
+| BOOKIT_DATABASE_PASSWORD | The password to use when logging into the database | <password> |
+
+The example values specified above are the values used in integration, staging, and production.  BOOKIT_DATABASE_PASSWORD is acquired via the appropriate AWS SSM Parameter Store value.
+
 
 ## Build information
 
