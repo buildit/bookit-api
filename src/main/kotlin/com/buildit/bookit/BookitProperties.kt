@@ -4,5 +4,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties("bookit")
 data class BookitProperties (
-    var foo: String = ""
+    var databaseUrl: String? = ""
 )
