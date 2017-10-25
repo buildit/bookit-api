@@ -1,8 +1,5 @@
 package com.buildit.bookit.v1.location
 
-import com.buildit.bookit.BookitProperties
-import com.buildit.bookit.database.DefaultDataAccess
-import com.buildit.bookit.database.DefaultConnectionProvider
 import com.buildit.bookit.v1.location.dto.Location
 import com.buildit.bookit.v1.location.dto.LocationNotFound
 import com.natpryce.hamkrest.assertion.assertThat
@@ -35,7 +32,7 @@ object LocationControllerTests : Spek({
     describe("get known location") {
         on("GET") {
             it("should return the location") {
-                val locationController = LocationController(LocationStorageRepository(DefaultDataAccess(DefaultConnectionProvider(BookitProperties()))))
+                val locationController = LocationController(mock {})
                 expect(locationController.getLocation(1).locationName).to.be.equal("The best location ever")
             }
         }
@@ -44,7 +41,7 @@ object LocationControllerTests : Spek({
     describe("fail to get an unknown location") {
         on("GET") {
             it("should throw an exception") {
-                val locationController = LocationController(LocationStorageRepository(DefaultDataAccess(DefaultConnectionProvider(BookitProperties()))))
+                val locationController = LocationController(mock {})
                 assertThat({ locationController.getLocation(2) }, throws<LocationNotFound>())
             }
         }

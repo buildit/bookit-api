@@ -3,8 +3,7 @@
 !gradle/wrapper/gradle-wrapper.jar
 
 derbyDB
-derby.log
-*.db
+data/*
 
 ### STS ###
 .apt_generated

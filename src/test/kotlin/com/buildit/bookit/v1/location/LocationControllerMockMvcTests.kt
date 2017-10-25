@@ -1,8 +1,8 @@
 package com.buildit.bookit.v1.location
 
-import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.reset
 import org.hamcrest.Matchers
-import org.junit.Before
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,9 +25,9 @@ class LocationControllerMockMvcTests @Autowired constructor(
     @MockBean
     lateinit var mockLocationRepo: LocationRepository
 
-    @Before
-    fun setupMock() {
-        mockLocationRepo = mock {}
+    @AfterEach
+    fun resetMocks() {
+        reset(mockLocationRepo)
     }
 
     /**

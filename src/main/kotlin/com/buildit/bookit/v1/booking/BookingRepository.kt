@@ -1,10 +1,9 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.database.DataAccess
 import com.buildit.bookit.v1.booking.dto.Booking
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import org.springframework.stereotype.Repository
-import java.sql.PreparedStatement
-import java.sql.ResultSet
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -14,63 +13,48 @@ import java.util.concurrent.atomic.AtomicInteger
 val local: ZoneId = ZoneId.systemDefault()
 val utc: ZoneId = ZoneId.of("UTC") // this should be replaced with that of the bookable
 
-fun mapFromResultSet(rs: ResultSet): Booking
-{
-    fun toLocalDateTime(ts: Timestamp) = ZonedDateTime.ofInstant(ts.toInstant(), utc).withZoneSameInstant(local).toLocalDateTime()
-
-    return Booking(
-        rs.getInt("BOOKING_ID"),
-        rs.getInt("BOOKABLE_ID"),
-        rs.getString("SUBJECT"),
-        toLocalDateTime(rs.getTimestamp("START_DATE")),
-        toLocalDateTime(rs.getTimestamp("END_DATE")))
-}
-
-@Suppress("MagicNumber")
-fun applyParameters(ps: PreparedStatement,
-                    bookingId: Int,
-                    bookableId: Int,
-                    subject: String,
-                    startDateTime: LocalDateTime,
-                    endDateTime: LocalDateTime) {
-    ps.setInt(1, bookingId)
-    ps.setInt(2, bookableId)
-    ps.setString(3, subject)
-    ps.setTimestamp(4, Timestamp.from(startDateTime.toInstant(utc.rules.getOffset(startDateTime))))
-    ps.setTimestamp(5, Timestamp.from(endDateTime.toInstant(utc.rules.getOffset(endDateTime))))
-}
-
 interface BookingRepository {
     fun getAllBookings(): Collection<Booking>
     fun insertBooking(bookableId: Int, subject: String, startDateTime: LocalDateTime, endDateTime: LocalDateTime): Booking
 }
 
 @Repository
-class BookingDatabaseRepository(private val dataAccess: DataAccess) : BookingRepository {
+class BookingDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : BookingRepository {
     private val tableName = "BOOKING"
 
-    private val fields = arrayOf("BOOKING_ID", "BOOKABLE_ID", "SUBJECT", "START_DATE", "END_DATE")
-
-    private val projection = fields.joinToString()
-
-    private val parameters = (1..fields.size).map { "?" }.joinToString()
-
-    private val baseProjection = "SELECT $projection FROM $tableName"
-    private val insertStatement = "INSERT INTO $tableName VALUES ($parameters)"
-
     // replace this with a s
-    private var bookingId = AtomicInteger(0)
+    private var bookingIdGenerator = AtomicInteger(0)
 
-    override fun getAllBookings(): Collection<Booking> = dataAccess.fetch(baseProjection, ::mapFromResultSet)
+    override fun getAllBookings(): Collection<Booking> = jdbcTemplate.query(
+        "SELECT BOOKING_ID, BOOKABLE_ID, SUBJECT, START_DATE, END_DATE FROM $tableName") { rs, _ ->
+        fun toLocalDateTime(ts: Timestamp) = ZonedDateTime.ofInstant(ts.toInstant(), utc).withZoneSameInstant(local).toLocalDateTime()
+
+        Booking(
+            rs.getInt("BOOKING_ID"),
+            rs.getInt("BOOKABLE_ID"),
+            rs.getString("SUBJECT"),
+            toLocalDateTime(rs.getTimestamp("START_DATE")),
+            toLocalDateTime(rs.getTimestamp("END_DATE"))
+        )
+    }
 
     override fun insertBooking(bookableId: Int,
                                subject: String,
                                startDateTime: LocalDateTime,
                                endDateTime: LocalDateTime): Booking {
-        val booking = bookingId.incrementAndGet()
+        val bookingId = bookingIdGenerator.incrementAndGet()
 
-        dataAccess.insert(insertStatement, { ps -> applyParameters(ps, booking, bookableId, subject, startDateTime, endDateTime) })
+        SimpleJdbcInsert(jdbcTemplate).withTableName(tableName).apply {
+            execute(
+                mapOf("BOOKING_ID" to bookingId,
+                    "BOOKABLE_ID" to bookableId,
+                    "SUBJECT" to subject,
+                    "START_DATE" to startDateTime,
+                    "END_DATE" to endDateTime
+                )
+            )
+        }
 
-        return Booking(booking, bookableId, subject, startDateTime, endDateTime)
+        return Booking(bookingId, bookableId, subject, startDateTime, endDateTime)
     }
 }

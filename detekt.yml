@@ -16,6 +16,8 @@ potential-bugs:
 complexity:
   LongParameterList:
     threshold: 8
+  StringLiteralDuplication:
+    active: false
 
 comments:
   active: false
