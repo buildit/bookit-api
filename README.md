@@ -60,7 +60,7 @@ In addition to the [common Spring Boot properties](https://docs.spring.io/spring
 | BOOKIT_DATABASE_URL    | The JDBC Connection URL | jdbc:mysql:aurora://aurora.bookit.internal/bookit  |
 | BOOKIT_DATABASE_DRIVER    | The JDBC Driver Class (can be inferred via BOOKIT_DATABASE_URL, required if using MariaDB) | org.mariadb.jdbc.Driver |
 | BOOKIT_DATABASE_USER | The username to use when logging into database | admin |
-| BOOKIT_DATABASE_PASSWORD | The password to use when logging into the database | <password> |
+| BOOKIT_DATABASE_PASSWORD | The password to use when logging into the database | _password_ |
 
 The example values specified above are the values used in integration, staging, and production.  BOOKIT_DATABASE_PASSWORD is acquired via the appropriate AWS SSM Parameter Store value.
 
