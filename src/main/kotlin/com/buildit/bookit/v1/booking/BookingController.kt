@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import java.time.Clock
 import java.time.LocalDateTime
+import java.time.ZoneId
 
-@ResponseStatus(value= HttpStatus.BAD_REQUEST)
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 class StartDateTimeInPastException : RuntimeException("StartDateTime must be in the future")
 
-@ResponseStatus(value= HttpStatus.BAD_REQUEST)
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 class EndDateTimeBeforeStartTimeException : RuntimeException("EndDateTime must be after StartDateTime")
 
 /**
@@ -27,9 +29,9 @@ class EndDateTimeBeforeStartTimeException : RuntimeException("EndDateTime must b
 @RestController
 @RequestMapping("/v1/booking")
 @Transactional
-class BookingController(private val bookingRepo: BookingRepository) {
+class BookingController(private val bookingRepo: BookingRepository, private val clock: Clock) {
     @Suppress("MagicNumber")
-    val theBooking = Booking(1, 1000, "The Booking", LocalDateTime.now(), LocalDateTime.now())
+    val theBooking = Booking(1, 1000, "The Booking", LocalDateTime.now(clock.withZone(ZoneId.of("America/New_York"))), LocalDateTime.now(clock.withZone(ZoneId.of("America/New_York"))).plusHours(1))
 
     /**
      */
@@ -53,7 +55,7 @@ class BookingController(private val bookingRepo: BookingRepository) {
      */
     @PostMapping()
     fun createBooking(@RequestBody bookingRequest: BookingRequest): ResponseEntity<Booking> {
-        val now = LocalDateTime.now()
+        val now = LocalDateTime.now(clock.withZone(ZoneId.of("America/New_York")))
         if (!bookingRequest.startDateTime.isAfter(now)) {
             throw StartDateTimeInPastException()
         }
@@ -62,7 +64,12 @@ class BookingController(private val bookingRepo: BookingRepository) {
             throw EndDateTimeBeforeStartTimeException()
         }
 
-        val booking = bookingRepo.insertBooking(bookingRequest.bookableId, bookingRequest.subject, bookingRequest.startDateTime, bookingRequest.endDateTime)
+        val booking = bookingRepo.insertBooking(
+            bookingRequest.bookableId,
+            bookingRequest.subject,
+            bookingRequest.startDateTime,
+            bookingRequest.endDateTime
+        )
 
         return ResponseEntity
             .status(HttpStatus.CREATED)

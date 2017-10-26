@@ -13,13 +13,17 @@ import springfox.documentation.builders.RequestHandlerSelectors
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2
+import java.time.Clock
 
 /**
  * Main class (needed for spring boot integration)
  */
 @SpringBootApplication
 @EnableConfigurationProperties(BookitProperties::class)
-class BookitApplication
+class BookitApplication {
+    @Bean
+    fun defaultClock(): Clock = Clock.systemUTC()
+}
 
 /**
  * Swagger configuration
@@ -32,9 +36,9 @@ class SwaggerConfiguration {
      */
     @Bean
     fun api(): Docket = Docket(DocumentationType.SWAGGER_2)
-                            .select()
-                            .apis(RequestHandlerSelectors.basePackage(BookitApplication::class.java.`package`.name))
-                            .build()
+        .select()
+        .apis(RequestHandlerSelectors.basePackage(BookitApplication::class.java.`package`.name))
+        .build()
 }
 
 /**
@@ -47,13 +51,13 @@ class WebMvcConfiguration {
      */
     @Bean
     fun corsConfigurer(): WebMvcConfigurer = object : WebMvcConfigurerAdapter() {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry
-                    .addMapping("/**")
-                    .allowedOrigins("*")
-            }
+        override fun addCorsMappings(registry: CorsRegistry) {
+            registry
+                .addMapping("/**")
+                .allowedOrigins("*")
         }
     }
+}
 
 /**
  * Main entry point of the application

@@ -4,14 +4,8 @@ import com.buildit.bookit.v1.booking.dto.Booking
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import org.springframework.stereotype.Repository
-import java.sql.Timestamp
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.concurrent.atomic.AtomicInteger
-
-val local: ZoneId = ZoneId.systemDefault()
-val utc: ZoneId = ZoneId.of("UTC") // this should be replaced with that of the bookable
 
 interface BookingRepository {
     fun getAllBookings(): Collection<Booking>
@@ -27,14 +21,13 @@ class BookingDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : Bookin
 
     override fun getAllBookings(): Collection<Booking> = jdbcTemplate.query(
         "SELECT BOOKING_ID, BOOKABLE_ID, SUBJECT, START_DATE, END_DATE FROM $tableName") { rs, _ ->
-        fun toLocalDateTime(ts: Timestamp) = ZonedDateTime.ofInstant(ts.toInstant(), utc).withZoneSameInstant(local).toLocalDateTime()
 
         Booking(
             rs.getInt("BOOKING_ID"),
             rs.getInt("BOOKABLE_ID"),
             rs.getString("SUBJECT"),
-            toLocalDateTime(rs.getTimestamp("START_DATE")),
-            toLocalDateTime(rs.getTimestamp("END_DATE"))
+            rs.getObject("START_DATE", LocalDateTime::class.java),
+            rs.getObject("END_DATE", LocalDateTime::class.java)
         )
     }
 

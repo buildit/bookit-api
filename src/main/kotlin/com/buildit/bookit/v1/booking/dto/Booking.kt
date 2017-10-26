@@ -10,7 +10,7 @@ data class BookingRequest(val bookableId: Int, val subject: String, val startDat
 /**
  * Booking response
  */
-data class Booking (
+data class Booking(
     val bookingId: Int,
     val bookableId: Int,
     val subject: String,

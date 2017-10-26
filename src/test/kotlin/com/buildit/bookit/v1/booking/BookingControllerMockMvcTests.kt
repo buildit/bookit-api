@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 /**
@@ -86,8 +87,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
     @Nested
     inner class CreateBooking {
-        private val startDateTime: LocalDateTime = LocalDateTime.now().plusHours(1)
-        private val endDateTime: LocalDateTime = startDateTime.plusHours(1)
+        private val startDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1)
+        private val endDateTime = startDateTime.plusHours(1)
         private val subject = "New Meeting"
 
         @BeforeEach
