@@ -1,49 +1,30 @@
 package com.buildit.bookit.v1.location
 
-import com.buildit.bookit.database.DataAccess
-import com.buildit.bookit.v1.location.dto.Location
-import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.mock
 import com.winterbe.expekt.expect
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.describe
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.dsl.on
-import java.sql.ResultSet
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
 /**
  * Booking controller unit tests
  */
-object LocationRepositoryTests : Spek({
-    describe("map result set") {
-        on("mapping a result set") {
-            it("should map to a location properly") {
-                val resultSet = mock<ResultSet> {
-                    on { getInt("LOCATION_ID") }.doReturn(1)
-                    on { getString("LOCATION_NAME") }.doReturn("The location")
-                    on { getString("LOCATION_TZ") }.doReturn("The TZ")
-                }
+@ExtendWith(SpringExtension::class)
+@JdbcTest
+class LocationRepositoryTests @Autowired constructor (
+    val jdbcTemplate: JdbcTemplate
+) {
+    @Test
+    fun getLocations() {
+        // arrange
+        val locationRepo = LocationStorageRepository(jdbcTemplate)
 
-                val location = mapFromResultSet(resultSet)
+        // act
+        val locations = locationRepo.getLocations()
 
-                expect(location.locationId).to.be.equal(1)
-                expect(location.locationName).to.be.equal("The location")
-                expect(location.timeZone).to.be.equal("The TZ")
-            }
-        }
+        // assert
+        expect(locations.size).to.be.equal(2)
     }
-
-    describe("get all locations") {
-        on("calling get locations") {
-            it("should get a list of locations") {
-                val dataAccess = mock<DataAccess> {
-                    on { fetch("SELECT LOCATION_ID, LOCATION_NAME, LOCATION_TZ FROM LOCATION", ::mapFromResultSet) }.doReturn(listOf(Location(1, "NYC", "Americas/New_York")))
-                }
-
-                val locationRepo = LocationStorageRepository(dataAccess)
-                val locations = locationRepo.getLocations()
-                expect(locations.size).to.be.equal(1)
-            }
-        }
-    }
-})
+}

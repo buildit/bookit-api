@@ -10,7 +10,9 @@ buildscript {
         jackson_version = '2.9.0'
         h2_version = '1.4.196'
         mockito_kotlin_1_1 = '1.5.0'
-        mysql_version='5.1.6'
+        mysql_version = '5.1.44'
+        mariadb_version = '2.1.2:'
+        jacoco_version = '0.7.9'
     }
     repositories {
         mavenCentral()
@@ -98,10 +100,10 @@ junitPlatform {
 afterEvaluate {
     jacoco {
         applyTo junitPlatformTest
-        toolVersion = "0.7.9"
+        toolVersion = jacoco_version
     }
 
-    task junit5CodeCoverageReport(type:JacocoReport){
+    task junit5CodeCoverageReport(type: JacocoReport){
         executionData junitPlatformTest
         sourceSets sourceSets.main
         sourceDirectories = files(project.sourceSets.main.allSource.srcDirs)
@@ -116,7 +118,7 @@ afterEvaluate {
         }
     }
 
-    task junit5CodeCoverageVerification(type:JacocoCoverageVerification){
+    task junit5CodeCoverageVerification(type: JacocoCoverageVerification){
         executionData junitPlatformTest
         sourceSets sourceSets.main
         sourceDirectories = files(project.sourceSets.main.allSource.srcDirs)
@@ -140,7 +142,6 @@ afterEvaluate {
     check.dependsOn junit5CodeCoverageVerification
 }
 
-
 dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
     compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
@@ -149,7 +150,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-actuator-docs')
     compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-jdbc')
 
     // for kotlin data classes
     compile("com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version")
@@ -164,13 +165,15 @@ dependencies {
     //database
     compile("com.h2database:h2:$h2_version")
     compile("mysql:mysql-connector-java:$mysql_version")
+    compile("org.mariadb.jdbc:mariadb-java-client:$mariadb_version")
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
 
     runtime('org.springframework.boot:spring-boot-devtools')
 
-    testCompile('junit:junit')
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'junit', module: 'junit'
+    }
     testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
     testCompile("com.winterbe:expekt:$expekt_version")
     testCompile("org.jetbrains.spek:spek-api:$spek_version")

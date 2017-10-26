@@ -5,13 +5,14 @@ import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 
 @ResponseStatus(value= HttpStatus.BAD_REQUEST)
@@ -25,6 +26,7 @@ class EndDateTimeBeforeStartTimeException : RuntimeException("EndDateTime must b
  */
 @RestController
 @RequestMapping("/v1/booking")
+@Transactional
 class BookingController(private val bookingRepo: BookingRepository) {
     @Suppress("MagicNumber")
     val theBooking = Booking(1, 1000, "The Booking", LocalDateTime.now(), LocalDateTime.now())

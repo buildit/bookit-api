@@ -1,0 +1,17 @@
+---
+
+management:
+  context-path: /management
+  security:
+    enabled: false
+springfox:
+  documentation.swagger.v2.path: /api-docs
+spring:
+  jackson:
+    serialization.write-dates-as-timestamps: false
+  datasource:
+    name: bookit
+    username: ${bookit.database.user:}
+    password: ${bookit.database.password:}
+    url: ${bookit.database.url:}
+    driver-class-name: ${bookit.database.driver:}

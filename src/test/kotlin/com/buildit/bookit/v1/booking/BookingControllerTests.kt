@@ -1,8 +1,5 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.BookitProperties
-import com.buildit.bookit.database.DefaultDataAccess
-import com.buildit.bookit.database.DefaultConnectionProvider
 import com.buildit.bookit.v1.bookable.dto.BookableNotFound
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
@@ -39,7 +36,13 @@ object BookingControllerTests : Spek({
     describe("get unknown booking") {
         on("invoking getBooking()") {
             it("should throw an exception") {
-                assertThat({ BookingController(BookingDatabaseRepository(DefaultDataAccess(DefaultConnectionProvider(BookitProperties())))).getBooking(2) }, throws<BookableNotFound>())
+                // arrange
+
+                // act
+                fun action() = BookingController(mock {}).getBooking(2)
+
+                // assert
+                assertThat({ action() }, throws<BookableNotFound>())
             }
         }
     }
@@ -47,15 +50,20 @@ object BookingControllerTests : Spek({
     describe("create a booking") {
         on("createBooking()") {
             it("should create a booking") {
+                // arrange
                 val start = LocalDateTime.now().plusHours(1)
                 val end = start.plusHours(1)
                 val request = BookingRequest(999999, "MyRequest", start, end)
-                val response = BookingController(BookingDatabaseRepository(DefaultDataAccess(DefaultConnectionProvider(BookitProperties())))).createBooking(request)
-                val booking = response.body
+                val createdBooking = Booking(1, 999999, "MyRequest", start, end)
+                val mockRepo = mock<BookingRepository> {
+                    on { insertBooking(999999, "MyRequest", start, end) }.doReturn(createdBooking)
+                }
+                // act
+                val response = BookingController(mockRepo).createBooking(request)
 
-                expect(booking.subject).to.be.equal("MyRequest")
-                expect(booking.bookableId).to.be.equal(999999)
-                expect(booking.bookingId).to.be.above(0)
+                // assert
+                val booking = response.body
+                expect(booking).to.equal(createdBooking)
             }
         }
     }
