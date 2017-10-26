@@ -34,7 +34,6 @@ class BookableControllerMockMvcTests @Autowired constructor(
         result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.name", Matchers.equalToIgnoringCase("The best bookable ever")))
     }
 
-
     /**
      * Fail on non-existent
      */

@@ -47,8 +47,11 @@ class BookableController {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         endDateTime: LocalDateTime?
     ): Collection<Bookable> {
-        if ((startDateTime != null && endDateTime == null) ||
-            (startDateTime == null && endDateTime != null)) {
+        if (startDateTime != null && endDateTime == null) {
+            throw InvalidBookableSearch()
+        }
+
+        if (startDateTime == null && endDateTime != null) {
             throw InvalidBookableSearch()
         }
 
