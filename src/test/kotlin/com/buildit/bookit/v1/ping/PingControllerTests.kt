@@ -1,8 +1,6 @@
 package com.buildit.bookit.v1.ping
 
 import com.buildit.bookit.BookitProperties
-import com.natpryce.hamkrest.assertion.assertThat
-import com.natpryce.hamkrest.throws
 import com.winterbe.expekt.expect
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
@@ -18,15 +16,6 @@ object PingControllerTests : Spek({
             it("should return UP") {
                 val pingController = PingController(BookitProperties())
                 expect(pingController.ping().status).to.be.equal("UP")
-            }
-        }
-    }
-
-    describe("/v1/ping/error") {
-        on("GET") {
-            it("should throw exception") {
-                val pingController = PingController(BookitProperties())
-                assertThat({ pingController.error() }, throws<RuntimeException>())
             }
         }
     }

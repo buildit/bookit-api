@@ -19,15 +19,4 @@ class PingController(val bookitProperties: BookitProperties) {
      */
     @GetMapping
     fun ping(): Ping = Ping(bookitProperties = bookitProperties)
-
-    /**
-     * Gets ping information
-     */
-    @GetMapping("error")
-    @Suppress("TooGenericExceptionThrown")
-    fun error(): Ping {
-        logger.error("PING ERROR")
-        throw RuntimeException("PING EXCEPTION")
-    }
-
 }
