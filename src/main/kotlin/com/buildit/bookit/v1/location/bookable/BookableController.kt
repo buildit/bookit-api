@@ -29,4 +29,12 @@ class BookableController {
 
         throw BookableNotFound()
     }
+
+    /**
+     * Get all bookables
+     */
+    @GetMapping()
+    fun getAllBookables(@PathVariable("location") location: String): Collection<Bookable> {
+        return listOf(theBookable)
+    }
 }

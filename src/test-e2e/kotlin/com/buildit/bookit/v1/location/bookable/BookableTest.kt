@@ -33,5 +33,22 @@ object BookableTest : Spek(
                     JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
                 }
             }
+            on("Get all bookables")
+            {
+                val response = restTemplate.getForEntity("/v1/location/nyc/bookable", String::class.java)
+
+                it("should return 1 bookable")
+                {
+                    val expectedResponse = """
+                        [
+                            {
+                                "name": "The best bookable ever",
+                                "location": "NYC"
+                            }
+                        ]
+                    """.trimIndent()
+                    JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
+                }
+            }
         }
     })
