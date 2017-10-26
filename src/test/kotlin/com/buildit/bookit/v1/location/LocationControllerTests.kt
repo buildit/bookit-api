@@ -20,7 +20,7 @@ object LocationControllerTests : Spek({
         on("GET") {
             it("should return the location") {
                 val connProvider = mock<LocationRepository> {
-                    on { getLocations() }.doReturn(listOf(Location(1, "NYC", "Americas/New_York")))
+                    on { getLocations() }.doReturn(listOf(Location("NYC", "Americas/New_York")))
                 }
 
                 val locationController = LocationController(connProvider)
@@ -33,7 +33,7 @@ object LocationControllerTests : Spek({
         on("GET") {
             it("should return the location") {
                 val locationController = LocationController(mock {})
-                expect(locationController.getLocation(1).name).to.be.equal("The best location ever")
+                expect(locationController.getLocation("The best location ever").name).to.be.equal("The best location ever")
             }
         }
     }
@@ -42,7 +42,7 @@ object LocationControllerTests : Spek({
         on("GET") {
             it("should throw an exception") {
                 val locationController = LocationController(mock {})
-                assertThat({ locationController.getLocation(2) }, throws<LocationNotFound>())
+                assertThat({ locationController.getLocation("foo") }, throws<LocationNotFound>())
             }
         }
     }

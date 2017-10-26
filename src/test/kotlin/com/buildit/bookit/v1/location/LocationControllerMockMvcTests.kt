@@ -37,7 +37,7 @@ class LocationControllerMockMvcTests @Autowired constructor(
     fun getValidLocationURITest() {
         // arrange
         // act
-        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/1"))
+        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/The best location ever"))
 
         // assert
         result.andExpect(MockMvcResultMatchers.status().isOk)
@@ -55,20 +55,5 @@ class LocationControllerMockMvcTests @Autowired constructor(
 
         // assert
         result.andExpect(MockMvcResultMatchers.status().is4xxClientError)
-    }
-
-    /**
-     * Get location has a name
-     */
-    @Test
-    fun getValidLocationTest() {
-        // arrange
-        // act
-        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/1"))
-
-        // assert
-        result.andExpect(MockMvcResultMatchers.status().isOk)
-        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.name",
-            Matchers.equalToIgnoringCase("The best location ever")))
     }
 }

@@ -1,4 +1,4 @@
-package com.buildit.bookit.v1.bookable
+package com.buildit.bookit.v1.location.bookable
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.hamcrest.Matchers
@@ -27,24 +27,13 @@ class BookableControllerMockMvcTests @Autowired constructor(
     fun getExistingBookableTest() {
         // arrange
         // act
-        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/bookable/1"))
+        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/nyc/bookable/The best bookable ever"))
 
         // assert
         result.andExpect(MockMvcResultMatchers.status().isOk)
-        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.bookableName", Matchers.equalToIgnoringCase("The best bookable ever")))
+        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.name", Matchers.equalToIgnoringCase("The best bookable ever")))
     }
 
-    /**
-     * Fail on malformed
-     */
-    @Test
-    fun getMalformedURL() {
-        // arrange
-        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/bookable/notanumber"))
-
-        // assert
-        result.andExpect(MockMvcResultMatchers.status().is4xxClientError)
-    }
 
     /**
      * Fail on non-existent
@@ -52,7 +41,7 @@ class BookableControllerMockMvcTests @Autowired constructor(
     @Test
     fun getNonexistentBookableTest() {
         // arrange
-        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/bookable/999"))
+        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/nyc/bookable/foo"))
 
         // assert
         result.andExpect(MockMvcResultMatchers.status().isNotFound)

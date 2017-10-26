@@ -1,4 +1,4 @@
-package com.buildit.bookit.v1.location
+package com.buildit.bookit.v1.location.bookable
 
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
@@ -10,31 +10,25 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder
 
 /**
- * Test /v1/location like a black box
+ * Test /v1/location/<location>/bookable like a black box
  */
-object LocationTests : Spek(
+object BookableTest : Spek(
     {
         val uri: String = System.getenv("ENDPOINT_URI") ?: "http://localhost:8080"
         val restTemplate = TestRestTemplate(RestTemplateBuilder().rootUri(uri).build())
-        describe("/v1/location")
+        describe("/v1/location/<location>/bookable")
         {
-            on("Get all locations")
+            on("Get 1 bookable")
             {
-                val response = restTemplate.getForEntity("/v1/location", String::class.java)
+                val response = restTemplate.getForEntity("/v1/location/nyc/bookable/The best bookable ever", String::class.java)
 
-                it("should return all locations")
+                it("should return 1 bookable")
                 {
                     val expectedResponse = """
-                        [
-                            {
-                                "name": "NYC",
-                                "timeZone": "America/New_York"
-                            },
-                            {
-                                "name": "LON",
-                                "timeZone": "Europe/London"
-                            }
-                        ]
+                        {
+                            "name": "The best bookable ever",
+                            "location": "NYC"
+                        }
                     """.trimIndent()
                     JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
                 }

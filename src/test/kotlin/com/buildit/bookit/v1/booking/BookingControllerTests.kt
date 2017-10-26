@@ -1,8 +1,8 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.v1.bookable.dto.BookableNotFound
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
+import com.buildit.bookit.v1.location.bookable.dto.BookableNotFound
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import com.nhaarman.mockito_kotlin.doReturn

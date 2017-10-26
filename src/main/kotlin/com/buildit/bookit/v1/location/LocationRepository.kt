@@ -12,7 +12,7 @@ interface LocationRepository {
 class LocationStorageRepository(private val jdbcTemplate: JdbcTemplate) : LocationRepository {
 
     override fun getLocations(): Collection<Location> = jdbcTemplate.query(
-        "SELECT LOCATION_ID, LOCATION_NAME, LOCATION_TZ FROM LOCATION") { rs, _ ->
-        Location(rs.getInt("LOCATION_ID"), rs.getString("LOCATION_NAME"), rs.getString("LOCATION_TZ"))
+        "SELECT LOCATION_NAME, LOCATION_TZ FROM LOCATION") { rs, _ ->
+        Location(rs.getString("LOCATION_NAME"), rs.getString("LOCATION_TZ"))
     }
 }

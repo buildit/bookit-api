@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/v1/location")
 @Transactional
 class LocationController(private val locationRepo: LocationRepository) {
-    val theLocation = Location(1, "The best location ever", "Y")
+    val theLocation = Location("The best location ever", "Y")
 
     @GetMapping
     fun getLocations(): Collection<Any> = locationRepo.getLocations()
@@ -25,9 +25,9 @@ class LocationController(private val locationRepo: LocationRepository) {
     /**
      * Get information about a location
      */
-    @GetMapping(value = "/{id}")
-    fun getLocation(@PathVariable("id") locationId: Int): Location {
-        if (locationId == theLocation.id) {
+    @GetMapping(value = "/{name}")
+    fun getLocation(@PathVariable("name") location: String): Location {
+        if (location == theLocation.name) {
             return theLocation
         }
 
