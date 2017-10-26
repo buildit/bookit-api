@@ -120,7 +120,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
         @Test
         fun createBookingInThePastTest() {
             // arrange
-            val startDateTime = LocalDateTime.now().minusHours(1)
+            val startDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).minusHours(1)
             val endDateTime = startDateTime.plusHours(1)
             val request = BookingRequest(1, subject, startDateTime, endDateTime)
 
@@ -136,7 +136,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
         @Test
         fun createBookingWithMisOrderedDatesTest() {
             // arrange
-            val startDateTime = LocalDateTime.now().plusHours(1)
+            val startDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1)
             val endDateTime = startDateTime.minusHours(1)
             val request = BookingRequest(1, subject, startDateTime, endDateTime)
 
