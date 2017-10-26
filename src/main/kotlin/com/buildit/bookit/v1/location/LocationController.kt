@@ -27,7 +27,7 @@ class LocationController(private val locationRepo: LocationRepository) {
      */
     @GetMapping(value = "/{id}")
     fun getLocation(@PathVariable("id") locationId: Int): Location {
-        if (locationId == theLocation.locationId) {
+        if (locationId == theLocation.id) {
             return theLocation
         }
 

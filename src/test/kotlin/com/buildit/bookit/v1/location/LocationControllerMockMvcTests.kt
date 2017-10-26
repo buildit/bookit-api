@@ -41,7 +41,7 @@ class LocationControllerMockMvcTests @Autowired constructor(
 
         // assert
         result.andExpect(MockMvcResultMatchers.status().isOk)
-        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.locationName", Matchers.equalToIgnoringCase("The best location ever")))
+        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.name", Matchers.equalToIgnoringCase("The best location ever")))
     }
 
     /**
@@ -68,7 +68,7 @@ class LocationControllerMockMvcTests @Autowired constructor(
 
         // assert
         result.andExpect(MockMvcResultMatchers.status().isOk)
-        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.locationName",
-                                                                Matchers.equalToIgnoringCase("The best location ever")))
+        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.name",
+            Matchers.equalToIgnoringCase("The best location ever")))
     }
 }

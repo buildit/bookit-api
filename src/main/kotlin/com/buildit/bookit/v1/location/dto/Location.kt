@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.ResponseStatus
 /**
  * Location response
  */
-data class Location(val locationId: Int,
-                    val locationName: String,
+data class Location(val id: Int,
+                    val name: String,
                     val timeZone: String)
 
 /**
  * 404 location not found
  */
-@ResponseStatus(value=HttpStatus.NOT_FOUND)
+@ResponseStatus(value = HttpStatus.NOT_FOUND)
 class LocationNotFound : RuntimeException("Location not found")
