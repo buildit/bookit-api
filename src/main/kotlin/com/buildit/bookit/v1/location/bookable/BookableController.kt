@@ -29,14 +29,14 @@ class InvalidBookableSearchStartDateRequired : RuntimeException("startDateTime i
 class InvalidBookableSearchEndDateRequired : RuntimeException("endDateTime is required if startDateTime is specified")
 
 @RestController
-@RequestMapping("/v1/location/{location}/bookable")
+@RequestMapping("/v1/location/{locationId}/bookable")
 @Transactional
 class BookableController(private val bookableRepository: BookableRepository, private val locationRepository: LocationRepository, val bookingRepository: BookingRepository) {
     /**
      * Get a bookable
      */
-    @GetMapping(value = "/{name}")
-    fun getBookable(@PathVariable("location") location: Int, @PathVariable("name") bookable: Int): Bookable {
+    @GetMapping(value = "/{bookableId}")
+    fun getBookable(@PathVariable("locationId") location: Int, @PathVariable("bookableId") bookable: Int): Bookable {
         locationRepository.getLocations().find { it.id == location } ?: throw LocationNotFound()
         return bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound()
     }
@@ -46,7 +46,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
      */
     @GetMapping
     fun getAllBookables(
-        @PathVariable("location") locationId: Int,
+        @PathVariable("locationId") locationId: Int,
         @RequestParam("startDateTime", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         startDateTime: LocalDateTime? = null,
