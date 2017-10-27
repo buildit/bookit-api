@@ -63,8 +63,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         if (startDateTime != null && endDateTime != null && !endDateTime.isAfter(startDateTime)) {
             throw EndDateTimeBeforeStartTimeException()
         }
-
-
+        
         return bookableRepository.getAllBookables().takeWhile { it.locationId == location }
     }
 }
