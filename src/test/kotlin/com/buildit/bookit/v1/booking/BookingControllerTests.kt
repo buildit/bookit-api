@@ -112,7 +112,7 @@ object BookingControllerTests : Spek({
                 fun action() = bookingController.createBooking(request)
 
                 // assert
-                assertThat({ action() }, throws<StartDateTimeInPastException>())
+                assertThat({ action() }, throws<StartInPastException>())
             }
         }
     }

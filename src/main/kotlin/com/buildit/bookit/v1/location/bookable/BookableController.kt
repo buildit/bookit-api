@@ -1,7 +1,7 @@
 package com.buildit.bookit.v1.location.bookable
 
 import com.buildit.bookit.v1.booking.BookingRepository
-import com.buildit.bookit.v1.booking.EndDateTimeBeforeStartTimeException
+import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.dto.LocationNotFound
@@ -23,10 +23,10 @@ import java.time.ZoneId
 class BookableNotFound : RuntimeException("Bookable not found")
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-class InvalidBookableSearchStartDateRequired : RuntimeException("startDateTime is required if endDateTime is specified")
+class InvalidBookableSearchStartDateRequired : RuntimeException("start is required if end is specified")
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-class InvalidBookableSearchEndDateRequired : RuntimeException("endDateTime is required if startDateTime is specified")
+class InvalidBookableSearchEndDateRequired : RuntimeException("end is required if start is specified")
 
 @RestController
 @RequestMapping("/v1/location/{locationId}/bookable")
@@ -47,17 +47,17 @@ class BookableController(private val bookableRepository: BookableRepository, pri
     @GetMapping
     fun getAllBookables(
         @PathVariable("locationId") locationId: Int,
-        @RequestParam("startDateTime", required = false)
+        @RequestParam("start", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         startDateTime: LocalDateTime? = null,
-        @RequestParam("endDateTime", required = false)
+        @RequestParam("end", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         endDateTime: LocalDateTime? = null
     ): Collection<Bookable> {
         val location = locationRepository.getLocations().find { it.id == locationId } ?: throw LocationNotFound()
 
         if (startDateTime != null && endDateTime != null && !endDateTime.isAfter(startDateTime)) {
-            throw EndDateTimeBeforeStartTimeException()
+            throw EndBeforeStartException()
         }
 
         val interval = Interval.of(
@@ -78,7 +78,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         }
 
         val unavailableBookables = bookingRepository.getAllBookings().takeWhile {
-            interval.overlaps(Interval.of(it.startDateTime.atZone(ZoneId.of(location.timeZone)).toInstant(), it.endDateTime.atZone(ZoneId.of(location.timeZone)).toInstant()))
+            interval.overlaps(Interval.of(it.start.atZone(ZoneId.of(location.timeZone)).toInstant(), it.end.atZone(ZoneId.of(location.timeZone)).toInstant()))
         }.distinctBy { it.bookableId }
 
         return bookableRepository.getAllBookables().takeWhile { it.locationId == locationId }.map { bookable ->

@@ -137,8 +137,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
             // assert
             result.andExpect(MockMvcResultMatchers.status().isCreated)
             result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase(subject)))
-            result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.startDateTime", Matchers.equalToIgnoringCase(startDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))))
-            result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.endDateTime", Matchers.equalToIgnoringCase(endDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))))
+            result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.start", Matchers.equalToIgnoringCase(startDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))))
+            result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.end", Matchers.equalToIgnoringCase(endDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))))
 
         }
 

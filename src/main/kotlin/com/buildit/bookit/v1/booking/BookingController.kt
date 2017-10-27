@@ -20,10 +20,10 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-class StartDateTimeInPastException : RuntimeException("StartDateTime must be in the future")
+class StartInPastException : RuntimeException("Start must be in the future")
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-class EndDateTimeBeforeStartTimeException : RuntimeException("EndDateTime must be after StartDateTime")
+class EndBeforeStartException : RuntimeException("End must be after Start")
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 class BookingNotFound : RuntimeException("Booking not found")
@@ -59,19 +59,19 @@ class BookingController(private val bookingRepository: BookingRepository, privat
         val location = locationRepoistory.getLocations().single { it.id == bookable.locationId }
 
         val now = LocalDateTime.now(clock.withZone(ZoneId.of(location.timeZone)))
-        if (!bookingRequest.startDateTime.isAfter(now)) {
-            throw StartDateTimeInPastException()
+        if (!bookingRequest.start.isAfter(now)) {
+            throw StartInPastException()
         }
 
-        if (!bookingRequest.endDateTime.isAfter(bookingRequest.startDateTime)) {
-            throw EndDateTimeBeforeStartTimeException()
+        if (!bookingRequest.end.isAfter(bookingRequest.start)) {
+            throw EndBeforeStartException()
         }
 
         val booking = bookingRepository.insertBooking(
             bookingRequest.bookableId,
             bookingRequest.subject,
-            bookingRequest.startDateTime,
-            bookingRequest.endDateTime
+            bookingRequest.start,
+            bookingRequest.end
         )
 
         return ResponseEntity

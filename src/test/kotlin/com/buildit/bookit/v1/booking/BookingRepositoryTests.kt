@@ -43,8 +43,8 @@ class BookingRepositoryTests @Autowired constructor(
         expect(booking.id).to.be.equal(1)
         expect(booking.bookableId).to.be.equal(1)
         expect(booking.subject).to.be.equal("My Inserted")
-        expect(booking.startDateTime).to.be.equal(start)
-        expect(booking.endDateTime).to.be.equal(end)
+        expect(booking.start).to.be.equal(start)
+        expect(booking.end).to.be.equal(end)
     }
 
     @Test

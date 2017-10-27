@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 /**
  * Booking request
  */
-data class BookingRequest(val bookableId: Int, val subject: String, val startDateTime: LocalDateTime, val endDateTime: LocalDateTime)
+data class BookingRequest(val bookableId: Int, val subject: String, val start: LocalDateTime, val end: LocalDateTime)
 
 /**
  * Booking response
@@ -14,6 +14,6 @@ data class Booking(
     val id: Int,
     val bookableId: Int,
     val subject: String,
-    val startDateTime: LocalDateTime,
-    val endDateTime: LocalDateTime)
+    val start: LocalDateTime,
+    val end: LocalDateTime)
 

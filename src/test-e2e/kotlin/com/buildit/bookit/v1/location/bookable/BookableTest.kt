@@ -70,30 +70,30 @@ object BookableTest : Spek(
                 val inOneHour = now.plusHours(1).toString()
                 val inTwoHours = now.plusHours(2).toString()
 
-                it("should require endDateTime if startDateTime specified")
+                it("should require end if start specified")
                 {
-                    val response = restTemplate.getForEntity("/v1/location/1/bookable?startDateTime=$inOneHour", String::class.java)
+                    val response = restTemplate.getForEntity("/v1/location/1/bookable?start=$inOneHour", String::class.java)
 
                     expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
                 }
 
-                it("should require startDateTime if endDateTime specified")
+                it("should require start if end specified")
                 {
-                    val response = restTemplate.getForEntity("/v1/location/1/bookable?endDateTime=$inTwoHours", String::class.java)
+                    val response = restTemplate.getForEntity("/v1/location/1/bookable?end=$inTwoHours", String::class.java)
 
                     expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
                 }
 
-                it("should require startDateTime before endDateTime")
+                it("should require start before end")
                 {
-                    val response = restTemplate.getForEntity("/v1/location/1/bookable?startDateTime=$inTwoHours&endDateTime=$inOneHour", String::class.java)
+                    val response = restTemplate.getForEntity("/v1/location/1/bookable?start=$inTwoHours&end=$inOneHour", String::class.java)
 
                     expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
                 }
 
                 it("should find available bookable")
                 {
-                    val response = restTemplate.getForEntity("/v1/location/1/bookable?startDateTime=$inOneHour&endDateTime=$inTwoHours", String::class.java)
+                    val response = restTemplate.getForEntity("/v1/location/1/bookable?start=$inOneHour&end=$inTwoHours", String::class.java)
 
                     val expectedResponse = """
                         [

@@ -33,8 +33,8 @@ object BookingTests : Spek(
                 {
                     "bookableId": 1,
                     "subject": "My new meeting",
-                    "startDateTime": "${tomorrowISO}T09:00:00",
-                    "endDateTime": "${tomorrowISO}T10:00:00.000"
+                    "start": "${tomorrowISO}T09:00:00",
+                    "end": "${tomorrowISO}T10:00:00.000"
                 }
                 """.trimIndent()
 
@@ -62,8 +62,8 @@ object BookingTests : Spek(
                 {
                     "bookableId": 1,
                     "subject": "My meeting in the past",
-                    "startDateTime": "${yesterdayISO}T09:00:00",
-                    "endDateTime": "${yesterdayISO}T10:00:00.000"
+                    "start": "${yesterdayISO}T09:00:00",
+                    "end": "${yesterdayISO}T10:00:00.000"
                 }
                 """.trimIndent()
 
@@ -78,8 +78,8 @@ object BookingTests : Spek(
                     val jsonResponse = JSONObject(response.body)
 
                     expect(response.statusCode).to.be.equal(HttpStatus.BAD_REQUEST)
-                    expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.StartDateTimeInPastException")
-                    expect(jsonResponse.get("message")).to.be.equal("StartDateTime must be in the future")
+                    expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.StartInPastException")
+                    expect(jsonResponse.get("message")).to.be.equal("Start must be in the future")
                 }
             }
 
@@ -92,8 +92,8 @@ object BookingTests : Spek(
                 {
                     "bookableId": 1,
                     "subject": "My meeting in the past",
-                    "startDateTime": "${tomorrowISO}T09:00:00",
-                    "endDateTime": "${tomorrowISO}T08:00:00.000"
+                    "start": "${tomorrowISO}T09:00:00",
+                    "end": "${tomorrowISO}T08:00:00.000"
                 }
                 """.trimIndent()
 
@@ -108,8 +108,8 @@ object BookingTests : Spek(
                     val jsonResponse = JSONObject(response.body)
 
                     expect(response.statusCode).to.be.equal(HttpStatus.BAD_REQUEST)
-                    expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.EndDateTimeBeforeStartTimeException")
-                    expect(jsonResponse.get("message")).to.be.equal("EndDateTime must be after StartDateTime")
+                    expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.EndBeforeStartException")
+                    expect(jsonResponse.get("message")).to.be.equal("End must be after Start")
                 }
             }
 
@@ -120,8 +120,8 @@ object BookingTests : Spek(
                 {
                     "bookableId": 1,
                     "subject": "My meeting in the past",
-                    "startDateTime": "foo",
-                    "endDateTime": "bar"
+                    "start": "foo",
+                    "end": "bar"
                 }
                 """.trimIndent()
 
