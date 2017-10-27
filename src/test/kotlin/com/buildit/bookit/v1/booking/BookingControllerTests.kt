@@ -15,6 +15,7 @@ import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import java.time.Clock
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 /**
  * Booking controller unit tests
@@ -48,7 +49,7 @@ object BookingControllerTests : Spek({
         }
 
         on("createBooking()") {
-            val start = LocalDateTime.now(clock).plusHours(1)
+            val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1)
             val end = start.plusHours(1)
             val createdBooking = Booking(1, 999999, "MyRequest", start, end)
             val mockRepo = mock<BookingRepository> {
