@@ -16,24 +16,24 @@ import org.jetbrains.spek.api.dsl.on
  * Location controller unit tests
  */
 object LocationControllerTests : Spek({
-    describe("get known location") {
+    val mockRepository = mock<LocationRepository> {
+        on { getLocations() }.doReturn(listOf(Location(1, "NYC", "Americas/New_York")))
+    }
+
+    describe("get all locations") {
         on("GET") {
             it("should return the location") {
-                val connProvider = mock<LocationRepository> {
-                    on { getLocations() }.doReturn(listOf(Location("NYC", "Americas/New_York")))
-                }
-
-                val locationController = LocationController(connProvider)
+                val locationController = LocationController(mockRepository)
                 expect(locationController.getLocations().size).to.be.equal(1)
             }
         }
     }
 
-    describe("get known location") {
+    describe("get 1 location") {
         on("GET") {
             it("should return the location") {
-                val locationController = LocationController(mock {})
-                expect(locationController.getLocation("The best location ever").name).to.be.equal("The best location ever")
+                val locationController = LocationController(mockRepository)
+                expect(locationController.getLocation(1).name).to.be.equal("NYC")
             }
         }
     }
@@ -41,8 +41,8 @@ object LocationControllerTests : Spek({
     describe("fail to get an unknown location") {
         on("GET") {
             it("should throw an exception") {
-                val locationController = LocationController(mock {})
-                assertThat({ locationController.getLocation("foo") }, throws<LocationNotFound>())
+                val locationController = LocationController(mockRepository)
+                assertThat({ locationController.getLocation(2) }, throws<LocationNotFound>())
             }
         }
     }

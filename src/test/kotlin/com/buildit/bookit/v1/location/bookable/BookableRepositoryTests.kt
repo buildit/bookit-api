@@ -1,5 +1,6 @@
-package com.buildit.bookit.v1.location
+package com.buildit.bookit.v1.location.bookable
 
+import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -13,18 +14,19 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
  */
 @ExtendWith(SpringExtension::class)
 @JdbcTest
-class LocationRepositoryTests @Autowired constructor(
+class BookableRepositoryTests @Autowired constructor(
     val jdbcTemplate: JdbcTemplate
 ) {
     @Test
-    fun getLocations() {
+    fun getAllBookables() {
         // arrange
-        val locationRepo = LocationDatabaseRepository(jdbcTemplate)
+        val bookableRepository = BookableDatabaseRepository(jdbcTemplate)
 
         // act
-        val locations = locationRepo.getLocations()
+        val bookables = bookableRepository.getAllBookables()
 
         // assert
-        expect(locations.size).to.be.equal(2)
+        expect(bookables.size).to.be.equal(1)
+        expect(bookables).to.contain(Bookable(1, 1, "Red", true))
     }
 }

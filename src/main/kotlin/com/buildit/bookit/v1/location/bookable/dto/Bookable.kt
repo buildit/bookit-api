@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.ResponseStatus
 /**
  * Bookable resource response
  */
-data class Bookable(val name: String,
-                    val location: String,
+data class Bookable(val id: Int,
+                    val locationId: Int,
+                    val name: String,
                     val available: Boolean = true)
 
 /**

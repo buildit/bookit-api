@@ -2,7 +2,8 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
-import com.buildit.bookit.v1.location.bookable.dto.BookableNotFound
+import com.buildit.bookit.v1.location.bookable.BookableRepository
+import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import com.nhaarman.mockito_kotlin.doReturn
@@ -29,7 +30,7 @@ object BookingControllerTests : Spek({
                 val mockRepo = mock<BookingRepository> {
                     on { getAllBookings() }.doReturn(listOf(Booking(1, 2, "Booking", startDateTime, endDateTime)))
                 }
-                val bookings = BookingController(mockRepo, clock).getAllBookings().body
+                val bookings = BookingController(mockRepo, mock {}, clock).getAllBookings().body
                 expect(bookings.size).to.be.equal(1)
             }
         }
@@ -39,29 +40,69 @@ object BookingControllerTests : Spek({
                 // arrange
 
                 // act
-                fun action() = BookingController(mock {}, clock).getBooking(2)
+                fun action() = BookingController(mock {}, mock {}, clock).getBooking(2)
 
                 // assert
-                assertThat({ action() }, throws<BookableNotFound>())
+                assertThat({ action() }, throws<BookingNotFound>())
             }
         }
 
         on("createBooking()") {
+            val start = LocalDateTime.now(clock).plusHours(1)
+            val end = start.plusHours(1)
+            val createdBooking = Booking(1, 999999, "MyRequest", start, end)
+            val mockRepo = mock<BookingRepository> {
+                on { insertBooking(999999, "MyRequest", start, end) }.doReturn(createdBooking)
+            }
+            val mockBookableRepo = mock<BookableRepository> {
+                on { getAllBookables() }.doReturn(listOf(Bookable(999999, 1, "Bookable", true)))
+            }
+
+            val bookingController = BookingController(mockRepo, mockBookableRepo, clock)
+
             it("should create a booking") {
                 // arrange
-                val start = LocalDateTime.now(clock).plusHours(1)
-                val end = start.plusHours(1)
                 val request = BookingRequest(999999, "MyRequest", start, end)
-                val createdBooking = Booking(1, 999999, "MyRequest", start, end)
-                val mockRepo = mock<BookingRepository> {
-                    on { insertBooking(999999, "MyRequest", start, end) }.doReturn(createdBooking)
-                }
+
                 // act
-                val response = BookingController(mockRepo, clock).createBooking(request)
+                val response = bookingController.createBooking(request)
 
                 // assert
                 val booking = response.body
                 expect(booking).to.equal(createdBooking)
+            }
+
+            it("should validate bookable exists") {
+                // arrange
+                val request = BookingRequest(12345, "MyRequest", start, end)
+
+                // act
+                fun action() = bookingController.createBooking(request)
+
+                // assert
+                assertThat({ action() }, throws<InvalidBookable>())
+            }
+
+            it("should validate end after start") {
+                // arrange
+                val request = BookingRequest(999999, "MyRequest", end, start)
+
+                // act
+                fun action() = bookingController.createBooking(request)
+
+                // assert
+                assertThat({ action() }, throws<EndDateTimeBeforeStartTimeException>())
+            }
+
+            it("should validate start time in future") {
+                // arrange
+                val request = BookingRequest(999999, "MyRequest", start.minusDays(1), end)
+
+                // act
+                fun action() = bookingController.createBooking(request)
+
+                // assert
+                assertThat({ action() }, throws<StartDateTimeInPastException>())
             }
         }
     }

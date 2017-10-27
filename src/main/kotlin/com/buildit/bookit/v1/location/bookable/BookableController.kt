@@ -1,8 +1,10 @@
 package com.buildit.bookit.v1.location.bookable
 
+import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.BookableNotFound
 import com.buildit.bookit.v1.location.bookable.dto.InvalidBookableSearch
+import com.buildit.bookit.v1.location.dto.LocationNotFound
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,20 +20,14 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping("/v1/location/{location}/bookable")
 @Transactional
-class BookableController {
-    val theBookable = Bookable("The best bookable ever", "NYC")
-
+class BookableController(private val bookableRepository: BookableRepository, private val locationRepository: LocationRepository) {
     /**
      * Get a bookable
      */
     @GetMapping(value = "/{name}")
-    fun getBookable(@PathVariable("location") location: String, @PathVariable("name") bookable: String): Bookable {
-        if (bookable.equals(theBookable.name, true) &&
-            location.equals(theBookable.location, true)) {
-            return theBookable
-        }
-
-        throw BookableNotFound()
+    fun getBookable(@PathVariable("location") location: Int, @PathVariable("name") bookable: Int): Bookable {
+        locationRepository.getLocations().find { it.id == location } ?: throw LocationNotFound()
+        return bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound()
     }
 
     /**
@@ -39,7 +35,7 @@ class BookableController {
      */
     @GetMapping
     fun getAllBookables(
-        @PathVariable("location") location: String,
+        @PathVariable("location") location: Int,
         @RequestParam("startDateTime", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         startDateTime: LocalDateTime?,
@@ -55,6 +51,6 @@ class BookableController {
             throw InvalidBookableSearch()
         }
 
-        return listOf(theBookable).takeWhile { it.location.equals(location, true) }
+        return bookableRepository.getAllBookables().takeWhile { it.locationId == location }
     }
 }

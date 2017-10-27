@@ -11,8 +11,9 @@ data class BookingRequest(val bookableId: Int, val subject: String, val startDat
  * Booking response
  */
 data class Booking(
-    val bookingId: Int,
+    val id: Int,
     val bookableId: Int,
     val subject: String,
     val startDateTime: LocalDateTime,
     val endDateTime: LocalDateTime)
+

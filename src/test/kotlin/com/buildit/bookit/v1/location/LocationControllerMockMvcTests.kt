@@ -1,8 +1,12 @@
 package com.buildit.bookit.v1.location
 
+import com.buildit.bookit.v1.location.dto.Location
+import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.reset
+import com.nhaarman.mockito_kotlin.whenever
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,6 +29,11 @@ class LocationControllerMockMvcTests @Autowired constructor(
     @MockBean
     lateinit var mockLocationRepo: LocationRepository
 
+    @BeforeEach
+    fun setupMocks() {
+        whenever(mockLocationRepo.getLocations()).doReturn(listOf(Location(1, "The best location ever", "America/New_York")))
+    }
+
     @AfterEach
     fun resetMocks() {
         reset(mockLocationRepo)
@@ -37,11 +46,12 @@ class LocationControllerMockMvcTests @Autowired constructor(
     fun getValidLocationURITest() {
         // arrange
         // act
-        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/The best location ever"))
+        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/1"))
 
         // assert
         result.andExpect(MockMvcResultMatchers.status().isOk)
         result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.name", Matchers.equalToIgnoringCase("The best location ever")))
+        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.timeZone", Matchers.equalToIgnoringCase("America/New_York")))
     }
 
     /**
@@ -54,6 +64,6 @@ class LocationControllerMockMvcTests @Autowired constructor(
         val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/notanumber"))
 
         // assert
-        result.andExpect(MockMvcResultMatchers.status().is4xxClientError)
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 }

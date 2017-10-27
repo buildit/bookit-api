@@ -8,6 +8,8 @@ style:
     ignoreNumbers: '0,1,2,1000,999999'
   MaxLineLength:
     active: false
+  ThrowsCount:
+    active: false
 
 potential-bugs:
   LateinitUsage:

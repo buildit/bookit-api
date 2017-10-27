@@ -2,6 +2,8 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
+import com.buildit.bookit.v1.location.bookable.BookableRepository
+import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.reset
@@ -15,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -35,15 +36,27 @@ class BookingControllerMockMvcTests @Autowired constructor(
     private val mapper: ObjectMapper
 ) {
     @MockBean
-    lateinit var mockRepository: BookingRepository
+    lateinit var mockBookingRepository: BookingRepository
+
+    @MockBean
+    lateinit var mockBookableRepository: BookableRepository
 
     @AfterEach
     fun resetMocks() {
-        reset(mockRepository)
+        reset(mockBookingRepository)
+        reset(mockBookableRepository)
     }
 
     @Nested
     inner class GetBooking {
+        val startDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1)
+        val endDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(2)
+
+        @BeforeEach
+        fun setupMock() {
+            whenever(mockBookingRepository.getAllBookings()).doReturn(listOf(Booking(1, 1, "The Booking", startDateTime, endDateTime)))
+        }
+
         /**
          * Get a booking
          */
@@ -81,7 +94,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
             val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/booking/notanumber"))
 
             // assert
-            result.andExpect(MockMvcResultMatchers.status().is4xxClientError)
+            result.andExpect(MockMvcResultMatchers.status().isBadRequest)
         }
     }
 
@@ -93,7 +106,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @BeforeEach
         fun createMock() {
-            whenever(mockRepository.insertBooking(1, subject, startDateTime, endDateTime)).doReturn(Booking(1, 1, subject, startDateTime, endDateTime))
+            whenever(mockBookingRepository.insertBooking(1, subject, startDateTime, endDateTime)).doReturn(Booking(1, 1, subject, startDateTime, endDateTime))
+            whenever(mockBookableRepository.getAllBookables()).doReturn(listOf(Bookable(1, 1, "Foo", true)))
         }
 
         /**
@@ -110,7 +124,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
                 .content(mapper.writeValueAsString(request)))
 
             // assert
-            result.andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.CREATED.value()))
+            result.andExpect(MockMvcResultMatchers.status().isCreated)
             result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase(subject)))
             result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.startDateTime", Matchers.equalToIgnoringCase(startDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))))
             result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.endDateTime", Matchers.equalToIgnoringCase(endDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))))
@@ -130,7 +144,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
                 .content(mapper.writeValueAsString(request)))
 
             // assert
-            result.andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.BAD_REQUEST.value()))
+            result.andExpect(MockMvcResultMatchers.status().isBadRequest)
         }
 
         @Test
@@ -146,7 +160,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
                 .content(mapper.writeValueAsString(request)))
 
             // assert
-            result.andExpect(MockMvcResultMatchers.status().`is`(HttpStatus.BAD_REQUEST.value()))
+            result.andExpect(MockMvcResultMatchers.status().isBadRequest)
         }
     }
 }
