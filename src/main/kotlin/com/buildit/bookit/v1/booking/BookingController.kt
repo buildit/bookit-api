@@ -2,6 +2,7 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
+import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -36,7 +37,7 @@ class InvalidBookable : RuntimeException("Bookable does not exist")
 @RestController
 @RequestMapping("/v1/booking")
 @Transactional
-class BookingController(private val bookingRepository: BookingRepository, private val bookableRepository: BookableRepository, private val clock: Clock) {
+class BookingController(private val bookingRepository: BookingRepository, private val bookableRepository: BookableRepository, private val locationRepoistory: LocationRepository, private val clock: Clock) {
     /**
      */
     @GetMapping
@@ -54,9 +55,10 @@ class BookingController(private val bookingRepository: BookingRepository, privat
      */
     @PostMapping()
     fun createBooking(@RequestBody bookingRequest: BookingRequest): ResponseEntity<Booking> {
-        bookableRepository.getAllBookables().find { it.id == bookingRequest.bookableId } ?: throw InvalidBookable()
+        val bookable = bookableRepository.getAllBookables().find { it.id == bookingRequest.bookableId } ?: throw InvalidBookable()
+        val location = locationRepoistory.getLocations().single { it.id == bookable.locationId }
 
-        val now = LocalDateTime.now(clock.withZone(ZoneId.of("America/New_York")))
+        val now = LocalDateTime.now(clock.withZone(ZoneId.of(location.timeZone)))
         if (!bookingRequest.startDateTime.isAfter(now)) {
             throw StartDateTimeInPastException()
         }

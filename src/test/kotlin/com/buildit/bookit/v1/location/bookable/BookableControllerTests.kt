@@ -35,9 +35,7 @@ object BookableControllerTests : Spek({
     val mockBookableRepository = mock<BookableRepository> {
         on { getAllBookables() }.doReturn(listOf(availableBookable, londonBookable))
     }
-    val mockBookingRepository = mock<BookingRepository> {
-
-    }
+    val mockBookingRepository = mock<BookingRepository> {}
     val bookableController = BookableController(mockBookableRepository, mockLocationRepository, mockBookingRepository)
 
     describe("get 1 bookable") {

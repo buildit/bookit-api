@@ -2,8 +2,10 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
+import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
+import com.buildit.bookit.v1.location.dto.Location
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.reset
@@ -41,10 +43,19 @@ class BookingControllerMockMvcTests @Autowired constructor(
     @MockBean
     lateinit var mockBookableRepository: BookableRepository
 
+    @MockBean
+    lateinit var mockLocationRepository: LocationRepository
+
+    @BeforeEach
+    fun setupMocks() {
+        whenever(mockLocationRepository.getLocations()).doReturn(listOf(Location(1, "NYC", "America/New_York")))
+    }
+
     @AfterEach
     fun resetMocks() {
         reset(mockBookingRepository)
         reset(mockBookableRepository)
+        reset(mockLocationRepository)
     }
 
     @Nested

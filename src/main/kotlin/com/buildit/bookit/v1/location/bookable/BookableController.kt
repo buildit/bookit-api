@@ -46,7 +46,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
      */
     @GetMapping
     fun getAllBookables(
-        @PathVariable("location") location: Int,
+        @PathVariable("location") locationId: Int,
         @RequestParam("startDateTime", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         startDateTime: LocalDateTime? = null,
@@ -54,19 +54,19 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         endDateTime: LocalDateTime? = null
     ): Collection<Bookable> {
-        locationRepository.getLocations().find { it.id == location } ?: throw LocationNotFound()
+        val location = locationRepository.getLocations().find { it.id == locationId } ?: throw LocationNotFound()
 
         if (startDateTime != null && endDateTime != null && !endDateTime.isAfter(startDateTime)) {
             throw EndDateTimeBeforeStartTimeException()
         }
 
         val interval = Interval.of(
-            startDateTime?.atZone(ZoneId.of("America/New_York"))?.toInstant() ?: Instant.MIN,
-            endDateTime?.atZone(ZoneId.of("America/New_York"))?.toInstant() ?: Instant.MAX
+            startDateTime?.atZone(ZoneId.of(location.timeZone))?.toInstant() ?: Instant.MIN,
+            endDateTime?.atZone(ZoneId.of(location.timeZone))?.toInstant() ?: Instant.MAX
         )
 
         if (interval == Interval.ALL) {
-            return bookableRepository.getAllBookables().takeWhile { it.locationId == location }
+            return bookableRepository.getAllBookables().takeWhile { it.locationId == locationId }
         }
 
         if (interval.isUnboundedStart) {
@@ -78,10 +78,10 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         }
 
         val unavailableBookables = bookingRepository.getAllBookings().takeWhile {
-            interval.overlaps(Interval.of(it.startDateTime.atZone(ZoneId.of("America/New_York")).toInstant(), it.endDateTime.atZone(ZoneId.of("America/New_York")).toInstant()))
+            interval.overlaps(Interval.of(it.startDateTime.atZone(ZoneId.of(location.timeZone)).toInstant(), it.endDateTime.atZone(ZoneId.of(location.timeZone)).toInstant()))
         }.distinctBy { it.bookableId }
 
-        return bookableRepository.getAllBookables().takeWhile { it.locationId == location }.map { bookable ->
+        return bookableRepository.getAllBookables().takeWhile { it.locationId == locationId }.map { bookable ->
             bookable.copy(available = bookable.available && unavailableBookables.none { it.bookableId == bookable.id })
         }
     }

@@ -2,8 +2,10 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
+import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
+import com.buildit.bookit.v1.location.dto.Location
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import com.nhaarman.mockito_kotlin.doReturn
@@ -22,6 +24,13 @@ import java.time.ZoneId
  */
 object BookingControllerTests : Spek({
     describe("/v1/booking") {
+        val mockLocationRepository = mock<LocationRepository> {
+            on { getLocations() }.doReturn(listOf(
+                Location(1, "NYC", "America/New_York"),
+                Location(2, "LON", "Europe/London")
+            ))
+        }
+
         val clock = Clock.systemUTC()
         on("invoking getAllBookings()") {
             it("should get all bookings") {
@@ -31,7 +40,7 @@ object BookingControllerTests : Spek({
                 val mockRepo = mock<BookingRepository> {
                     on { getAllBookings() }.doReturn(listOf(Booking(1, 2, "Booking", startDateTime, endDateTime)))
                 }
-                val bookings = BookingController(mockRepo, mock {}, clock).getAllBookings().body
+                val bookings = BookingController(mockRepo, mock {}, mockLocationRepository, clock).getAllBookings().body
                 expect(bookings.size).to.be.equal(1)
             }
         }
@@ -41,7 +50,7 @@ object BookingControllerTests : Spek({
                 // arrange
 
                 // act
-                fun action() = BookingController(mock {}, mock {}, clock).getBooking(2)
+                fun action() = BookingController(mock {}, mock {}, mockLocationRepository, clock).getBooking(2)
 
                 // assert
                 assertThat({ action() }, throws<BookingNotFound>())
@@ -59,7 +68,7 @@ object BookingControllerTests : Spek({
                 on { getAllBookables() }.doReturn(listOf(Bookable(999999, 1, "Bookable", true)))
             }
 
-            val bookingController = BookingController(mockRepo, mockBookableRepo, clock)
+            val bookingController = BookingController(mockRepo, mockBookableRepo, mockLocationRepository, clock)
 
             it("should create a booking") {
                 // arrange
