@@ -84,6 +84,13 @@ object BookableTest : Spek(
                     expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
                 }
 
+                it("should require startDateTime before endDateTime")
+                {
+                    val response = restTemplate.getForEntity("/v1/location/1/bookable?startDateTime=$inTwoHours&endDateTime=$inOneHour", String::class.java)
+
+                    expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
+                }
+
                 it("should find available bookable")
                 {
                     val response = restTemplate.getForEntity("/v1/location/1/bookable?startDateTime=$inOneHour&endDateTime=$inTwoHours", String::class.java)
