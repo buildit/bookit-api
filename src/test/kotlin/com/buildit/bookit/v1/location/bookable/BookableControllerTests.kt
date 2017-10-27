@@ -1,7 +1,7 @@
 package com.buildit.bookit.v1.location.bookable
 
 import com.buildit.bookit.v1.booking.BookingRepository
-import com.buildit.bookit.v1.booking.EndDateTimeBeforeStartTimeException
+import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
@@ -87,11 +87,11 @@ object BookableControllerTests : Spek({
             }
 
             it("should require startDate before endDate, equal") {
-                assertThat({ bookableController.getAllBookables(1, now.plusHours(1), now.plusHours(1)) }, throws<EndDateTimeBeforeStartTimeException>())
+                assertThat({ bookableController.getAllBookables(1, now.plusHours(1), now.plusHours(1)) }, throws<EndBeforeStartException>())
             }
 
             it("should require startDate before endDate, not equal") {
-                assertThat({ bookableController.getAllBookables(1, now.plusHours(2), now.plusHours(1)) }, throws<EndDateTimeBeforeStartTimeException>())
+                assertThat({ bookableController.getAllBookables(1, now.plusHours(2), now.plusHours(1)) }, throws<EndBeforeStartException>())
             }
 
             it("should find an available bookable") {
