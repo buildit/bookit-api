@@ -11,8 +11,9 @@ buildscript {
         h2_version = '1.4.196'
         mockito_kotlin_1_1 = '1.5.0'
         mysql_version = '5.1.44'
-        mariadb_version = '2.1.2:'
+        mariadb_version = '2.1.2'
         jacoco_version = '0.7.9'
+        threeten_version = '1.2'
     }
     repositories {
         mavenCentral()
@@ -166,6 +167,8 @@ dependencies {
     compile("mysql:mysql-connector-java:$mysql_version")
     compile("org.mariadb.jdbc:mariadb-java-client:$mariadb_version")
 
+    compile("org.threeten:threeten-extra:$threeten_version")
+
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
 
     runtime('org.springframework.boot:spring-boot-devtools')
@@ -185,7 +188,6 @@ dependencies {
     testRuntime("org.junit.platform:junit-platform-console:$junit_gradle_version")
     testRuntime("org.jetbrains.spek:spek-junit-platform-engine:$spek_version")
 }
-
 
 // https://stackoverflow.com/questions/45297339/junit-5-under-gradle-with-multiple-source-sets
 task 'test-e2e'(

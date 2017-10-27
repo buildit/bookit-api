@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.location.bookable
 
+import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndDateTimeBeforeStartTimeException
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
@@ -13,7 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import org.threeten.extra.Interval
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 class BookableNotFound : RuntimeException("Bookable not found")
@@ -27,7 +31,7 @@ class InvalidBookableSearchEndDateRequired : RuntimeException("endDateTime is re
 @RestController
 @RequestMapping("/v1/location/{location}/bookable")
 @Transactional
-class BookableController(private val bookableRepository: BookableRepository, private val locationRepository: LocationRepository) {
+class BookableController(private val bookableRepository: BookableRepository, private val locationRepository: LocationRepository, val bookingRepository: BookingRepository) {
     /**
      * Get a bookable
      */
@@ -52,18 +56,33 @@ class BookableController(private val bookableRepository: BookableRepository, pri
     ): Collection<Bookable> {
         locationRepository.getLocations().find { it.id == location } ?: throw LocationNotFound()
 
-        if (startDateTime != null && endDateTime == null) {
-            throw InvalidBookableSearchEndDateRequired()
-        }
-
-        if (startDateTime == null && endDateTime != null) {
-            throw InvalidBookableSearchStartDateRequired()
-        }
-
         if (startDateTime != null && endDateTime != null && !endDateTime.isAfter(startDateTime)) {
             throw EndDateTimeBeforeStartTimeException()
         }
-        
-        return bookableRepository.getAllBookables().takeWhile { it.locationId == location }
+
+        val interval = Interval.of(
+            startDateTime?.atZone(ZoneId.of("America/New_York"))?.toInstant() ?: Instant.MIN,
+            endDateTime?.atZone(ZoneId.of("America/New_York"))?.toInstant() ?: Instant.MAX
+        )
+
+        if (interval == Interval.ALL) {
+            return bookableRepository.getAllBookables().takeWhile { it.locationId == location }
+        }
+
+        if (interval.isUnboundedStart) {
+            throw InvalidBookableSearchStartDateRequired()
+        }
+
+        if (interval.isUnboundedEnd) {
+            throw InvalidBookableSearchEndDateRequired()
+        }
+
+        val unavailableBookables = bookingRepository.getAllBookings().takeWhile {
+            interval.overlaps(Interval.of(it.startDateTime.atZone(ZoneId.of("America/New_York")).toInstant(), it.endDateTime.atZone(ZoneId.of("America/New_York")).toInstant()))
+        }.distinctBy { it.bookableId }
+
+        return bookableRepository.getAllBookables().takeWhile { it.locationId == location }.map { bookable ->
+            bookable.copy(available = bookable.available && unavailableBookables.none { it.bookableId == bookable.id })
+        }
     }
 }

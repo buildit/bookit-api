@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.location.bookable
 
+import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.dto.Location
@@ -35,6 +36,9 @@ class BookableControllerMockMvcTests @Autowired constructor(
     @MockBean
     lateinit var mockLocationRepository: LocationRepository
 
+    @MockBean
+    lateinit var mockBookingRepository: BookingRepository
+
     @BeforeEach
     fun setupMocks() {
         whenever(mockLocationRepository.getLocations()).doReturn(listOf(Location(1, "NYC", "America/New_York")))
@@ -45,6 +49,7 @@ class BookableControllerMockMvcTests @Autowired constructor(
     fun resetMocks() {
         reset(mockBookableRepository)
         reset(mockLocationRepository)
+        reset(mockBookingRepository)
     }
 
     @Test
