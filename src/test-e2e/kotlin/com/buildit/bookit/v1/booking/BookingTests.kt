@@ -35,7 +35,7 @@ object BookingTests : Spek(
                     "startDateTime": "${tomorrowISO}T09:00:00",
                     "endDateTime": "${tomorrowISO}T10:00:00.000"
                 }
-                """
+                """.trimIndent()
 
                 val headers = HttpHeaders()
                 headers.contentType = MediaType.APPLICATION_JSON
@@ -64,7 +64,7 @@ object BookingTests : Spek(
                     "startDateTime": "${yesterdayISO}T09:00:00",
                     "endDateTime": "${yesterdayISO}T10:00:00.000"
                 }
-                """
+                """.trimIndent()
 
                 val headers = HttpHeaders()
                 headers.contentType = MediaType.APPLICATION_JSON
@@ -94,7 +94,7 @@ object BookingTests : Spek(
                     "startDateTime": "${tomorrowISO}T09:00:00",
                     "endDateTime": "${tomorrowISO}T08:00:00.000"
                 }
-                """
+                """.trimIndent()
 
                 val headers = HttpHeaders()
                 headers.contentType = MediaType.APPLICATION_JSON
@@ -122,7 +122,7 @@ object BookingTests : Spek(
                     "startDateTime": "foo",
                     "endDateTime": "bar"
                 }
-                """
+                """.trimIndent()
 
                 val headers = HttpHeaders()
                 headers.contentType = MediaType.APPLICATION_JSON
