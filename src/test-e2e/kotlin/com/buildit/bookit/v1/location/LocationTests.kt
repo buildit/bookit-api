@@ -27,10 +27,12 @@ object LocationTests : Spek(
                     val expectedResponse = """
                         [
                             {
+                                "id": 1,
                                 "name": "NYC",
                                 "timeZone": "America/New_York"
                             },
                             {
+                                "id": 2,
                                 "name": "LON",
                                 "timeZone": "Europe/London"
                             }

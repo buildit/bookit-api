@@ -26,14 +26,15 @@ object BookableTest : Spek(
         {
             on("Get 1 bookable")
             {
-                val response = restTemplate.getForEntity("/v1/location/nyc/bookable/The best bookable ever", String::class.java)
+                val response = restTemplate.getForEntity("/v1/location/1/bookable/1", String::class.java)
 
                 it("should return 1 bookable")
                 {
                     val expectedResponse = """
                         {
-                            "name": "The best bookable ever",
-                            "location": "NYC",
+                            "id": 1,
+                            "locationId": 1,
+                            "name": "Red",
                             "available": true
                         }
                     """.trimIndent()
@@ -46,15 +47,16 @@ object BookableTest : Spek(
         {
             on("Get all bookables")
             {
-                val response = restTemplate.getForEntity("/v1/location/nyc/bookable", String::class.java)
+                val response = restTemplate.getForEntity("/v1/location/1/bookable", String::class.java)
 
                 it("should return all bookables")
                 {
                     val expectedResponse = """
                         [
                             {
-                                "name": "The best bookable ever",
-                                "location": "NYC",
+                                "id": 1,
+                                "locationId": 1,
+                                "name": "Red",
                                 "available": true
                             }
                         ]
@@ -70,27 +72,28 @@ object BookableTest : Spek(
 
                 it("should require endDateTime if startDateTime specified")
                 {
-                    val response = restTemplate.getForEntity("/v1/location/nyc/bookable?startDateTime=$inOneHour", String::class.java)
+                    val response = restTemplate.getForEntity("/v1/location/1/bookable?startDateTime=$inOneHour", String::class.java)
 
                     expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
                 }
 
                 it("should require startDateTime if endDateTime specified")
                 {
-                    val response = restTemplate.getForEntity("/v1/location/nyc/bookable?endDateTime=$inTwoHours", String::class.java)
+                    val response = restTemplate.getForEntity("/v1/location/1/bookable?endDateTime=$inTwoHours", String::class.java)
 
                     expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
                 }
 
                 it("should find available bookable")
                 {
-                    val response = restTemplate.getForEntity("/v1/location/nyc/bookable?startDateTime=$inOneHour&endDateTime=$inTwoHours", String::class.java)
+                    val response = restTemplate.getForEntity("/v1/location/1/bookable?startDateTime=$inOneHour&endDateTime=$inTwoHours", String::class.java)
 
                     val expectedResponse = """
                         [
                             {
-                                "name": "The best bookable ever",
-                                "location": "NYC",
+                                "id": 1,
+                                "locationId": 1,
+                                "name": "Red",
                                 "available": true
                             }
                         ]

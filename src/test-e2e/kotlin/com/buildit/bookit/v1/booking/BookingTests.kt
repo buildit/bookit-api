@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import java.time.LocalDate
+import java.time.ZoneId
 
 /**
  * Test /v1/booking like a black box
@@ -25,7 +26,7 @@ object BookingTests : Spek(
         {
             on("POSTing a valid meeting")
             {
-                val tomorrow = LocalDate.now().plusDays(1)
+                val tomorrow = LocalDate.now(ZoneId.of("America/New_York")).plusDays(1)
                 val tomorrowISO = "${tomorrow.year}-${tomorrow.monthValue}-${tomorrow.dayOfMonth}"
                 val goodRequest =
                     """
@@ -46,7 +47,7 @@ object BookingTests : Spek(
                 it("should return a created meeting")
                 {
                     val jsonResponse = JSONObject(response.body)
-                    expect(jsonResponse.getInt("bookingId")).to.be.above(0)
+                    expect(jsonResponse.getInt("id")).to.be.above(0)
                     expect(jsonResponse.get("bookableId")).to.be.equal(1)
                     expect(jsonResponse.get("subject")).to.be.equal("My new meeting")
                 }
@@ -54,7 +55,7 @@ object BookingTests : Spek(
 
             on("POSTing with a date in the past")
             {
-                val yesterday = LocalDate.now().minusDays(1)
+                val yesterday = LocalDate.now(ZoneId.of("America/New_York")).minusDays(1)
                 val yesterdayISO = "${yesterday.year}-${yesterday.monthValue}-${yesterday.dayOfMonth}"
                 val badRequest =
                     """
@@ -84,7 +85,7 @@ object BookingTests : Spek(
 
             on("POSTing with a end date before the start date")
             {
-                val tomorrow = LocalDate.now().plusDays(1)
+                val tomorrow = LocalDate.now(ZoneId.of("America/New_York")).plusDays(1)
                 val tomorrowISO = "${tomorrow.year}-${tomorrow.monthValue}-${tomorrow.dayOfMonth}"
                 val badRequest =
                     """
