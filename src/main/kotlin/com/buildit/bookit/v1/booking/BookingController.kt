@@ -4,6 +4,7 @@ import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
+import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
@@ -18,6 +19,7 @@ import java.net.URI
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
+import javax.validation.Valid
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 class StartInPastException : RuntimeException("Start must be in the future")
@@ -29,7 +31,10 @@ class EndBeforeStartException : RuntimeException("End must be after Start")
 class BookingNotFound : RuntimeException("Booking not found")
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-class InvalidBookable : RuntimeException("Bookable does not exist")
+class BookableNotAvailable : RuntimeException("Bookable is not available.  Please select another time")
+
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+class InvalidBooking(message: String) : RuntimeException(message)
 
 /**
  * Endpoint to manage bookings
@@ -54,9 +59,22 @@ class BookingController(private val bookingRepository: BookingRepository, privat
      * Create a booking
      */
     @PostMapping()
-    fun createBooking(@RequestBody bookingRequest: BookingRequest): ResponseEntity<Booking> {
+    fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest): ResponseEntity<Booking> {
         val bookable = bookableRepository.getAllBookables().find { it.id == bookingRequest.bookableId } ?: throw InvalidBookable()
         val location = locationRepoistory.getLocations().single { it.id == bookable.locationId }
+
+        if (bookingRequest.bookableId == null) {
+            throw InvalidBooking("Invalid booking: bookableId required")
+        }
+        if (bookingRequest.subject == null || bookingRequest.subject.isBlank()) {
+            throw InvalidBooking("Invalid booking: subject required")
+        }
+        if (bookingRequest.start == null) {
+            throw InvalidBooking("Invalid booking: start required")
+        }
+        if (bookingRequest.end == null) {
+            throw InvalidBooking("Invalid booking: end required")
+        }
 
         val now = LocalDateTime.now(clock.withZone(ZoneId.of(location.timeZone)))
         if (!bookingRequest.start.isAfter(now)) {
@@ -65,6 +83,12 @@ class BookingController(private val bookingRepository: BookingRepository, privat
 
         if (!bookingRequest.end.isAfter(bookingRequest.start)) {
             throw EndBeforeStartException()
+        }
+
+        if (bookingRepository.getAllBookings().filter { it.bookableId == bookable.id }.any {
+            false
+        }) {
+            throw BookableNotAvailable()
         }
 
         val booking = bookingRepository.insertBooking(
