@@ -26,5 +26,4 @@ class LocationController(private val locationRepository: LocationRepository) {
     @GetMapping(value = "/{id}")
     fun getLocation(@PathVariable("id") location: Int): Location =
         locationRepository.getLocations().find { it.id == location } ?: throw LocationNotFound()
-
 }
