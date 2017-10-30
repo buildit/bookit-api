@@ -184,6 +184,5 @@ class BookingControllerMockMvcTests @Autowired constructor(
             post("/v1/booking")
                 .contentType(APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
-
     }
 }
