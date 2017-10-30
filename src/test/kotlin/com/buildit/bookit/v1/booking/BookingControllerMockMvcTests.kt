@@ -180,10 +180,10 @@ class BookingControllerMockMvcTests @Autowired constructor(
                 .andExpect(status().isBadRequest)
         }
 
-        private fun post(request: BookingRequest): MockHttpServletRequestBuilder? {
-            return post("/v1/booking")
+        private fun post(request: BookingRequest): MockHttpServletRequestBuilder? =
+            post("/v1/booking")
                 .contentType(APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
-        }
+
     }
 }
