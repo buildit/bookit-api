@@ -207,7 +207,6 @@ object BookableControllerTests : Spek({
                 // assert
                 expect(bookables).to.contain(availableBookable)
             }
-
         }
     }
 })
