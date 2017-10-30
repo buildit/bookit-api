@@ -158,11 +158,65 @@ class BookingControllerMockMvcTests @Autowired constructor(
         }
 
         @Test
-        fun createBookingWithMisOrderedDatesTest() {
+        fun createBookingNoBookable() {
             // arrange
-            val startDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1)
-            val endDateTime = startDateTime.minusHours(1)
-            val request = BookingRequest(1, subject, startDateTime, endDateTime)
+            val request = BookingRequest(null, subject, startDateTime, endDateTime)
+
+            // act
+            val result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/booking")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+
+            // assert
+            result.andExpect(MockMvcResultMatchers.status().isBadRequest)
+        }
+
+        @Test
+        fun createBookingNoSubject() {
+            // arrange
+            val request = BookingRequest(1, null, startDateTime, endDateTime)
+
+            // act
+            val result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/booking")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+
+            // assert
+            result.andExpect(MockMvcResultMatchers.status().isBadRequest)
+        }
+
+        @Test
+        fun createBookingBlankSubject() {
+            // arrange
+            val request = BookingRequest(1, "  ", startDateTime, endDateTime)
+
+            // act
+            val result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/booking")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+
+            // assert
+            result.andExpect(MockMvcResultMatchers.status().isBadRequest)
+        }
+
+        @Test
+        fun createBookingNoStart() {
+            // arrange
+            val request = BookingRequest(1, subject, null, endDateTime)
+
+            // act
+            val result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/booking")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+
+            // assert
+            result.andExpect(MockMvcResultMatchers.status().isBadRequest)
+        }
+
+        @Test
+        fun createBookingNoEnd() {
+            // arrange
+            val request = BookingRequest(1, subject, startDateTime, null)
 
             // act
             val result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/booking")

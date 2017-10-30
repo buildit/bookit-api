@@ -1,17 +1,21 @@
 package com.buildit.bookit.v1.booking.dto
 
+import org.hibernate.validator.constraints.NotBlank
 import java.time.LocalDateTime
-import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 
 /**
  * Booking request
  */
 data class BookingRequest(
-    @NotNull val bookableId: Int?,
-    @NotNull @Min(1) val subject: String?,
-    @NotNull val start: LocalDateTime?,
-    @NotNull val end: LocalDateTime?
+    @field:NotNull(message = "bookableId is required")
+    val bookableId: Int?,
+    @field:NotBlank(message = "subject is required and cannot be blank")
+    val subject: String?,
+    @field:NotNull(message = "start is required")
+    val start: LocalDateTime?,
+    @field:NotNull(message = "end is required")
+    val end: LocalDateTime?
 )
 
 /**

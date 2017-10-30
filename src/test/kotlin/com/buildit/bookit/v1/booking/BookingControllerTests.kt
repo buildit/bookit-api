@@ -104,17 +104,6 @@ object BookingControllerTests : Spek({
                 // assert
                 assertThat({ action() }, throws<EndBeforeStartException>())
             }
-
-            it("should validate start time in future") {
-                // arrange
-                val request = BookingRequest(999999, "MyRequest", start.minusDays(1), end)
-
-                // act
-                fun action() = bookingController.createBooking(request)
-
-                // assert
-                assertThat({ action() }, throws<StartInPastException>())
-            }
         }
     }
 })
