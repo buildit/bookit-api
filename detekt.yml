@@ -20,6 +20,8 @@ complexity:
     threshold: 8
   StringLiteralDuplication:
     active: false
+  TooManyFunctions:
+    threshold: 15
 
 comments:
   active: false
