@@ -28,6 +28,9 @@ class InvalidBookableSearchStartDateRequired : RuntimeException("start is requir
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 class InvalidBookableSearchEndDateRequired : RuntimeException("end is required if start is specified")
 
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+class InvalidBookable : RuntimeException("Bookable does not exist")
+
 @RestController
 @RequestMapping("/v1/location/{locationId}/bookable")
 @Transactional

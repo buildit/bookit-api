@@ -4,6 +4,7 @@ import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
+import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.dto.Location
 import com.natpryce.hamkrest.assertion.assertThat
@@ -102,17 +103,6 @@ object BookingControllerTests : Spek({
 
                 // assert
                 assertThat({ action() }, throws<EndBeforeStartException>())
-            }
-
-            it("should validate start time in future") {
-                // arrange
-                val request = BookingRequest(999999, "MyRequest", start.minusDays(1), end)
-
-                // act
-                fun action() = bookingController.createBooking(request)
-
-                // assert
-                assertThat({ action() }, throws<StartInPastException>())
             }
         }
     }
