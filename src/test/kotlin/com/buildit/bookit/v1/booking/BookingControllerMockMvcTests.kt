@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.reset
 import com.nhaarman.mockito_kotlin.whenever
-import org.hamcrest.Matchers
+import org.hamcrest.Matchers.equalToIgnoringCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -19,142 +19,125 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.MediaType
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import java.time.LocalDateTime
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDateTime.now
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
 /**
- * Booking Contoller spring mvc integration tests
+ * Booking controller spring mvc integration tests
  */
 @ExtendWith(SpringExtension::class)
 @WebMvcTest(BookingController::class)
 class BookingControllerMockMvcTests @Autowired constructor(
-    private val mockMvc: MockMvc,
+    private val mvc: MockMvc,
     private val mapper: ObjectMapper
 ) {
-    @MockBean
-    lateinit var mockBookingRepository: BookingRepository
+    private val NYC = "America/New_York"
+    private val NYC_TZ = ZoneId.of(NYC)
 
     @MockBean
-    lateinit var mockBookableRepository: BookableRepository
+    lateinit var bookingRepository: BookingRepository
 
     @MockBean
-    lateinit var mockLocationRepository: LocationRepository
+    lateinit var bookableRepository: BookableRepository
+
+    @MockBean
+    lateinit var locationRepository: LocationRepository
 
     @BeforeEach
     fun setupMocks() {
-        whenever(mockLocationRepository.getLocations()).doReturn(listOf(Location(1, "NYC", "America/New_York")))
+        whenever(locationRepository.getLocations()).doReturn(listOf(Location(1, "NYC", NYC)))
     }
 
     @AfterEach
     fun resetMocks() {
-        reset(mockBookingRepository)
-        reset(mockBookableRepository)
-        reset(mockLocationRepository)
+        reset(bookingRepository)
+        reset(bookableRepository)
+        reset(locationRepository)
     }
 
     @Nested
     inner class GetBooking {
-        val startDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1)
-        val endDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(2)
+        private val startDateTime = now(NYC_TZ).plusHours(1)
+        private val endDateTime = now(NYC_TZ).plusHours(2)
 
         @BeforeEach
         fun setupMock() {
-            whenever(mockBookingRepository.getAllBookings()).doReturn(listOf(Booking(1, 1, "The Booking", startDateTime, endDateTime)))
+            whenever(bookingRepository.getAllBookings())
+                .doReturn(listOf(Booking(1, 1, "The Booking", startDateTime, endDateTime)))
         }
 
-        /**
-         * Get a booking
-         */
         @Test
-        fun getExistingBookingTest() {
-            // arrange
-            // act
-            val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/booking/1"))
-
-            // assert
-            result.andExpect(MockMvcResultMatchers.status().isOk)
-            result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase("The Booking")))
+        fun existingBooking() {
+            mvc.perform(get("/v1/booking/1"))
+                .andExpect(status().isOk)
+                .andExpect(jsonPath<String>("$.subject", equalToIgnoringCase("The Booking")))
         }
 
-        /**
-         * Fail to get a booking
-         */
         @Test
-        fun getNonexistentBookingTest() {
-            // arrange
-            // act
-            val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/booking/999"))
-
-            // assert
-            result.andExpect(MockMvcResultMatchers.status().isNotFound)
+        fun cantFindNonexistentBooking() {
+            mvc.perform(get("/v1/booking/999"))
+                .andExpect(status().isNotFound)
         }
 
-        /**
-         * Fail to get a booking
-         */
         @Test
-        fun getMalformedURITest() {
-            // arrange
-            // act
-            val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/booking/notanumber"))
-
-            // assert
-            result.andExpect(MockMvcResultMatchers.status().isBadRequest)
+        fun cantGetMalformedRequest() {
+            mvc.perform(get("/v1/booking/notanumber"))
+                .andExpect(status().isBadRequest)
         }
     }
 
     @Nested
     inner class CreateBooking {
-        private val startDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1)
+        private val startDateTime = now(NYC_TZ).plusHours(1)
         private val endDateTime = startDateTime.plusHours(1)
         private val subject = "New Meeting"
 
         @BeforeEach
         fun createMock() {
-            whenever(mockBookingRepository.insertBooking(1, subject, startDateTime, endDateTime)).doReturn(Booking(1, 1, subject, startDateTime, endDateTime))
-            whenever(mockBookableRepository.getAllBookables()).doReturn(listOf(Bookable(1, 1, "Foo", true)))
+            whenever(bookingRepository.insertBooking(1, subject, startDateTime, endDateTime))
+                .doReturn(Booking(1, 1, subject, startDateTime, endDateTime))
+            whenever(bookableRepository.getAllBookables())
+                .doReturn(listOf(Bookable(1, 1, "Foo", true)))
         }
 
-        /**
-         * Create a booking
-         */
         @Test
-        fun createBookingTest() {
-            // arrange
+        fun createValidBooking() {
             val request = BookingRequest(1, subject, startDateTime, endDateTime)
 
-            // act
-            val result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/booking")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-
-            // assert
-            result.andExpect(MockMvcResultMatchers.status().isCreated)
-            result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.subject", Matchers.equalToIgnoringCase(subject)))
-            result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.start", Matchers.equalToIgnoringCase(startDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))))
-            result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.end", Matchers.equalToIgnoringCase(endDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))))
+            mvc.perform(post(request))
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath<String>("$.subject", equalToIgnoringCase(subject)))
+                .andExpect(jsonPath<String>("$.start", equalToIgnoringCase(startDateTime.format(ISO_LOCAL_DATE_TIME))))
+                .andExpect(jsonPath<String>("$.end", equalToIgnoringCase(endDateTime.format(ISO_LOCAL_DATE_TIME))))
         }
 
         @Test
-        fun createBookingInThePastTest() {
-            // arrange
-            val startDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).minusHours(1)
+        fun cantCreateBookingInPast() {
+            val startDateTime = now(NYC_TZ).minusHours(1)
             val endDateTime = startDateTime.plusHours(1)
             val request = BookingRequest(1, subject, startDateTime, endDateTime)
 
-            // act
-            val result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/booking")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
+            mvc.perform(post(request))
+                .andExpect(status().isBadRequest)
+        }
 
-            // assert
-            result.andExpect(MockMvcResultMatchers.status().isBadRequest)
+        @Test
+        fun cantCreateBookingWithMisorderedDates() {
+            val startDateTime = now(NYC_TZ).plusHours(1)
+            val endDateTime = startDateTime.minusHours(1)
+            val request = BookingRequest(1, subject, startDateTime, endDateTime)
+
+            mvc.perform(post(request))
+                .andExpect(status().isBadRequest)
         }
 
         @Test
@@ -226,6 +209,11 @@ class BookingControllerMockMvcTests @Autowired constructor(
             // assert
             result.andExpect(MockMvcResultMatchers.status().isBadRequest)
         }
+
+        private fun post(request: BookingRequest): MockHttpServletRequestBuilder? {
+            return post("/v1/booking")
+                .contentType(APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request))
+        }
     }
 }
-
