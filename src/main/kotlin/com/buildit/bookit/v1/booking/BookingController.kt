@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import org.threeten.extra.Interval
 import java.net.URI
 import java.time.Clock
 import java.time.LocalDateTime
@@ -34,7 +35,7 @@ class EndBeforeStartException : InvalidBooking("End must be after Start")
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 class BookingNotFound : RuntimeException("Booking not found")
 
-@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+@ResponseStatus(value = HttpStatus.CONFLICT)
 class BookableNotAvailable : RuntimeException("Bookable is not available.  Please select another time")
 
 /**
@@ -80,9 +81,16 @@ class BookingController(private val bookingRepository: BookingRepository, privat
             throw EndBeforeStartException()
         }
 
-        if (bookingRepository.getAllBookings().filter { it.bookableId == bookable.id }.any {
-            false
-        }) {
+        val interval = Interval.of(
+            bookingRequest.start.atZone(ZoneId.of(location.timeZone)).toInstant(),
+            bookingRequest.end.atZone(ZoneId.of(location.timeZone)).toInstant()
+        )
+
+        val unavailable = bookingRepository.getAllBookings()
+            .filter { it.bookableId == bookable.id }
+            .any { interval.overlaps(Interval.of(it.start.atZone(ZoneId.of(location.timeZone)).toInstant(), it.end.atZone(ZoneId.of(location.timeZone)).toInstant())) }
+
+        if (unavailable) {
             throw BookableNotAvailable()
         }
 

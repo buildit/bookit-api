@@ -64,6 +64,10 @@ object BookingControllerTests : Spek({
             val createdBooking = Booking(1, 999999, "MyRequest", start, end)
             val mockRepo = mock<BookingRepository> {
                 on { insertBooking(999999, "MyRequest", start, end) }.doReturn(createdBooking)
+                on { getAllBookings() }.doReturn(listOf(
+                    Booking(1, 999999, "Before", start.minusHours(1), end.minusHours(1)),
+                    Booking(2, 999999, "After", start.plusHours(1), end.plusHours(1))
+                ))
             }
             val mockBookableRepo = mock<BookableRepository> {
                 on { getAllBookables() }.doReturn(listOf(Bookable(999999, 1, "Bookable", true)))
@@ -103,6 +107,28 @@ object BookingControllerTests : Spek({
 
                 // assert
                 assertThat({ action() }, throws<EndBeforeStartException>())
+            }
+
+            it("should check that the bookable is available - overlap start") {
+                // arrange
+                val request = BookingRequest(999999, "MyRequest", start.minusMinutes(30), end.minusMinutes(30))
+
+                // act
+                fun action() = bookingController.createBooking(request)
+
+                // assert
+                assertThat({ action() }, throws<BookableNotAvailable>())
+            }
+
+            it("should check that the bookable is available - overlap end") {
+                // arrange
+                val request = BookingRequest(999999, "MyRequest", start.plusMinutes(30), end.plusMinutes(30))
+
+                // act
+                fun action() = bookingController.createBooking(request)
+
+                // assert
+                assertThat({ action() }, throws<BookableNotAvailable>())
             }
         }
     }

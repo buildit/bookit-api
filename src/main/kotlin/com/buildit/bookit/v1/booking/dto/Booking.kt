@@ -28,4 +28,3 @@ data class Booking(
     val start: LocalDateTime,
     val end: LocalDateTime
 )
-
