@@ -12,7 +12,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 
 /**
@@ -26,15 +26,14 @@ object BookingTests : Spek(
         {
             describe("POSTing a valid meeting")
             {
-                val tomorrow = LocalDate.now(ZoneId.of("America/New_York")).plusDays(1)
-                val tomorrowISO = "${tomorrow.year}-${tomorrow.monthValue}-${tomorrow.dayOfMonth}"
+                val tomorrow = LocalDateTime.now(ZoneId.of("America/New_York")).plusDays(1)
                 val goodRequest =
                     """
                 {
                     "bookableId": 1,
                     "subject": "My new meeting",
-                    "start": "${tomorrowISO}T09:00:00",
-                    "end": "${tomorrowISO}T10:00:00.000"
+                    "start": "$tomorrow",
+                    "end": "${tomorrow.plusHours(1)}"
                 }
                 """.trimIndent()
 
@@ -59,15 +58,14 @@ object BookingTests : Spek(
 
             on("POSTing with a date in the past")
             {
-                val yesterday = LocalDate.now(ZoneId.of("America/New_York")).minusDays(1)
-                val yesterdayISO = "${yesterday.year}-${yesterday.monthValue}-${yesterday.dayOfMonth}"
+                val yesterday = LocalDateTime.now(ZoneId.of("America/New_York")).minusDays(1)
                 val badRequest =
                     """
                 {
                     "bookableId": 1,
                     "subject": "My meeting in the past",
-                    "start": "${yesterdayISO}T09:00:00",
-                    "end": "${yesterdayISO}T10:00:00.000"
+                    "start": "$yesterday",
+                    "end": "${yesterday.plusHours(1)}"
                 }
                 """.trimIndent()
 
@@ -89,15 +87,14 @@ object BookingTests : Spek(
 
             on("POSTing with a end date before the start date")
             {
-                val tomorrow = LocalDate.now(ZoneId.of("America/New_York")).plusDays(1)
-                val tomorrowISO = "${tomorrow.year}-${tomorrow.monthValue}-${tomorrow.dayOfMonth}"
+                val tomorrow = LocalDateTime.now(ZoneId.of("America/New_York")).plusDays(1)
                 val badRequest =
                     """
                 {
                     "bookableId": 1,
                     "subject": "My meeting in the past",
-                    "start": "${tomorrowISO}T09:00:00",
-                    "end": "${tomorrowISO}T08:00:00.000"
+                    "start": "$tomorrow",
+                    "end": "${tomorrow.minusHours(1)}"
                 }
                 """.trimIndent()
 
