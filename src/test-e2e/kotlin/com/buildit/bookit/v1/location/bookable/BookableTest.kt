@@ -15,7 +15,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import java.net.URI
-import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -24,7 +23,6 @@ import java.time.ZoneId
  */
 object BookableTest : Spek(
     {
-        val clock = Clock.system(ZoneId.of("America/New_York"))
         val uri: String = System.getenv("ENDPOINT_URI") ?: "http://localhost:8080"
         val restTemplate = TestRestTemplate(RestTemplateBuilder().rootUri(uri).build())
 
@@ -72,7 +70,7 @@ object BookableTest : Spek(
             }
             describe("Search for available bookables")
             {
-                val now = LocalDateTime.now(clock)
+                val now = LocalDateTime.now(ZoneId.of("America/New_York"))
                 val inOneHour = now.plusHours(1)
                 val inTwoHours = now.plusHours(2)
 
