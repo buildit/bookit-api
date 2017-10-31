@@ -2,6 +2,7 @@ package com.buildit.bookit.v1.location.bookable
 
 import com.winterbe.expekt.expect
 import org.jetbrains.spek.api.Spek
+import org.jetbrains.spek.api.dsl.context
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
@@ -9,7 +10,11 @@ import org.skyscreamer.jsonassert.JSONAssert
 import org.skyscreamer.jsonassert.JSONCompareMode
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import java.net.URI
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -22,6 +27,7 @@ object BookableTest : Spek(
         val clock = Clock.system(ZoneId.of("America/New_York"))
         val uri: String = System.getenv("ENDPOINT_URI") ?: "http://localhost:8080"
         val restTemplate = TestRestTemplate(RestTemplateBuilder().rootUri(uri).build())
+
         describe("/v1/location/<location>/bookable/<bookable>")
         {
             on("Get 1 bookable")
@@ -64,11 +70,11 @@ object BookableTest : Spek(
                     JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
                 }
             }
-            on("Search for available bookables")
+            describe("Search for available bookables")
             {
                 val now = LocalDateTime.now(clock)
-                val inOneHour = now.plusHours(1).toString()
-                val inTwoHours = now.plusHours(2).toString()
+                val inOneHour = now.plusHours(1)
+                val inTwoHours = now.plusHours(2)
 
                 it("should require end if start specified")
                 {
@@ -106,6 +112,67 @@ object BookableTest : Spek(
                         ]
                     """.trimIndent()
                     JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
+                }
+
+                context("room unavailable") {
+                    var location: URI? = null
+
+                    beforeGroup {
+                        val goodRequest =
+                            """
+                            {
+                                "bookableId": 1,
+                                "subject": "My new meeting",
+                                "start": "$inOneHour",
+                                "end": "$inTwoHours"
+                            }
+                            """.trimIndent()
+
+                        val headers = HttpHeaders()
+                        headers.contentType = MediaType.APPLICATION_JSON
+
+                        val entity = HttpEntity<String>(goodRequest, headers)
+                        val response = restTemplate.postForEntity("/v1/booking", entity, String::class.java)
+                        location = response.headers.location
+                    }
+
+                    it("should find unavailable bookable")
+                    {
+                        val response = restTemplate.getForEntity("/v1/location/1/bookable?start=$inOneHour&end=$inTwoHours", String::class.java)
+
+                        val expectedResponse = """
+                        [
+                            {
+                                "id": 1,
+                                "locationId": 1,
+                                "name": "Red",
+                                "available": false
+                            }
+                        ]
+                    """.trimIndent()
+                        JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
+                    }
+
+                    it("should find available bookable")
+                    {
+                        val response = restTemplate.getForEntity("/v1/location/1/bookable?start=$inTwoHours&end=${inTwoHours.plusHours(1)}", String::class.java)
+
+                        val expectedResponse = """
+                        [
+                            {
+                                "id": 1,
+                                "locationId": 1,
+                                "name": "Red",
+                                "available": true
+                            }
+                        ]
+                    """.trimIndent()
+                        JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
+                    }
+
+                    afterGroup {
+                        location?.let { restTemplate.delete(it) }
+                    }
                 }
             }
         }

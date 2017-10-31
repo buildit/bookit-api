@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger
 interface BookingRepository {
     fun getAllBookings(): Collection<Booking>
     fun insertBooking(bookableId: Int, subject: String, startDateTime: LocalDateTime, endDateTime: LocalDateTime): Booking
+    fun delete(id: Int)
 }
 
 @Repository
@@ -49,5 +50,9 @@ class BookingDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : Bookin
         }
 
         return Booking(bookingId, bookableId, subject, startDateTime, endDateTime)
+    }
+
+    override fun delete(id: Int) {
+        jdbcTemplate.update("DELETE FROM $tableName WHERE BOOKING_ID = ?", id)
     }
 }

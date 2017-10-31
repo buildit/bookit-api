@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Errors
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -53,9 +54,12 @@ class BookingController(private val bookingRepository: BookingRepository, privat
     /**
      * Get a booking
      */
-    @GetMapping(value = "/{id}")
+    @GetMapping("/{id}")
     fun getBooking(@PathVariable("id") bookingId: Int): Booking =
         bookingRepository.getAllBookings().find { it.id == bookingId } ?: throw BookingNotFound()
+
+    @DeleteMapping("/{id}")
+    fun deleteBooking(@PathVariable("id") id: Int) = bookingRepository.delete(id)
 
     /**
      * Create a booking

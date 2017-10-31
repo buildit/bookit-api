@@ -24,7 +24,7 @@ object BookingTests : Spek(
         val restTemplate = TestRestTemplate(RestTemplateBuilder().rootUri(uri).build())
         describe("/v1/booking")
         {
-            on("POSTing a valid meeting")
+            describe("POSTing a valid meeting")
             {
                 val tomorrow = LocalDate.now(ZoneId.of("America/New_York")).plusDays(1)
                 val tomorrowISO = "${tomorrow.year}-${tomorrow.monthValue}-${tomorrow.dayOfMonth}"
@@ -50,6 +50,10 @@ object BookingTests : Spek(
                     expect(jsonResponse.getInt("id")).to.be.above(0)
                     expect(jsonResponse.get("bookableId")).to.be.equal(1)
                     expect(jsonResponse.get("subject")).to.be.equal("My new meeting")
+                }
+
+                afterEachTest {
+                    response.headers.location?.let { restTemplate.delete(it) }
                 }
             }
 

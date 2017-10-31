@@ -29,7 +29,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime.now
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
 /**
  * Booking controller spring mvc integration tests
@@ -116,8 +115,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
             mvc.perform(post(request))
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath<String>("$.subject", equalToIgnoringCase(subject)))
-                .andExpect(jsonPath<String>("$.start", equalToIgnoringCase(startDateTime.format(ISO_LOCAL_DATE_TIME))))
-                .andExpect(jsonPath<String>("$.end", equalToIgnoringCase(endDateTime.format(ISO_LOCAL_DATE_TIME))))
+                .andExpect(jsonPath<String>("$.start", equalToIgnoringCase(startDateTime.toString())))
+                .andExpect(jsonPath<String>("$.end", equalToIgnoringCase(endDateTime.toString())))
         }
 
         @Test
