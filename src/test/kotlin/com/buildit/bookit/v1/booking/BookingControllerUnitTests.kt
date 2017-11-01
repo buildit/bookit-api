@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 class BookingControllerUnitTests {
 
@@ -31,8 +32,8 @@ class BookingControllerUnitTests {
 
             @BeforeEach
             fun setup() {
-                val startDateTime = LocalDateTime.parse("2017-09-26T09:00:00")
-                val endDateTime = LocalDateTime.parse("2017-09-26T10:00:00")
+                val startDateTime = LocalDateTime.parse("2017-09-26T09:00")
+                val endDateTime = LocalDateTime.parse("2017-09-26T10:00")
                 bookingRepo = mock {
                     on { getAllBookings() }.doReturn(
                         listOf(
@@ -75,7 +76,7 @@ class BookingControllerUnitTests {
             private lateinit var bookingController: BookingController
             private lateinit var locationRepo: LocationRepository
 
-            private val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1)
+            private val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
             private val createdBooking = Booking(1, 999999, "MyRequest", start, end)
 
@@ -113,6 +114,16 @@ class BookingControllerUnitTests {
             }
 
             @Test
+            fun `should chop seconds`() {
+                val request = BookingRequest(999999, "MyRequest", start.plusSeconds(59), end.plusSeconds(59))
+
+                val response = bookingController.createBooking(request)
+                val booking = response.body
+
+                expect(booking).to.equal(createdBooking)
+            }
+
+            @Test
             fun `should validate bookable exists`() {
                 val request = BookingRequest(12345, "MyRequest", start, end)
                 fun action() = bookingController.createBooking(request)
@@ -126,6 +137,7 @@ class BookingControllerUnitTests {
                     "MyRequest",
                     start.minusMinutes(30),
                     end.minusMinutes(30))
+
                 fun action() = bookingController.createBooking(request)
                 assertThat({ action() }, throws<BookableNotAvailable>())
             }
@@ -137,6 +149,7 @@ class BookingControllerUnitTests {
                     "MyRequest",
                     start.plusMinutes(30),
                     end.plusMinutes(30))
+
                 fun action() = bookingController.createBooking(request)
                 assertThat({ action() }, throws<BookableNotAvailable>())
             }
