@@ -22,6 +22,7 @@ import java.net.URI
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import javax.validation.Valid
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
@@ -76,18 +77,21 @@ class BookingController(private val bookingRepository: BookingRepository, privat
             throw InvalidBooking(errorMessage)
         }
 
+        val startDateTimeTruncated = bookingRequest.start!!.truncatedTo(ChronoUnit.MINUTES)
+        val endDateTimeTruncated = bookingRequest.end!!.truncatedTo(ChronoUnit.MINUTES)
+
         val now = LocalDateTime.now(clock.withZone(ZoneId.of(location.timeZone)))
-        if (!bookingRequest.start!!.isAfter(now)) {
+        if (!startDateTimeTruncated.isAfter(now)) {
             throw StartInPastException()
         }
 
-        if (!bookingRequest.end!!.isAfter(bookingRequest.start)) {
+        if (!endDateTimeTruncated.isAfter(startDateTimeTruncated)) {
             throw EndBeforeStartException()
         }
 
         val interval = Interval.of(
-            bookingRequest.start.atZone(ZoneId.of(location.timeZone)).toInstant(),
-            bookingRequest.end.atZone(ZoneId.of(location.timeZone)).toInstant()
+            startDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant(),
+            endDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant()
         )
 
         val unavailable = bookingRepository.getAllBookings()
@@ -101,8 +105,8 @@ class BookingController(private val bookingRepository: BookingRepository, privat
         val booking = bookingRepository.insertBooking(
             bookingRequest.bookableId!!,
             bookingRequest.subject!!,
-            bookingRequest.start,
-            bookingRequest.end
+            startDateTimeTruncated,
+            endDateTimeTruncated
         )
 
         return ResponseEntity

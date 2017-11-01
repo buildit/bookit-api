@@ -18,6 +18,7 @@ import org.threeten.extra.Interval
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 class BookableNotFound : RuntimeException("Bookable not found")
@@ -51,7 +52,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
     fun getAllBookables(
         @PathVariable("locationId") locationId: Int,
         @RequestParam("start", required = false)
-        @DateTimeFormat(pattern = "yyyy-MM-dd'T'H:mm[[:ss][.SSS]]")
+        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm[[:ss][.SSS]]")
         startDateTime: LocalDateTime? = null,
         @RequestParam("end", required = false)
         @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm[[:ss][.SSS]]")
@@ -59,13 +60,16 @@ class BookableController(private val bookableRepository: BookableRepository, pri
     ): Collection<Bookable> {
         val location = locationRepository.getLocations().find { it.id == locationId } ?: throw LocationNotFound()
 
-        if (startDateTime != null && endDateTime != null && !endDateTime.isAfter(startDateTime)) {
+        val startDateTimeTruncated = startDateTime?.truncatedTo(ChronoUnit.MINUTES)
+        val endDateTimeTruncated = endDateTime?.truncatedTo(ChronoUnit.MINUTES)
+
+        if (startDateTimeTruncated != null && endDateTimeTruncated != null && !endDateTimeTruncated.isAfter(startDateTimeTruncated)) {
             throw EndBeforeStartException()
         }
 
         val interval = Interval.of(
-            startDateTime?.atZone(ZoneId.of(location.timeZone))?.toInstant() ?: Instant.MIN,
-            endDateTime?.atZone(ZoneId.of(location.timeZone))?.toInstant() ?: Instant.MAX
+            startDateTimeTruncated?.atZone(ZoneId.of(location.timeZone))?.toInstant() ?: Instant.MIN,
+            endDateTimeTruncated?.atZone(ZoneId.of(location.timeZone))?.toInstant() ?: Instant.MAX
         )
 
         if (interval == Interval.ALL) {

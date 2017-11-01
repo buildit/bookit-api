@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.booking.dto
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import org.hibernate.validator.constraints.NotBlank
 import java.time.LocalDateTime
 import javax.validation.constraints.NotNull
@@ -25,6 +26,8 @@ data class Booking(
     val id: Int,
     val bookableId: Int,
     val subject: String,
+    @field:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     val start: LocalDateTime,
+    @field:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     val end: LocalDateTime
 )

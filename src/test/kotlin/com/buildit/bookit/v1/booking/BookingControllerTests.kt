@@ -19,6 +19,7 @@ import org.jetbrains.spek.api.dsl.on
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 /**
  * Booking controller unit tests
@@ -35,8 +36,8 @@ object BookingControllerTests : Spek({
         val clock = Clock.systemUTC()
         on("invoking getAllBookings()") {
             it("should get all bookings") {
-                val startDateTime = LocalDateTime.parse("2017-09-26T09:00:00")
-                val endDateTime = LocalDateTime.parse("2017-09-26T10:00:00")
+                val startDateTime = LocalDateTime.parse("2017-09-26T09:00")
+                val endDateTime = LocalDateTime.parse("2017-09-26T10:00")
 
                 val mockRepo = mock<BookingRepository> {
                     on { getAllBookings() }.doReturn(listOf(Booking(1, 2, "Booking", startDateTime, endDateTime)))
@@ -59,7 +60,7 @@ object BookingControllerTests : Spek({
         }
 
         on("createBooking()") {
-            val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1)
+            val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             val end = start.plusHours(1)
             val createdBooking = Booking(1, 999999, "MyRequest", start, end)
             val mockRepo = mock<BookingRepository> {
@@ -78,6 +79,18 @@ object BookingControllerTests : Spek({
             it("should create a booking") {
                 // arrange
                 val request = BookingRequest(999999, "MyRequest", start, end)
+
+                // act
+                val response = bookingController.createBooking(request)
+
+                // assert
+                val booking = response.body
+                expect(booking).to.equal(createdBooking)
+            }
+
+            it("should chop seconds") {
+                // arrange
+                val request = BookingRequest(999999, "MyRequest", start.plusSeconds(59), end.plusSeconds(59))
 
                 // act
                 val response = bookingController.createBooking(request)

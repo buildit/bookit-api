@@ -32,8 +32,8 @@ class BookingRepositoryTests @Autowired constructor(
     @Test
     fun insertBooking() {
         // arrange
-        val start = LocalDateTime.parse("2017-04-21T10:00:00")
-        val end = LocalDateTime.parse("2017-04-21T11:00:00")
+        val start = LocalDateTime.parse("2017-04-21T10:00")
+        val end = LocalDateTime.parse("2017-04-21T11:00")
         val bookingRepo = BookingDatabaseRepository(jdbcTemplate)
 
         // act
@@ -50,8 +50,8 @@ class BookingRepositoryTests @Autowired constructor(
     @Test
     fun getAllBookings1Booking() {
         // arrange
-        val start = LocalDateTime.parse("2017-04-21T10:00:00")
-        val end = LocalDateTime.parse("2017-04-21T11:00:00")
+        val start = LocalDateTime.parse("2017-04-21T10:00")
+        val end = LocalDateTime.parse("2017-04-21T11:00")
         val bookingRepo = BookingDatabaseRepository(jdbcTemplate)
         val booking = bookingRepo.insertBooking(1, "My Inserted", start, end)
 

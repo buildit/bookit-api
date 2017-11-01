@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDateTime.now
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 /**
  * Booking controller spring mvc integration tests
@@ -41,6 +42,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
 ) {
     private val NYC = "America/New_York"
     private val NYC_TZ = ZoneId.of(NYC)
+    private val startDateTime = now(NYC_TZ).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
+    private val endDateTime = now(NYC_TZ).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
 
     @MockBean
     lateinit var bookingRepository: BookingRepository
@@ -65,9 +68,6 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
     @Nested
     inner class GetBooking {
-        private val startDateTime = now(NYC_TZ).plusHours(1)
-        private val endDateTime = now(NYC_TZ).plusHours(2)
-
         @BeforeEach
         fun setupMock() {
             whenever(bookingRepository.getAllBookings())
@@ -96,8 +96,6 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
     @Nested
     inner class CreateBooking {
-        private val startDateTime = now(NYC_TZ).plusHours(1)
-        private val endDateTime = startDateTime.plusHours(1)
         private val subject = "New Meeting"
 
         @BeforeEach

@@ -18,6 +18,7 @@ import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 /**
  * Bookable controller unit tests
@@ -77,7 +78,7 @@ object BookableControllerTests : Spek({
         }
 
         on("Find available bookables") {
-            val now = LocalDateTime.now(ZoneId.of("America/New_York"))
+            val now = LocalDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.MINUTES)
             it("should require endDate if startDate specified") {
                 assertThat({ bookableController.getAllBookables(1, now.plusHours(1)) }, throws<InvalidBookableSearchEndDateRequired>())
             }
