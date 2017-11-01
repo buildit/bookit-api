@@ -96,7 +96,12 @@ class BookingController(private val bookingRepository: BookingRepository, privat
 
         val unavailable = bookingRepository.getAllBookings()
             .filter { it.bookableId == bookable.id }
-            .any { interval.overlaps(Interval.of(it.start.atZone(ZoneId.of(location.timeZone)).toInstant(), it.end.atZone(ZoneId.of(location.timeZone)).toInstant())) }
+            .any {
+                interval.overlaps(
+                    Interval.of(
+                        it.start.atZone(ZoneId.of(location.timeZone)).toInstant(),
+                        it.end.atZone(ZoneId.of(location.timeZone)).toInstant()))
+            }
 
         if (unavailable) {
             throw BookableNotAvailable()
