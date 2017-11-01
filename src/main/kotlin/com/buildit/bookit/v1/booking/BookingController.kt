@@ -46,7 +46,7 @@ class BookableNotAvailable : RuntimeException("Bookable is not available.  Pleas
 @RestController
 @RequestMapping("/v1/booking")
 @Transactional
-class BookingController(private val bookingRepository: BookingRepository, private val bookableRepository: BookableRepository, private val locationRepoistory: LocationRepository, private val clock: Clock) {
+class BookingController(private val bookingRepository: BookingRepository, private val bookableRepository: BookableRepository, private val locationRepository: LocationRepository, private val clock: Clock) {
     /**
      */
     @GetMapping
@@ -69,7 +69,7 @@ class BookingController(private val bookingRepository: BookingRepository, privat
     @PostMapping()
     fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: Errors? = null): ResponseEntity<Booking> {
         val bookable = bookableRepository.getAllBookables().find { it.id == bookingRequest.bookableId } ?: throw InvalidBookable()
-        val location = locationRepoistory.getLocations().single { it.id == bookable.locationId }
+        val location = locationRepository.getLocations().single { it.id == bookable.locationId }
 
         if (errors?.hasErrors() == true) {
             val errorMessage = errors.allErrors.joinToString(",", transform = { it.defaultMessage })
@@ -96,7 +96,12 @@ class BookingController(private val bookingRepository: BookingRepository, privat
 
         val unavailable = bookingRepository.getAllBookings()
             .filter { it.bookableId == bookable.id }
-            .any { interval.overlaps(Interval.of(it.start.atZone(ZoneId.of(location.timeZone)).toInstant(), it.end.atZone(ZoneId.of(location.timeZone)).toInstant())) }
+            .any {
+                interval.overlaps(
+                    Interval.of(
+                        it.start.atZone(ZoneId.of(location.timeZone)).toInstant(),
+                        it.end.atZone(ZoneId.of(location.timeZone)).toInstant()))
+            }
 
         if (unavailable) {
             throw BookableNotAvailable()
