@@ -51,10 +51,10 @@ class BookableController(private val bookableRepository: BookableRepository, pri
     fun getAllBookables(
         @PathVariable("locationId") locationId: Int,
         @RequestParam("start", required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
         startDateTime: LocalDateTime? = null,
         @RequestParam("end", required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
         endDateTime: LocalDateTime? = null
     ): Collection<Bookable> {
         val location = locationRepository.getLocations().find { it.id == locationId } ?: throw LocationNotFound()
