@@ -9,8 +9,10 @@ import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.reset
 import com.nhaarman.mockito_kotlin.whenever
 import org.hamcrest.Matchers.equalToIgnoringCase
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -56,6 +58,13 @@ class BookingControllerMockMvcTests @Autowired constructor(
     @BeforeEach
     fun setupMocks() {
         whenever(locationRepo.getLocations()).doReturn(listOf(Location(1, "NYC", NYC)))
+    }
+
+    @AfterEach
+    fun resetMocks() {
+        reset(bookingRepo)
+        reset(bookableRepo)
+        reset(locationRepo)
     }
 
     @Nested
