@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test
 import org.skyscreamer.jsonassert.JSONAssert
 import org.skyscreamer.jsonassert.JSONCompareMode
 import org.springframework.http.HttpStatus
-import java.net.URI
+import org.springframework.http.ResponseEntity
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -19,6 +20,7 @@ import java.time.ZoneId
  */
 class `Bookable E2E Tests` {
     val now = LocalDateTime.now(ZoneId.of("America/New_York"))
+    val today = LocalDate.now(ZoneId.of("America/New_York"))
     val inOneHour = now.plusHours(1)
     val inTwoHours = now.plusHours(2)
 
@@ -33,7 +35,11 @@ class `Bookable E2E Tests` {
                             "id": 1,
                             "locationId": 1,
                             "name": "Red",
-                            "available": true
+                            "disposition": {
+                                "closed": false,
+                                "reason": ""
+                            },
+                            bookings: []
                         }
                     """.trimIndent()
         JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
@@ -51,7 +57,11 @@ class `Bookable E2E Tests` {
                                 "id": 1,
                                 "locationId": 1,
                                 "name": "Red",
-                                "available": true
+                                "disposition": {
+                                    "closed": false,
+                                    "reason": ""
+                                },
+                                bookings: []
                             }
                         ]
                     """.trimIndent()
@@ -61,22 +71,8 @@ class `Bookable E2E Tests` {
     @Nested
     inner class `Search for bookables` {
         @Test
-        fun `should require end if start specified`() {
-            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=$inOneHour", String::class.java)
-
-            expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
-        }
-
-        @Test
-        fun `should require start if end specified`() {
-            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?end=$inTwoHours", String::class.java)
-
-            expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
-        }
-
-        @Test
         fun `should require start before end`() {
-            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=$inTwoHours&end=$inOneHour", String::class.java)
+            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=$today&end=${today.minusDays(1)}", String::class.java)
 
             expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
         }
@@ -84,7 +80,7 @@ class `Bookable E2E Tests` {
         @Test
         fun `should find available bookable`() {
             // act
-            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=$inOneHour&end=$inTwoHours", String::class.java)
+            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=$today&end=$today&expand=bookings", String::class.java)
 
             // assert
             val expectedResponse = """
@@ -93,7 +89,11 @@ class `Bookable E2E Tests` {
                                 "id": 1,
                                 "locationId": 1,
                                 "name": "Red",
-                                "available": true
+                                "disposition": {
+                                    "closed": false,
+                                    "reason": ""
+                                },
+                                bookings: []
                             }
                         ]
                     """.trimIndent()
@@ -102,7 +102,7 @@ class `Bookable E2E Tests` {
 
         @Nested
         inner class `room unavailable` {
-            var location: URI? = null
+            var createResponse: ResponseEntity<String>? = null
 
             @BeforeEach
             fun `create booking`() {
@@ -115,13 +115,13 @@ class `Bookable E2E Tests` {
                                 "end": "$inTwoHours"
                             }
                             """
-                location = Global.REST_TEMPLATE.postForLocation("/v1/booking", goodRequest.toEntity())
+                createResponse = Global.REST_TEMPLATE.postForEntity("/v1/booking", goodRequest.toEntity(), String::class.java)
             }
 
             @Test
-            fun `should find unavailable bookable`() {
+            fun `should find bookable with bookings`() {
                 // act
-                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=$inOneHour&end=$inTwoHours", String::class.java)
+                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?expand=bookings", String::class.java)
 
                 // assert
                 val expectedResponse = """
@@ -130,7 +130,13 @@ class `Bookable E2E Tests` {
                                 "id": 1,
                                 "locationId": 1,
                                 "name": "Red",
-                                "available": false
+                                "disposition": {
+                                    "closed": false,
+                                    "reason": ""
+                                },
+                                bookings: [
+                                    ${createResponse?.body}
+                                ]
                             }
                         ]
                     """.trimIndent()
@@ -138,9 +144,9 @@ class `Bookable E2E Tests` {
             }
 
             @Test
-            fun `should find available bookable`() {
+            fun `should find bookable with no bookings on different day`() {
                 // act
-                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=$inTwoHours&end=${inTwoHours.plusHours(1)}", String::class.java)
+                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=${today.plusDays(1)}&expand=bookings", String::class.java)
 
                 // assert
                 val expectedResponse = """
@@ -149,7 +155,11 @@ class `Bookable E2E Tests` {
                                 "id": 1,
                                 "locationId": 1,
                                 "name": "Red",
-                                "available": true
+                                "disposition": {
+                                    "closed": false,
+                                    "reason": ""
+                                },
+                                bookings: []
                             }
                         ]
                     """.trimIndent()
@@ -158,7 +168,7 @@ class `Bookable E2E Tests` {
 
             @AfterEach
             fun `delete booking`() {
-                location?.let { Global.REST_TEMPLATE.delete(it) }
+                createResponse?.headers?.location?.let { Global.REST_TEMPLATE.delete(it) }
             }
         }
     }

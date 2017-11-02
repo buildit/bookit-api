@@ -1,6 +1,7 @@
 package com.buildit.bookit.v1.location.bookable
 
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
+import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -27,6 +28,6 @@ class BookableRepositoryTests @Autowired constructor(
 
         // assert
         expect(bookables.size).to.be.equal(1)
-        expect(bookables).to.contain(Bookable(1, 1, "Red", true))
+        expect(bookables).to.contain(Bookable(1, 1, "Red", Disposition()))
     }
 }

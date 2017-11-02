@@ -3,7 +3,7 @@ package com.buildit.bookit.v1.location.bookable
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.location.LocationRepository
-import com.buildit.bookit.v1.location.bookable.dto.Bookable
+import com.buildit.bookit.v1.location.bookable.dto.BookableResource
 import com.buildit.bookit.v1.location.dto.LocationNotFound
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.threeten.extra.Interval
-import java.time.Instant
-import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 class BookableNotFound : RuntimeException("Bookable not found")
@@ -40,9 +38,9 @@ class BookableController(private val bookableRepository: BookableRepository, pri
      * Get a bookable
      */
     @GetMapping(value = "/{bookableId}")
-    fun getBookable(@PathVariable("locationId") location: Int, @PathVariable("bookableId") bookable: Int): Bookable {
+    fun getBookable(@PathVariable("locationId") location: Int, @PathVariable("bookableId") bookable: Int): BookableResource {
         locationRepository.getLocations().find { it.id == location } ?: throw LocationNotFound()
-        return bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound()
+        return BookableResource(bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound())
     }
 
     /**
@@ -52,44 +50,38 @@ class BookableController(private val bookableRepository: BookableRepository, pri
     fun getAllBookables(
         @PathVariable("locationId") locationId: Int,
         @RequestParam("start", required = false)
-        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm[[:ss][.SSS]]")
-        startDateTime: LocalDateTime? = null,
+        @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
+        startDate: LocalDate? = null,
         @RequestParam("end", required = false)
-        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm[[:ss][.SSS]]")
-        endDateTime: LocalDateTime? = null
-    ): Collection<Bookable> {
+        @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
+        endDate: LocalDate? = null,
+        @RequestParam("expand", required = false)
+        expand: List<String>? = emptyList()
+    ): Collection<BookableResource> {
         val location = locationRepository.getLocations().find { it.id == locationId } ?: throw LocationNotFound()
+        val timeZone = ZoneId.of(location.timeZone)
+        val start = startDate ?: LocalDate.now(timeZone)
+        val end = endDate ?: start
 
-        val startDateTimeTruncated = startDateTime?.truncatedTo(ChronoUnit.MINUTES)
-        val endDateTimeTruncated = endDateTime?.truncatedTo(ChronoUnit.MINUTES)
-
-        if (startDateTimeTruncated != null && endDateTimeTruncated != null && !endDateTimeTruncated.isAfter(startDateTimeTruncated)) {
+        if (end.isBefore(start)) {
             throw EndBeforeStartException()
         }
 
         val interval = Interval.of(
-            startDateTimeTruncated?.atZone(ZoneId.of(location.timeZone))?.toInstant() ?: Instant.MIN,
-            endDateTimeTruncated?.atZone(ZoneId.of(location.timeZone))?.toInstant() ?: Instant.MAX
+            start.atStartOfDay(timeZone).toInstant(),
+            end.plusDays(1).atStartOfDay(timeZone).toInstant()
         )
 
-        if (interval == Interval.ALL) {
-            return bookableRepository.getAllBookables().takeWhile { it.locationId == locationId }
-        }
-
-        if (interval.isUnboundedStart) {
-            throw InvalidBookableSearchStartDateRequired()
-        }
-
-        if (interval.isUnboundedEnd) {
-            throw InvalidBookableSearchEndDateRequired()
-        }
-
-        val unavailableBookables = bookingRepository.getAllBookings().takeWhile {
-            interval.overlaps(Interval.of(it.start.atZone(ZoneId.of(location.timeZone)).toInstant(), it.end.atZone(ZoneId.of(location.timeZone)).toInstant()))
-        }.distinctBy { it.bookableId }
-
         return bookableRepository.getAllBookables().takeWhile { it.locationId == locationId }.map { bookable ->
-            bookable.copy(available = bookable.available && unavailableBookables.none { it.bookableId == bookable.id })
+            val bookings = when {
+                "bookings" in expand ?: emptyList() ->
+                    bookingRepository.getAllBookings().takeWhile { it.bookableId == bookable.id }.takeWhile {
+                        interval.overlaps(Interval.of(it.start.atZone(timeZone).toInstant(), it.end.atZone(timeZone).toInstant()))
+                    }
+                else -> emptyList()
+            }
+
+            BookableResource(bookable, bookings)
         }
     }
 }

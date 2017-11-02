@@ -3,6 +3,7 @@ package com.buildit.bookit.v1.location.bookable
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
+import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.whenever
@@ -39,7 +40,7 @@ class BookableControllerMockMvcTests @Autowired constructor(
         whenever(locationRepo.getLocations())
             .doReturn(listOf(Location(1, "NYC", "America/New_York")))
         whenever(bookableRepo.getAllBookables())
-            .doReturn(listOf(Bookable(1, 1, "The best bookable ever", true)))
+            .doReturn(listOf(Bookable(1, 1, "The best bookable ever", Disposition())))
     }
 
     @Test
@@ -47,7 +48,7 @@ class BookableControllerMockMvcTests @Autowired constructor(
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/1/bookable/1"))
             .andExpect(status().isOk)
             .andExpect(jsonPath<String>("$.name", equalToIgnoringCase("The best bookable ever")))
-            .andExpect(jsonPath<Boolean>("$.available", equalTo(true)))
+            .andExpect(jsonPath<Boolean>("$.disposition.closed", equalTo(false)))
     }
 
     @Test

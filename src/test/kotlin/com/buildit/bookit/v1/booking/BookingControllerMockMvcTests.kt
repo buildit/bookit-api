@@ -5,6 +5,7 @@ import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
+import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockito_kotlin.doReturn
@@ -103,7 +104,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
             whenever(bookingRepo.insertBooking(1, subject, startDateTime, endDateTime))
                 .doReturn(Booking(1, 1, subject, startDateTime, endDateTime))
             whenever(bookableRepo.getAllBookables())
-                .doReturn(listOf(Bookable(1, 1, "Foo", true)))
+                .doReturn(listOf(Bookable(1, 1, "Foo", Disposition())))
         }
 
         @Test
