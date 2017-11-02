@@ -22,12 +22,6 @@ import java.time.ZoneId
 class BookableNotFound : RuntimeException("Bookable not found")
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-class InvalidBookableSearchStartDateRequired : RuntimeException("start is required if end is specified")
-
-@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-class InvalidBookableSearchEndDateRequired : RuntimeException("end is required if start is specified")
-
-@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 class InvalidBookable : RuntimeException("Bookable does not exist")
 
 @RestController

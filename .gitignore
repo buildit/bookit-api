@@ -29,6 +29,7 @@ bin/
 .idea/checkstyle-idea.xml
 .idea/saveactions_settings.xml
 .idea/vcs.xml
+.idea/compiler.xml
 
 # Sensitive or high-churn files:
 .idea/**/dataSources/
