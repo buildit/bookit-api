@@ -8,10 +8,8 @@ import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.dto.Location
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.reset
 import com.nhaarman.mockito_kotlin.whenever
 import org.hamcrest.Matchers.equalToIgnoringCase
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -46,31 +44,24 @@ class BookingControllerMockMvcTests @Autowired constructor(
     private val endDateTime = now(NYC_TZ).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
 
     @MockBean
-    lateinit var bookingRepository: BookingRepository
+    lateinit var bookingRepo: BookingRepository
 
     @MockBean
-    lateinit var bookableRepository: BookableRepository
+    lateinit var bookableRepo: BookableRepository
 
     @MockBean
-    lateinit var locationRepository: LocationRepository
+    lateinit var locationRepo: LocationRepository
 
     @BeforeEach
     fun setupMocks() {
-        whenever(locationRepository.getLocations()).doReturn(listOf(Location(1, "NYC", NYC)))
-    }
-
-    @AfterEach
-    fun resetMocks() {
-        reset(bookingRepository)
-        reset(bookableRepository)
-        reset(locationRepository)
+        whenever(locationRepo.getLocations()).doReturn(listOf(Location(1, "NYC", NYC)))
     }
 
     @Nested
     inner class GetBooking {
         @BeforeEach
         fun setupMock() {
-            whenever(bookingRepository.getAllBookings())
+            whenever(bookingRepo.getAllBookings())
                 .doReturn(listOf(Booking(1, 1, "The Booking", startDateTime, endDateTime)))
         }
 
@@ -100,9 +91,9 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @BeforeEach
         fun createMock() {
-            whenever(bookingRepository.insertBooking(1, subject, startDateTime, endDateTime))
+            whenever(bookingRepo.insertBooking(1, subject, startDateTime, endDateTime))
                 .doReturn(Booking(1, 1, subject, startDateTime, endDateTime))
-            whenever(bookableRepository.getAllBookables())
+            whenever(bookableRepo.getAllBookables())
                 .doReturn(listOf(Bookable(1, 1, "Foo", true)))
         }
 
