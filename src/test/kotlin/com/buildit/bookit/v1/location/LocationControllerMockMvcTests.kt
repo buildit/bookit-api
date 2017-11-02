@@ -2,10 +2,8 @@ package com.buildit.bookit.v1.location
 
 import com.buildit.bookit.v1.location.dto.Location
 import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.reset
 import com.nhaarman.mockito_kotlin.whenever
-import org.hamcrest.Matchers
-import org.junit.jupiter.api.AfterEach
+import org.hamcrest.Matchers.equalToIgnoringCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -15,7 +13,8 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 /**
  * Tests the /location endpoint
@@ -27,43 +26,25 @@ class LocationControllerMockMvcTests @Autowired constructor(
 ) {
 
     @MockBean
-    lateinit var mockLocationRepo: LocationRepository
+    lateinit var locationRepo: LocationRepository
 
     @BeforeEach
     fun setupMocks() {
-        whenever(mockLocationRepo.getLocations()).doReturn(listOf(Location(1, "The best location ever", "America/New_York")))
+        whenever(locationRepo.getLocations())
+            .doReturn(listOf(Location(1, "The best location ever", "America/New_York")))
     }
 
-    @AfterEach
-    fun resetMocks() {
-        reset(mockLocationRepo)
-    }
-
-    /**
-     * Fail to get a location
-     */
     @Test
-    fun getValidLocationURITest() {
-        // arrange
-        // act
-        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/1"))
-
-        // assert
-        result.andExpect(MockMvcResultMatchers.status().isOk)
-        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.name", Matchers.equalToIgnoringCase("The best location ever")))
-        result.andExpect(MockMvcResultMatchers.jsonPath<String>("$.timeZone", Matchers.equalToIgnoringCase("America/New_York")))
+    fun `get known location`() {
+        mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/1"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath<String>("$.name", equalToIgnoringCase("The best location ever")))
+            .andExpect(jsonPath<String>("$.timeZone", equalToIgnoringCase("America/New_York")))
     }
 
-    /**
-     * Fail to get a location
-     */
     @Test
-    fun getMalformedURITest() {
-        // arrange
-        // act
-        val result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/notanumber"))
-
-        // assert
-        result.andExpect(MockMvcResultMatchers.status().isBadRequest)
+    fun `bad location id fails`() {
+        mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/notanumber"))
+            .andExpect(status().isBadRequest)
     }
 }

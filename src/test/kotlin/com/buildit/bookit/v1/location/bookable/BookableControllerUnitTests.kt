@@ -18,10 +18,6 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
-typealias Describe = Nested
-typealias On = Nested
-typealias It = Test
-
 class BookableControllerUnitTests {
     val locationRepo = mock<LocationRepository> {
         on { getLocations() }.doReturn(listOf(
@@ -40,10 +36,12 @@ class BookableControllerUnitTests {
 
     val bookableController = BookableController(bookableRepo, locationRepo, bookingRepo)
 
-    @Describe inner class `v1|bookable` {
-        @Describe inner class `get single bookable` {
-            @On inner class `that is known` {
-                @It
+    @Nested
+    inner class `v1|bookable` {
+        @Nested
+        inner class `get single bookable` {
+            @Nested inner class `that is known` {
+                @Test
                 fun `should return bookable1`() {
                     val bookable = bookableController.getBookable(1, 1)
 
@@ -52,37 +50,41 @@ class BookableControllerUnitTests {
                 }
             }
 
-            @On inner class `that is unknown` {
-                @It
+            @Nested
+            inner class `that is unknown` {
+                @Test
                 fun `throws exception for invalid bookable`() {
                     assertThat({ bookableController.getBookable(1, 2) }, throws<BookableNotFound>())
                 }
 
-                @It
+                @Test
                 fun `throws exception for invalid location`() {
                     assertThat({ bookableController.getBookable(-1, 1) }, throws<LocationNotFound>())
                 }
             }
         }
 
-        @Describe inner class `get multiple bookables` {
-            @On inner class `for location` {
-                @It
+        @Nested
+        inner class `get multiple bookables` {
+            @Nested
+            inner class `for location` {
+                @Test
                 fun `returns all bookables`() {
                     val allBookables = bookableController.getAllBookables(1)
                     expect(allBookables).to.contain(availableBookable)
                 }
 
-                @It
+                @Test
                 fun `with invalid location throws exception`() {
                     assertThat({ bookableController.getAllBookables(-1) }, throws<LocationNotFound>())
                 }
             }
 
-            @On inner class `with availability` {
+            @Nested
+            inner class `with availability` {
                 private val now: LocalDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.MINUTES)
 
-                @It
+                @Test
                 fun `requires endDate if startDate specified`() {
                     assertThat({
                         bookableController.getAllBookables(1, now.plusHours(1))
@@ -90,7 +92,7 @@ class BookableControllerUnitTests {
                         throws<InvalidBookableSearchEndDateRequired>())
                 }
 
-                @It
+                @Test
                 fun `requires startDate if endDate specified`() {
                     assertThat({
                         bookableController.getAllBookables(1, null, now.plusHours(1))
@@ -98,7 +100,7 @@ class BookableControllerUnitTests {
                         throws<InvalidBookableSearchStartDateRequired>())
                 }
 
-                @It
+                @Test
                 fun `requires startDate before endDate, equal`() {
                     assertThat({
                         bookableController.getAllBookables(1, now.plusHours(1), now.plusHours(1))
@@ -106,7 +108,7 @@ class BookableControllerUnitTests {
                         throws<EndBeforeStartException>())
                 }
 
-                @It
+                @Test
                 fun `requires startDate before endDate, not equal`() {
                     assertThat({
                         bookableController.getAllBookables(1, now.plusHours(2), now.plusHours(1))
@@ -114,14 +116,14 @@ class BookableControllerUnitTests {
                         throws<EndBeforeStartException>())
                 }
 
-                @It
+                @Test
                 fun `finds an available bookable`() {
                     expect(
                         bookableController.getAllBookables(1, now.plusHours(1), now.plusHours(2)))
                         .to.contain(availableBookable)
                 }
 
-                @It
+                @Test
                 fun `honors bookable available setting`() {
                     val bookableRepo = mock<BookableRepository> {
                         on { getAllBookables() }.doReturn(listOf(unavailableBookable))
@@ -133,7 +135,7 @@ class BookableControllerUnitTests {
                         .to.contain(unavailableBookable)
                 }
 
-                @It
+                @Test
                 fun `checks that there are no bookings for that time slot, same`() {
                     val bookingRepo = mock<BookingRepository> {
                         on { getAllBookings() }.doReturn(listOf(Booking(1, 1, "Booking", now.plusHours(1), now.plusHours(2))))
@@ -145,7 +147,7 @@ class BookableControllerUnitTests {
                         .to.contain(unavailableBookable)
                 }
 
-                @It
+                @Test
                 fun `checks that there are no bookings for that time slot, same - chop seconds`() {
                     // arrange
                     val mockRepository = mock<BookingRepository> {
@@ -160,7 +162,7 @@ class BookableControllerUnitTests {
                     expect(bookables).to.contain(unavailableBookable)
                 }
 
-                @It
+                @Test
                 fun `ignores bookings for other bookables`() {
                     val bookingRepo = mock<BookingRepository> {
                         on { getAllBookings() }.doReturn(listOf(Booking(1, 2, "Booking", now.plusHours(1), now.plusHours(2))))
@@ -172,7 +174,7 @@ class BookableControllerUnitTests {
                         .to.contain(availableBookable)
                 }
 
-                @It
+                @Test
                 fun `checks that there are no bookings for that time slot, overlap start`() {
                     val bookingRepo = mock<BookingRepository> {
                         on { getAllBookings() }.doReturn(listOf(Booking(1, 1, "Booking", now, now.plusMinutes(90))))
@@ -184,7 +186,7 @@ class BookableControllerUnitTests {
                         .to.contain(unavailableBookable)
                 }
 
-                @It
+                @Test
                 fun `checks that there are no bookings for that time slot, overlap end`() {
                     val bookingRepo = mock<BookingRepository> {
                         on { getAllBookings() }.doReturn(listOf(Booking(1, 1, "Booking", now.plusMinutes(90), now.plusMinutes(180))))
@@ -196,7 +198,7 @@ class BookableControllerUnitTests {
                         .to.contain(unavailableBookable)
                 }
 
-                @It
+                @Test
                 fun `checks that there are no bookings for that time slot, overlap both`() {
                     val bookingRepo = mock<BookingRepository> {
                         on { getAllBookings() }.doReturn(listOf(Booking(1, 1, "Booking", now, now.plusHours(3))))
@@ -208,7 +210,7 @@ class BookableControllerUnitTests {
                         .to.contain(unavailableBookable)
                 }
 
-                @It
+                @Test
                 fun `checks that there are no bookings for that time slot, abut`() {
                     val mockRepository = mock<BookingRepository> {
                         on { getAllBookings() }.doReturn(listOf(Booking(1, 1, "Booking", now, now.plusHours(1))))

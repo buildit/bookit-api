@@ -20,17 +20,10 @@ class PingControllerMockMvcTests @Autowired constructor(
     private val mockMvc: MockMvc
 ) {
 
-    /**
-     * ensure ping serialization works
-     */
     @Test
-    fun ping() {
-        // arrange
-        // act
-        val result = mockMvc.perform(get("/v1/ping"))
-
-        // assert
-        result.andExpect(status().isOk)
-        result.andExpect(jsonPath<String>("$.status", equalToIgnoringCase("up")))
+    fun `ping success`() {
+        mockMvc.perform(get("/v1/ping"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath<String>("$.status", equalToIgnoringCase("up")))
     }
 }
