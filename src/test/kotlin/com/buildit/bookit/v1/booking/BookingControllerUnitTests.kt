@@ -6,6 +6,7 @@ import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
+import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
@@ -97,7 +98,7 @@ class BookingControllerUnitTests {
                     ))
                 }
                 val bookableRepo = mock<BookableRepository> {
-                    on { getAllBookables() }.doReturn(listOf(Bookable(999999, 1, "Bookable", true)))
+                    on { getAllBookables() }.doReturn(listOf(Bookable(999999, 1, "Bookable", Disposition())))
                 }
 
                 bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, clock)

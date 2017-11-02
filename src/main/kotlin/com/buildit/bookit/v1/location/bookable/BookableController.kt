@@ -3,7 +3,6 @@ package com.buildit.bookit.v1.location.bookable
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.location.LocationRepository
-import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.BookableResource
 import com.buildit.bookit.v1.location.dto.LocationNotFound
 import org.springframework.format.annotation.DateTimeFormat
@@ -39,9 +38,9 @@ class BookableController(private val bookableRepository: BookableRepository, pri
      * Get a bookable
      */
     @GetMapping(value = "/{bookableId}")
-    fun getBookable(@PathVariable("locationId") location: Int, @PathVariable("bookableId") bookable: Int): Bookable {
+    fun getBookable(@PathVariable("locationId") location: Int, @PathVariable("bookableId") bookable: Int): BookableResource {
         locationRepository.getLocations().find { it.id == location } ?: throw LocationNotFound()
-        return bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound()
+        return BookableResource(bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound())
     }
 
     /**
@@ -74,11 +73,15 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         )
 
         return bookableRepository.getAllBookables().takeWhile { it.locationId == locationId }.map { bookable ->
-            BookableResource(bookable, expand?.firstOrNull { it.equals("bookings", true) }?.let {
-                bookingRepository.getAllBookings().takeWhile { it.bookableId == bookable.id }.takeWhile {
-                    interval.overlaps(Interval.of(it.start.atZone(timeZone).toInstant(), it.end.atZone(timeZone).toInstant()))
-                }
-            })
+            val bookings = when {
+                "bookings" in expand ?: emptyList() ->
+                    bookingRepository.getAllBookings().takeWhile { it.bookableId == bookable.id }.takeWhile {
+                        interval.overlaps(Interval.of(it.start.atZone(timeZone).toInstant(), it.end.atZone(timeZone).toInstant()))
+                    }
+                else -> emptyList()
+            }
+
+            BookableResource(bookable, bookings)
         }
     }
 }
