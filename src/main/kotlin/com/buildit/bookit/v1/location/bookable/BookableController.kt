@@ -34,7 +34,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
      */
     @GetMapping(value = "/{bookableId}")
     fun getBookable(@PathVariable("locationId") location: Int, @PathVariable("bookableId") bookable: Int): BookableResource {
-        locationRepository.getLocations().find { it.id == location } ?: throw LocationNotFound()
+        locationRepository.findOne(location) ?: throw LocationNotFound()
         return BookableResource(bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound())
     }
 
@@ -53,7 +53,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         @RequestParam("expand", required = false)
         expand: List<String>? = emptyList()
     ): Collection<BookableResource> {
-        val location = locationRepository.getLocations().find { it.id == locationId } ?: throw LocationNotFound()
+        val location = locationRepository.findOne(locationId) ?: throw LocationNotFound()
         val timeZone = ZoneId.of(location.timeZone)
         val start = startDate ?: LocalDate.now(timeZone)
         val end = endDate ?: start

@@ -69,7 +69,7 @@ class BookingController(private val bookingRepository: BookingRepository, privat
     @PostMapping()
     fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: Errors? = null): ResponseEntity<Booking> {
         val bookable = bookableRepository.getAllBookables().find { it.id == bookingRequest.bookableId } ?: throw InvalidBookable()
-        val location = locationRepository.getLocations().single { it.id == bookable.locationId }
+        val location = locationRepository.findOne(bookable.locationId)
 
         if (errors?.hasErrors() == true) {
             val errorMessage = errors.allErrors.joinToString(",", transform = { it.defaultMessage })
