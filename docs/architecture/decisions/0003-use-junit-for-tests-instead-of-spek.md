@@ -16,6 +16,6 @@ Use JUnit 5 for all unit and e2e tests.  This will simplify thing and has better
 
 ## Consequences
 
-Spek is nice but doesn't work with Spring's integration yet.  As such, we'd have to write JUnit tests anyways.  The JUnit 5 integration is more of a POC but works w/ Spring 4.x.  Spring 5.x suppports JUnit 5 out of the box.  
+Spek is nice but doesn't work with Spring's integration yet.  As such, we'd have to write JUnit tests anyways.  The JUnit 5 integration is more of a POC but works w/ Spring 4.x.  Spring 5.x supports JUnit 5 out of the box.  
 
 Tests will be a little more verbose, but JUnit supports nested tests and Kotlin allows for sentences for class and function names.  

@@ -1,7 +1,6 @@
 buildscript {
     ext {
         kotlin_version = '1.1.51'
-        spek_version = '1.1.5'
         junit_version = '5.0.1'
         junit_gradle_version = '1.0.1'
         expekt_version = '0.5.0'
@@ -191,7 +190,6 @@ dependencies {
     }
     testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
     testCompile("com.winterbe:expekt:$expekt_version")
-    testCompile("org.jetbrains.spek:spek-api:$spek_version")
     testCompile("org.junit.jupiter:junit-jupiter-api:$junit_version")
     testCompile("com.natpryce:hamkrest:$hamkrest_version")
     testCompile("com.nhaarman:mockito-kotlin-kt1.1:$mockito_kotlin_1_1")
@@ -199,7 +197,6 @@ dependencies {
 
     testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit_version")
     testRuntime("org.junit.platform:junit-platform-console:$junit_gradle_version")
-    testRuntime("org.jetbrains.spek:spek-junit-platform-engine:$spek_version")
 }
 
 // https://stackoverflow.com/questions/45297339/junit-5-under-gradle-with-multiple-source-sets
