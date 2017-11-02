@@ -74,7 +74,7 @@ class BookableControllerUnitTests {
                 }
             }
 
-            @On inner class `with avalability` {
+            @On inner class `with availability` {
                 private val now: LocalDateTime = LocalDateTime.now(ZoneId.of("America/New_York")).truncatedTo(ChronoUnit.MINUTES)
 
                 @It fun `requires endDate if startDate specified`() {
