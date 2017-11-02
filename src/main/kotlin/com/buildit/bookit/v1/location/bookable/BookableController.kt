@@ -2,7 +2,7 @@ package com.buildit.bookit.v1.location.bookable
 
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
-import com.buildit.bookit.v1.booking.dto.Booking
+import com.buildit.bookit.v1.booking.dto.interval
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.BookableResource
 import com.buildit.bookit.v1.location.dto.LocationNotFound
@@ -58,12 +58,6 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         val start = startDate ?: LocalDate.now(timeZone)
         val end = endDate ?: start
 
-        fun Booking.interval(): Interval {
-            return Interval.of(
-                this.start.atZone(timeZone).toInstant(),
-                this.end.atZone(timeZone).toInstant())
-        }
-
         if (end.isBefore(start)) {
             throw EndBeforeStartException()
         }
@@ -80,7 +74,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
                     "bookings" in expand ?: emptyList() ->
                         bookingRepository.getAllBookings()
                             .takeWhile { it.bookableId == bookable.id }
-                            .takeWhile { desiredInterval.overlaps(it.interval()) }
+                            .takeWhile { desiredInterval.overlaps(it.interval(timeZone)) }
                     else -> emptyList()
                 }
 

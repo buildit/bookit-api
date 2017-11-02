@@ -2,7 +2,9 @@ package com.buildit.bookit.v1.booking.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import org.hibernate.validator.constraints.NotBlank
+import org.threeten.extra.Interval
 import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.validation.constraints.NotNull
 
 /**
@@ -31,3 +33,9 @@ data class Booking(
     @field:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     val end: LocalDateTime
 )
+
+fun Booking.interval(timeZone: ZoneId): Interval =
+    Interval.of(
+        this.start.atZone(timeZone).toInstant(),
+        this.end.atZone(timeZone).toInstant())
+
