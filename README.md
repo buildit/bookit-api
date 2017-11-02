@@ -9,7 +9,7 @@ The project uses:
  - language: Kotlin (1.8 JVM) 
  - web framework: SpringBoot
  - build managers: Gradle
- - testing: Spek, Jupiter
+ - testing: Jupiter (Spek was also tried, and found wanting)
  - database: H2 (embedded - dev & test), AWS Aurora MySql (integration/staging/prod)
 
 You will need to have a 1.8 JVM installed to run.  Gradle will take care of the 
