@@ -57,7 +57,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
     @BeforeEach
     fun setupMocks() {
-        whenever(locationRepo.getLocations()).doReturn(listOf(Location(1, "NYC", NYC)))
+        whenever(locationRepo.findAll()).doReturn(listOf(Location(1, "NYC", NYC)))
+        whenever(locationRepo.findOne(1)).doReturn(Location(1, "NYC", NYC))
     }
 
     @AfterEach

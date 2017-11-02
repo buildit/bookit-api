@@ -37,8 +37,8 @@ class BookableControllerMockMvcTests @Autowired constructor(
 
     @BeforeEach
     fun setupMocks() {
-        whenever(locationRepo.getLocations())
-            .doReturn(listOf(Location(1, "NYC", "America/New_York")))
+        whenever(locationRepo.findOne(1))
+            .doReturn(Location(1, "NYC", "America/New_York"))
         whenever(bookableRepo.getAllBookables())
             .doReturn(listOf(Bookable(1, 1, "The best bookable ever", Disposition())))
     }

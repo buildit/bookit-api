@@ -12,12 +12,13 @@ import org.junit.jupiter.api.Test
 
 class LocationControllerUnitTests {
     val mockRepository = mock<LocationRepository> {
-        on { getLocations() }.doReturn(
+        on { findAll() }.doReturn(
             listOf(
                 Location(1, "NYC", "Americas/New_York"),
-                Location(1, "DEN", "Americas/Denver")
+                Location(2, "DEN", "Americas/Denver")
             )
         )
+        on { findOne(1) }.doReturn(Location(1, "NYC", "Americas/New_York"))
     }
 
     @Nested

@@ -21,10 +21,7 @@ import java.time.ZoneId
 
 class BookableControllerUnitTests {
     val locationRepo = mock<LocationRepository> {
-        on { getLocations() }.doReturn(listOf(
-            Location(1, "NYC", "America/New_York"),
-            Location(2, "LON", "Europe/London")
-        ))
+        on { findOne(1) }.doReturn(Location(1, "NYC", "America/New_York"))
     }
     private val londonBookable = Bookable(1, 2, "London Bookable", Disposition())
     val availableBookable = Bookable(1, 1, "The best bookable ever", Disposition())

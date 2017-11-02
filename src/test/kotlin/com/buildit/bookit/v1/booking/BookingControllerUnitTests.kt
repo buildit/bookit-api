@@ -84,10 +84,9 @@ class BookingControllerUnitTests {
             @BeforeEach
             fun setup() {
                 locationRepo = mock {
-                    on { getLocations() }.doReturn(listOf(
-                        Location(1, "NYC", "America/New_York"),
-                        Location(2, "LON", "Europe/London")
-                    ))
+                    on { findOne(1) }.doReturn(
+                        Location(1, "NYC", "America/New_York")
+                    )
                 }
 
                 val bookingRepository = mock<BookingRepository> {
