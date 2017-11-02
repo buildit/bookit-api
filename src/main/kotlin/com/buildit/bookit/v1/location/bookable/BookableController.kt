@@ -2,6 +2,7 @@ package com.buildit.bookit.v1.location.bookable
 
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
+import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.BookableResource
 import com.buildit.bookit.v1.location.dto.LocationNotFound
@@ -57,25 +58,33 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         val start = startDate ?: LocalDate.now(timeZone)
         val end = endDate ?: start
 
+        fun Booking.interval(): Interval {
+            return Interval.of(
+                this.start.atZone(timeZone).toInstant(),
+                this.end.atZone(timeZone).toInstant())
+        }
+
         if (end.isBefore(start)) {
             throw EndBeforeStartException()
         }
 
-        val interval = Interval.of(
+        val desiredInterval = Interval.of(
             start.atStartOfDay(timeZone).toInstant(),
             end.plusDays(1).atStartOfDay(timeZone).toInstant()
         )
 
-        return bookableRepository.getAllBookables().takeWhile { it.locationId == locationId }.map { bookable ->
-            val bookings = when {
-                "bookings" in expand ?: emptyList() ->
-                    bookingRepository.getAllBookings().takeWhile { it.bookableId == bookable.id }.takeWhile {
-                        interval.overlaps(Interval.of(it.start.atZone(timeZone).toInstant(), it.end.atZone(timeZone).toInstant()))
-                    }
-                else -> emptyList()
-            }
+        return bookableRepository.getAllBookables()
+            .takeWhile { it.locationId == locationId }
+            .map { bookable ->
+                val bookings = when {
+                    "bookings" in expand ?: emptyList() ->
+                        bookingRepository.getAllBookings()
+                            .takeWhile { it.bookableId == bookable.id }
+                            .takeWhile { desiredInterval.overlaps(it.interval()) }
+                    else -> emptyList()
+                }
 
-            BookableResource(bookable, bookings)
-        }
+                BookableResource(bookable, bookings)
+            }
     }
 }
