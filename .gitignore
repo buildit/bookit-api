@@ -25,6 +25,10 @@ bin/
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/dictionaries
+.idea/azureSettings.xml
+.idea/checkstyle-idea.xml
+.idea/saveactions_settings.xml
+.idea/vcs.xml
 
 # Sensitive or high-churn files:
 .idea/**/dataSources/
