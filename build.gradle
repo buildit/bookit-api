@@ -1,28 +1,35 @@
 buildscript {
-    ext {
-        kotlin_version = '1.1.51'
-        junit_version = '5.0.1'
-        junit_gradle_version = '1.0.1'
-        expekt_version = '0.5.0'
-        hamkrest_version = '1.4.2.0'
-        springfox_version = '2.7.0'
-        jackson_version = '2.9.0'
-        h2_version = '1.4.196'
-        mockito_kotlin_1_1 = '1.5.0'
-        mysql_version = '5.1.44'
-        mariadb_version = '2.1.2'
-        jacoco_version = '0.7.9'
-        threeten_version = '1.2'
-        ktlint_version = '0.11.1'
-    }
+    // these override spring boot defaults
+    // find defaults here -
+    // 1.5.x - https://github.com/spring-projects/spring-boot/blob/1.5.x/spring-boot-dependencies/pom.xml
+    // master - https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-dependencies/pom.xml
+    // double check version of spring boot
+    ext['hibernate.version'] = '5.2.12.Final'
+    ext['jackson.version'] = '2.9.0'
+    ext['mysql.version'] = '5.1.44'
+    ext['mariadb.version'] = '2.1.2'
+    ext['h2.version'] = '1.4.196'
+
+    // these are our additions (some become defaults in spring boot 2.x)
+    ext['kotlin.version'] = '1.1.51'
+    ext['junit-jupiter.version'] = '5.0.1'
+    ext['junit-platform.version'] = '1.0.1'
+    ext['expekt.version'] = '0.5.0'
+    ext['hamkrest.version'] = '1.4.2.0'
+    ext['springfox.version'] = '2.7.0'
+    ext['mockito-kotlin.version'] = '1.5.0'
+    ext['jacoco.version'] = '0.7.9'
+    ext['threeten.version'] = '1.2'
+    ext['ktlint.version'] = '0.11.1'
+
     repositories {
         mavenCentral()
     }
     configurations.classpath {
-        resolutionStrategy { force "com.github.shyiko:ktlint:$ktlint_version" }
+        resolutionStrategy { force "com.github.shyiko:ktlint:${property('ktlint.version')}" }
     }
     dependencies {
-        classpath("org.junit.platform:junit-platform-gradle-plugin:$junit_gradle_version")
+        classpath("org.junit.platform:junit-platform-gradle-plugin:${property('junit-platform.version')}")
         classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.0'
     }
 }
@@ -104,7 +111,7 @@ detektCheck.shouldRunAfter lintKotlin
 lintKotlin.shouldRunAfter compileTestKotlin
 
 junitPlatform {
-    platformVersion junit_gradle_version
+    platformVersion property('junit-platform.version')
 }
 
 junitPlatformTest.shouldRunAfter detektCheck
@@ -112,7 +119,7 @@ junitPlatformTest.shouldRunAfter detektCheck
 afterEvaluate {
     jacoco {
         applyTo junitPlatformTest
-        toolVersion = jacoco_version
+        toolVersion = property('jacoco.version')
     }
 
     task junit5CodeCoverageReport(type: JacocoReport) {
@@ -155,8 +162,8 @@ afterEvaluate {
 }
 
 dependencies {
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version")
-    compile("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${property('kotlin.version')}")
+    compile("org.jetbrains.kotlin:kotlin-reflect:${property('kotlin.version')}")
 
     //spring boot
     compile('org.springframework.boot:spring-boot-starter-actuator')
@@ -165,21 +172,21 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-jdbc')
 
     // for kotlin data classes
-    compile("com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version")
-    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jackson_version")
-    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version")
+    compile("com.fasterxml.jackson.module:jackson-module-kotlin")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
     // swagger
-    compile("io.springfox:springfox-swagger2:$springfox_version")
-    compile("io.springfox:springfox-bean-validators:$springfox_version")
-    compile("io.springfox:springfox-swagger-ui:$springfox_version")
+    compile("io.springfox:springfox-swagger2:${property('springfox.version')}")
+    compile("io.springfox:springfox-bean-validators:${property('springfox.version')}")
+    compile("io.springfox:springfox-swagger-ui:${property('springfox.version')}")
 
     //database
-    compile("com.h2database:h2:$h2_version")
-    compile("mysql:mysql-connector-java:$mysql_version")
-    compile("org.mariadb.jdbc:mariadb-java-client:$mariadb_version")
+    compile("com.h2database:h2")
+    compile("org.mariadb.jdbc:mariadb-java-client") // dropin replacement for mysql with aurora support
 
-    compile("org.threeten:threeten-extra:$threeten_version")
+    // joda time concepts left out of java.time apis
+    compile("org.threeten:threeten-extra:${property('threeten.version')}")
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
 
@@ -189,14 +196,14 @@ dependencies {
         exclude group: 'junit', module: 'junit'
     }
     testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
-    testCompile("com.winterbe:expekt:$expekt_version")
-    testCompile("org.junit.jupiter:junit-jupiter-api:$junit_version")
-    testCompile("com.natpryce:hamkrest:$hamkrest_version")
-    testCompile("com.nhaarman:mockito-kotlin-kt1.1:$mockito_kotlin_1_1")
+    testCompile("com.winterbe:expekt:${property('expekt.version')}")
+    testCompile("org.junit.jupiter:junit-jupiter-api:${property('junit-jupiter.version')}")
+    testCompile("com.natpryce:hamkrest:${property('hamkrest.version')}")
+    testCompile("com.nhaarman:mockito-kotlin-kt1.1:${property('mockito-kotlin.version')}")
     testCompile("com.github.sbrannen:spring-test-junit5:1.0.0")
 
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit_version")
-    testRuntime("org.junit.platform:junit-platform-console:$junit_gradle_version")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:${property('junit-jupiter.version')}")
+    testRuntime("org.junit.platform:junit-platform-console:${property('junit-platform.version')}")
 }
 
 // https://stackoverflow.com/questions/45297339/junit-5-under-gradle-with-multiple-source-sets
