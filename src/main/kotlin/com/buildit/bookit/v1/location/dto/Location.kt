@@ -2,6 +2,7 @@ package com.buildit.bookit.v1.location.dto
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
+import java.time.ZoneId
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
@@ -14,7 +15,7 @@ data class Location(
     @Id @GeneratedValue
     val id: Int,
     val name: String,
-    val timeZone: String)
+    val timeZone: ZoneId)
 
 /**
  * 404 location not found

@@ -3,8 +3,8 @@ package com.buildit.bookit.v1.location.bookable
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.booking.dto.interval
-import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.BookableResource
+import com.buildit.bookit.v1.location.dto.Location
 import com.buildit.bookit.v1.location.dto.LocationNotFound
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.threeten.extra.Interval
 import java.time.LocalDate
-import java.time.ZoneId
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 class BookableNotFound : RuntimeException("Bookable not found")
@@ -28,13 +27,13 @@ class InvalidBookable : RuntimeException("Bookable does not exist")
 @RestController
 @RequestMapping("/v1/location/{locationId}/bookable")
 @Transactional
-class BookableController(private val bookableRepository: BookableRepository, private val locationRepository: LocationRepository, val bookingRepository: BookingRepository) {
+class BookableController(private val bookableRepository: BookableRepository, val bookingRepository: BookingRepository) {
     /**
      * Get a bookable
      */
     @GetMapping(value = "/{bookableId}")
-    fun getBookable(@PathVariable("locationId") location: Int, @PathVariable("bookableId") bookable: Int): BookableResource {
-        locationRepository.findOne(location) ?: throw LocationNotFound()
+    fun getBookable(@PathVariable("locationId") location: Location?, @PathVariable("bookableId") bookable: Int): BookableResource {
+        location ?: throw LocationNotFound()
         return BookableResource(bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound())
     }
 
@@ -43,7 +42,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
      */
     @GetMapping
     fun getAllBookables(
-        @PathVariable("locationId") locationId: Int,
+        @PathVariable("locationId") location: Location?,
         @RequestParam("start", required = false)
         @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
         startDate: LocalDate? = null,
@@ -53,9 +52,8 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         @RequestParam("expand", required = false)
         expand: List<String>? = emptyList()
     ): Collection<BookableResource> {
-        val location = locationRepository.findOne(locationId) ?: throw LocationNotFound()
-        val timeZone = ZoneId.of(location.timeZone)
-        val start = startDate ?: LocalDate.now(timeZone)
+        location ?: throw LocationNotFound()
+        val start = startDate ?: LocalDate.now(location.timeZone)
         val end = endDate ?: start
 
         if (end.isBefore(start)) {
@@ -63,18 +61,18 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         }
 
         val desiredInterval = Interval.of(
-            start.atStartOfDay(timeZone).toInstant(),
-            end.plusDays(1).atStartOfDay(timeZone).toInstant()
+            start.atStartOfDay(location.timeZone).toInstant(),
+            end.plusDays(1).atStartOfDay(location.timeZone).toInstant()
         )
 
         return bookableRepository.getAllBookables()
-            .takeWhile { it.locationId == locationId }
+            .takeWhile { it.locationId == location.id }
             .map { bookable ->
                 val bookings = when {
                     "bookings" in expand ?: emptyList() ->
                         bookingRepository.getAllBookings()
                             .takeWhile { it.bookableId == bookable.id }
-                            .takeWhile { desiredInterval.overlaps(it.interval(timeZone)) }
+                            .takeWhile { desiredInterval.overlaps(it.interval(location.timeZone)) }
                     else -> emptyList()
                 }
 

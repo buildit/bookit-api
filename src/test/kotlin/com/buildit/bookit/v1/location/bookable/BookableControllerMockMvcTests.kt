@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.ZoneId
 
 @ExtendWith(SpringExtension::class)
 @WebMvcTest(BookableController::class)
@@ -37,8 +38,9 @@ class BookableControllerMockMvcTests @Autowired constructor(
 
     @BeforeEach
     fun setupMocks() {
+        val NYC = ZoneId.of("America/New_York")
         whenever(locationRepo.findOne(1))
-            .doReturn(Location(1, "NYC", "America/New_York"))
+            .doReturn(Location(1, "NYC", NYC))
         whenever(bookableRepo.getAllBookables())
             .doReturn(listOf(Bookable(1, 1, "The best bookable ever", Disposition())))
     }

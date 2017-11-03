@@ -41,10 +41,9 @@ class BookingControllerMockMvcTests @Autowired constructor(
     private val mvc: MockMvc,
     private val mapper: ObjectMapper
 ) {
-    private val NYC = "America/New_York"
-    private val NYC_TZ = ZoneId.of(NYC)
-    private val startDateTime = now(NYC_TZ).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
-    private val endDateTime = now(NYC_TZ).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
+    private val NYC = ZoneId.of("America/New_York")
+    private val startDateTime = now(NYC).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
+    private val endDateTime = now(NYC).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
 
     @MockBean
     lateinit var bookingRepo: BookingRepository
@@ -121,7 +120,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @Test
         fun `booking must be in future`() {
-            val startDateTime = now(NYC_TZ).minusHours(1)
+            val startDateTime = now(NYC).minusHours(1)
             val endDateTime = startDateTime.plusHours(1)
             val request = BookingRequest(1, subject, startDateTime, endDateTime)
 
@@ -131,7 +130,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @Test
         fun `booking start must precede end`() {
-            val startDateTime = now(NYC_TZ).plusHours(1)
+            val startDateTime = now(NYC).plusHours(1)
             val endDateTime = startDateTime.minusHours(1)
             val request = BookingRequest(1, subject, startDateTime, endDateTime)
 

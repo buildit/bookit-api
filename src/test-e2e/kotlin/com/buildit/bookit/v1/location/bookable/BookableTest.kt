@@ -19,8 +19,9 @@ import java.time.ZoneId
  * Test /v1/location/<location>/bookable like a black box
  */
 class `Bookable E2E Tests` {
-    val now = LocalDateTime.now(ZoneId.of("America/New_York"))
-    val today = LocalDate.now(ZoneId.of("America/New_York"))
+    val NYC = ZoneId.of("America/New_York")
+    val now = LocalDateTime.now(NYC)
+    val today = LocalDate.now(NYC)
     val inOneHour = now.plusHours(1)
     val inTwoHours = now.plusHours(2)
 

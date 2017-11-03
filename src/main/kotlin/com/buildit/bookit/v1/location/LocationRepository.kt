@@ -1,7 +1,9 @@
 package com.buildit.bookit.v1.location
 
 import com.buildit.bookit.v1.location.dto.Location
+import org.springframework.data.rest.core.annotation.RepositoryRestResource
 
+@RepositoryRestResource
 interface LocationRepository : org.springframework.data.repository.CrudRepository<Location, Int> {
 }
 

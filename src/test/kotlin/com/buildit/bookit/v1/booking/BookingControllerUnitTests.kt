@@ -26,6 +26,7 @@ class BookingControllerUnitTests {
     @Nested
     inner class `|v1|booking` {
         private val clock: Clock = Clock.systemUTC()
+        val NYC = ZoneId.of("America/New_York")
 
         @Nested
         inner class `get request` {
@@ -72,12 +73,13 @@ class BookingControllerUnitTests {
             }
         }
 
+
         @Nested
         inner class `createBooking` {
             private lateinit var bookingController: BookingController
             private lateinit var locationRepo: LocationRepository
 
-            private val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
+            private val start = LocalDateTime.now(NYC).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
             private val createdBooking = Booking(1, 999999, "MyRequest", start, end)
 
@@ -85,7 +87,7 @@ class BookingControllerUnitTests {
             fun setup() {
                 locationRepo = mock {
                     on { findOne(1) }.doReturn(
-                        Location(1, "NYC", "America/New_York")
+                        Location(1, "NYC", NYC)
                     )
                 }
 

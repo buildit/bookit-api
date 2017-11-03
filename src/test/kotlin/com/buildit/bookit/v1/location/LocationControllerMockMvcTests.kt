@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.ZoneId
 
 /**
  * Tests the /location endpoint
@@ -31,7 +32,7 @@ class LocationControllerMockMvcTests @Autowired constructor(
     @BeforeEach
     fun setupMocks() {
         whenever(locationRepo.findOne(1))
-            .doReturn(Location(1, "The best location ever", "America/New_York"))
+            .doReturn(Location(1, "The best location ever", ZoneId.of("America/New_York")))
     }
 
     @Test

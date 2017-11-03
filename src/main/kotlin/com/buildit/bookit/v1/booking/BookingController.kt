@@ -21,7 +21,6 @@ import org.threeten.extra.Interval
 import java.net.URI
 import java.time.Clock
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.validation.Valid
 
@@ -80,7 +79,7 @@ class BookingController(private val bookingRepository: BookingRepository, privat
         val startDateTimeTruncated = bookingRequest.start!!.truncatedTo(ChronoUnit.MINUTES)
         val endDateTimeTruncated = bookingRequest.end!!.truncatedTo(ChronoUnit.MINUTES)
 
-        val now = LocalDateTime.now(clock.withZone(ZoneId.of(location.timeZone)))
+        val now = LocalDateTime.now(clock.withZone(location.timeZone))
         if (!startDateTimeTruncated.isAfter(now)) {
             throw StartInPastException()
         }
@@ -90,8 +89,8 @@ class BookingController(private val bookingRepository: BookingRepository, privat
         }
 
         val interval = Interval.of(
-            startDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant(),
-            endDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant()
+            startDateTimeTruncated.atZone(location.timeZone).toInstant(),
+            endDateTimeTruncated.atZone(location.timeZone).toInstant()
         )
 
         val unavailable = bookingRepository.getAllBookings()
@@ -99,8 +98,8 @@ class BookingController(private val bookingRepository: BookingRepository, privat
             .any {
                 interval.overlaps(
                     Interval.of(
-                        it.start.atZone(ZoneId.of(location.timeZone)).toInstant(),
-                        it.end.atZone(ZoneId.of(location.timeZone)).toInstant()))
+                        it.start.atZone(location.timeZone).toInstant(),
+                        it.end.atZone(location.timeZone).toInstant()))
             }
 
         if (unavailable) {

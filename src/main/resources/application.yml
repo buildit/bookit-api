@@ -15,3 +15,6 @@ spring:
     password: ${bookit.database.password:}
     url: ${bookit.database.url:}
     driver-class-name: ${bookit.database.driver:}
+  jpa:
+    generate-ddl: true
+    show-sql: false

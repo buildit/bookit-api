@@ -9,16 +9,17 @@ import com.nhaarman.mockito_kotlin.mock
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.ZoneId
 
 class LocationControllerUnitTests {
     val mockRepository = mock<LocationRepository> {
         on { findAll() }.doReturn(
             listOf(
-                Location(1, "NYC", "Americas/New_York"),
-                Location(2, "DEN", "Americas/Denver")
+                Location(1, "NYC", ZoneId.of("Americas/New_York")),
+                Location(2, "DEN", ZoneId.of("Americas/Denver"))
             )
         )
-        on { findOne(1) }.doReturn(Location(1, "NYC", "Americas/New_York"))
+        on { findOne(1) }.doReturn(Location(1, "NYC", ZoneId.of("Americas/New_York")))
     }
 
     @Nested
