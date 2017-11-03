@@ -123,7 +123,7 @@ class `Booking E2E Tests` {
 
             expect(response?.statusCode).to.be.equal(HttpStatus.BAD_REQUEST)
             expect(jsonResponse.getString("exception")).to.be.equal("org.springframework.http.converter.HttpMessageNotReadableException")
-            expect(jsonResponse.getString("message")).to.contain("Can not deserialize value of type java.time.LocalDateTime from String \"foo\"")
+            expect(jsonResponse.getString("message")).to.contain("Cannot deserialize value of type `java.time.LocalDateTime` from String \"foo\"")
         }
     }
 }
