@@ -2,7 +2,6 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
-import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import org.springframework.http.HttpStatus
@@ -45,7 +44,7 @@ class BookableNotAvailable : RuntimeException("Bookable is not available.  Pleas
 @RestController
 @RequestMapping("/v1/booking")
 @Transactional
-class BookingController(private val bookingRepository: BookingRepository, private val bookableRepository: BookableRepository, private val locationRepository: LocationRepository, private val clock: Clock) {
+class BookingController(private val bookingRepository: BookingRepository, private val bookableRepository: BookableRepository, private val clock: Clock) {
     /**
      */
     @GetMapping
@@ -67,8 +66,7 @@ class BookingController(private val bookingRepository: BookingRepository, privat
     @Suppress("UnsafeCallOnNullableType")
     @PostMapping()
     fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: Errors? = null): ResponseEntity<Booking> {
-        val bookable = bookableRepository.getAllBookables().find { it.id == bookingRequest.bookableId } ?: throw InvalidBookable()
-        val location = locationRepository.findOne(bookable.locationId)
+        val bookable = bookableRepository.findOne(bookingRequest.bookableId) ?: throw InvalidBookable()
 
         if (errors?.hasErrors() == true) {
             val errorMessage = errors.allErrors.joinToString(",", transform = { it.defaultMessage })
@@ -79,7 +77,7 @@ class BookingController(private val bookingRepository: BookingRepository, privat
         val startDateTimeTruncated = bookingRequest.start!!.truncatedTo(ChronoUnit.MINUTES)
         val endDateTimeTruncated = bookingRequest.end!!.truncatedTo(ChronoUnit.MINUTES)
 
-        val now = LocalDateTime.now(clock.withZone(location.timeZone))
+        val now = LocalDateTime.now(clock.withZone(bookable.location.timeZone))
         if (!startDateTimeTruncated.isAfter(now)) {
             throw StartInPastException()
         }
@@ -89,8 +87,8 @@ class BookingController(private val bookingRepository: BookingRepository, privat
         }
 
         val interval = Interval.of(
-            startDateTimeTruncated.atZone(location.timeZone).toInstant(),
-            endDateTimeTruncated.atZone(location.timeZone).toInstant()
+            startDateTimeTruncated.atZone(bookable.location.timeZone).toInstant(),
+            endDateTimeTruncated.atZone(bookable.location.timeZone).toInstant()
         )
 
         val unavailable = bookingRepository.getAllBookings()
@@ -98,8 +96,8 @@ class BookingController(private val bookingRepository: BookingRepository, privat
             .any {
                 interval.overlaps(
                     Interval.of(
-                        it.start.atZone(location.timeZone).toInstant(),
-                        it.end.atZone(location.timeZone).toInstant()))
+                        it.start.atZone(bookable.location.timeZone).toInstant(),
+                        it.end.atZone(bookable.location.timeZone).toInstant()))
             }
 
         if (unavailable) {

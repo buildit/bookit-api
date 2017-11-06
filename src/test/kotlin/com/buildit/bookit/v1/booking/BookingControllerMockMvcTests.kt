@@ -2,7 +2,6 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
-import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.Disposition
@@ -42,6 +41,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
     private val mapper: ObjectMapper
 ) {
     private val NYC = ZoneId.of("America/New_York")
+    private val location = Location(1, "NYC", NYC)
     private val startDateTime = now(NYC).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
     private val endDateTime = now(NYC).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
 
@@ -51,20 +51,10 @@ class BookingControllerMockMvcTests @Autowired constructor(
     @MockBean
     lateinit var bookableRepo: BookableRepository
 
-    @MockBean
-    lateinit var locationRepo: LocationRepository
-
-    @BeforeEach
-    fun setupMocks() {
-        whenever(locationRepo.findAll()).doReturn(listOf(Location(1, "NYC", NYC)))
-        whenever(locationRepo.findOne(1)).doReturn(Location(1, "NYC", NYC))
-    }
-
     @AfterEach
     fun resetMocks() {
         reset(bookingRepo)
         reset(bookableRepo)
-        reset(locationRepo)
     }
 
     @Nested
@@ -103,8 +93,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
         fun createMock() {
             whenever(bookingRepo.insertBooking(1, subject, startDateTime, endDateTime))
                 .doReturn(Booking(1, 1, subject, startDateTime, endDateTime))
-            whenever(bookableRepo.getAllBookables())
-                .doReturn(listOf(Bookable(1, 1, "Foo", Disposition())))
+            whenever(bookableRepo.findOne(1))
+                .doReturn(listOf(Bookable(1, location, "Foo", Disposition())))
         }
 
         @Test

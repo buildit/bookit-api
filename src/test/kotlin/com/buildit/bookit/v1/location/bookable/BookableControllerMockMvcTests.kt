@@ -1,7 +1,6 @@
 package com.buildit.bookit.v1.location.bookable
 
 import com.buildit.bookit.v1.booking.BookingRepository
-import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
@@ -31,18 +30,13 @@ class BookableControllerMockMvcTests @Autowired constructor(
     lateinit var bookableRepo: BookableRepository
 
     @MockBean
-    lateinit var locationRepo: LocationRepository
-
-    @MockBean
     lateinit var bookingRepo: BookingRepository
 
     @BeforeEach
     fun setupMocks() {
         val NYC = ZoneId.of("America/New_York")
-        whenever(locationRepo.findOne(1))
-            .doReturn(Location(1, "NYC", NYC))
-        whenever(bookableRepo.getAllBookables())
-            .doReturn(listOf(Bookable(1, 1, "The best bookable ever", Disposition())))
+        whenever(bookableRepo.findOne(1))
+            .doReturn(listOf(Bookable(1, Location(1, "NYC", NYC), "The best bookable ever", Disposition())))
     }
 
     @Test

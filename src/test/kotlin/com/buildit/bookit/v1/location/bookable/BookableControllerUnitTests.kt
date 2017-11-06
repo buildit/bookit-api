@@ -21,11 +21,10 @@ import java.time.ZoneId
 class BookableControllerUnitTests {
     private val NYC = ZoneId.of("America/New_York")
     private val location = Location(1, "NYC", NYC)
-    val availableBookable = Bookable(1, 1, "The best bookable ever", Disposition())
-    private val londonBookable = Bookable(1, 2, "London Bookable", Disposition())
+    val availableBookable = Bookable(1, location, "The best bookable ever", Disposition())
 
     val bookableRepo = mock<BookableRepository> {
-        on { getAllBookables() }.doReturn(listOf(availableBookable, londonBookable))
+        on { findOne(1) }.doReturn(availableBookable)
     }
     val bookingRepo = mock<BookingRepository> {}
 
@@ -38,7 +37,7 @@ class BookableControllerUnitTests {
             @Nested inner class `that is known` {
                 @Test
                 fun `should return bookable1`() {
-                    val bookable = bookableController.getBookable(location, 1)
+                    val bookable = bookableController.getBookable(location, availableBookable)
 
                     expect(bookable).to.be.equal(BookableResource(availableBookable))
                 }
@@ -48,12 +47,17 @@ class BookableControllerUnitTests {
             inner class `that is unknown` {
                 @Test
                 fun `throws exception for invalid bookable`() {
-                    assertThat({ bookableController.getBookable(location, 2) }, throws<BookableNotFound>())
+                    assertThat({ bookableController.getBookable(location, null) }, throws<BookableNotFound>())
+                }
+
+                @Test
+                fun `throws exception for invalid bookable and location combination`() {
+                    assertThat({ bookableController.getBookable(Location(2, "LON", ZoneId.of("Europe/London")), availableBookable) }, throws<BookableNotFound>())
                 }
 
                 @Test
                 fun `throws exception for invalid location`() {
-                    assertThat({ bookableController.getBookable(null, 1) }, throws<LocationNotFound>())
+                    assertThat({ bookableController.getBookable(null, availableBookable) }, throws<LocationNotFound>())
                 }
             }
         }

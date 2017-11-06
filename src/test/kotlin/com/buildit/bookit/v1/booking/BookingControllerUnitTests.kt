@@ -2,7 +2,6 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
-import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
@@ -26,7 +25,8 @@ class BookingControllerUnitTests {
     @Nested
     inner class `|v1|booking` {
         private val clock: Clock = Clock.systemUTC()
-        val NYC = ZoneId.of("America/New_York")
+        private val NYC = ZoneId.of("America/New_York")
+        private val location = Location(1, "NYC", NYC)
 
         @Nested
         inner class `get request` {
@@ -51,7 +51,7 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `returns all existing bookings`() {
-                    val bookings = BookingController(bookingRepo, mock {}, mock {}, clock).getAllBookings().body
+                    val bookings = BookingController(bookingRepo, mock {}, clock).getAllBookings().body
                     expect(bookings.size).to.be.equal(2)
                 }
             }
@@ -61,13 +61,13 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `getBooking() for existing booking returns that booking`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking(1)
+                    val booking = BookingController(bookingRepo, mock {}, clock).getBooking(1)
                     expect(booking.id).to.be.equal(1)
                 }
 
                 @Test
                 fun `getBooking() for nonexistent booking throws exception`() {
-                    fun action() = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking(3)
+                    fun action() = BookingController(bookingRepo, mock {}, clock).getBooking(3)
                     assertThat({ action() }, throws<BookingNotFound>())
                 }
             }
@@ -77,7 +77,6 @@ class BookingControllerUnitTests {
         @Nested
         inner class `createBooking` {
             private lateinit var bookingController: BookingController
-            private lateinit var locationRepo: LocationRepository
 
             private val start = LocalDateTime.now(NYC).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
@@ -85,11 +84,6 @@ class BookingControllerUnitTests {
 
             @BeforeEach
             fun setup() {
-                locationRepo = mock {
-                    on { findOne(1) }.doReturn(
-                        Location(1, "NYC", NYC)
-                    )
-                }
 
                 val bookingRepository = mock<BookingRepository> {
                     on { insertBooking(999999, "MyRequest", start, end) }.doReturn(createdBooking)
@@ -99,10 +93,10 @@ class BookingControllerUnitTests {
                     ))
                 }
                 val bookableRepo = mock<BookableRepository> {
-                    on { getAllBookables() }.doReturn(listOf(Bookable(999999, 1, "Bookable", Disposition())))
+                    on { findOne(999999) }.doReturn(listOf(Bookable(999999, location, "Bookable", Disposition())))
                 }
 
-                bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, clock)
+                bookingController = BookingController(bookingRepository, bookableRepo, clock)
             }
 
             @Test

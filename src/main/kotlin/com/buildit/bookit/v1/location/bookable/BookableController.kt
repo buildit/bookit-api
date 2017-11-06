@@ -3,6 +3,7 @@ package com.buildit.bookit.v1.location.bookable
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.booking.dto.interval
+import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.BookableResource
 import com.buildit.bookit.v1.location.dto.Location
 import com.buildit.bookit.v1.location.dto.LocationNotFound
@@ -32,9 +33,13 @@ class BookableController(private val bookableRepository: BookableRepository, val
      * Get a bookable
      */
     @GetMapping(value = "/{bookableId}")
-    fun getBookable(@PathVariable("locationId") location: Location?, @PathVariable("bookableId") bookable: Int): BookableResource {
+    fun getBookable(@PathVariable("locationId") location: Location?, @PathVariable("bookableId") bookable: Bookable?): BookableResource {
         location ?: throw LocationNotFound()
-        return BookableResource(bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound())
+        bookable ?: throw BookableNotFound()
+        if (bookable.location != location) {
+            throw BookableNotFound()
+        }
+        return BookableResource(bookable)
     }
 
     /**
@@ -65,8 +70,7 @@ class BookableController(private val bookableRepository: BookableRepository, val
             end.plusDays(1).atStartOfDay(location.timeZone).toInstant()
         )
 
-        return bookableRepository.getAllBookables()
-            .takeWhile { it.locationId == location.id }
+        return bookableRepository.findByLocation(location)
             .map { bookable ->
                 val bookings = when {
                     "bookings" in expand ?: emptyList() ->
