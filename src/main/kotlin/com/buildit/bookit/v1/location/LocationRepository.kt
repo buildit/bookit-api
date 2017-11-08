@@ -7,16 +7,3 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource
 @RepositoryRestResource
 interface LocationRepository : CrudRepository<Location, Int> {
 }
-
-//@Repository
-//class LocationDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : LocationRepository {
-//
-//    override fun getLocations(): Collection<Location> = jdbcTemplate.query(
-//        "SELECT LOCATION_ID, LOCATION_NAME, LOCATION_TZ FROM LOCATION") { rs, _ ->
-//        Location(
-//            rs.getInt("LOCATION_ID"),
-//            rs.getString("LOCATION_NAME"),
-//            rs.getString("LOCATION_TZ")
-//        )
-//    }
-//}
