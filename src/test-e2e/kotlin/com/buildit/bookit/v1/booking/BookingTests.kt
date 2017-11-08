@@ -7,10 +7,13 @@ import org.json.JSONObject
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.skyscreamer.jsonassert.JSONAssert
+import org.skyscreamer.jsonassert.JSONCompareMode
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 /**
  * Test /v1/booking like a black box
@@ -42,10 +45,17 @@ class `Booking E2E Tests` {
                 response = Global.REST_TEMPLATE.postForEntity("/v1/booking", goodRequest.toEntity(), String::class.java)
 
                 // assert
-                val jsonResponse = JSONObject(response?.body)
-                expect(jsonResponse.getInt("id")).to.be.above(0)
-                expect(jsonResponse.get("bookableId")).to.be.equal(1)
-                expect(jsonResponse.get("subject")).to.be.equal("My new meeting")
+                val expectedResponse = """
+                    {
+                        "bookable": {
+                            "id": 1
+                        },
+                        "subject": "My new meeting",
+                        "start": "${tomorrow.truncatedTo(ChronoUnit.MINUTES)}",
+                        "end": "${tomorrow.plusHours(1).truncatedTo(ChronoUnit.MINUTES)}"
+                    }
+                    """
+                JSONAssert.assertEquals(expectedResponse, response?.body, JSONCompareMode.LENIENT)
             }
 
             @AfterEach

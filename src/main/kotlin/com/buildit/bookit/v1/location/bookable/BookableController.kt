@@ -74,8 +74,7 @@ class BookableController(private val bookableRepository: BookableRepository, val
             .map { bookable ->
                 val bookings = when {
                     "bookings" in expand ?: emptyList() ->
-                        bookingRepository.getAllBookings()
-                            .takeWhile { it.bookableId == bookable.id }
+                        bookingRepository.findByBookable(bookable)
                             .takeWhile { desiredInterval.overlaps(it.interval(location.timeZone)) }
                     else -> emptyList()
                 }

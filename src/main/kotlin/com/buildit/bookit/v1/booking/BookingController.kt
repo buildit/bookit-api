@@ -48,14 +48,13 @@ class BookingController(private val bookingRepository: BookingRepository, privat
     /**
      */
     @GetMapping
-    fun getAllBookings(): ResponseEntity<Collection<Booking>> = ResponseEntity.ok(bookingRepository.getAllBookings())
+    fun getAllBookings(): ResponseEntity<Collection<Booking>> = ResponseEntity.ok(bookingRepository.findAll().toList())
 
     /**
      * Get a booking
      */
     @GetMapping("/{id}")
-    fun getBooking(@PathVariable("id") bookingId: Int): Booking =
-        bookingRepository.getAllBookings().find { it.id == bookingId } ?: throw BookingNotFound()
+    fun getBooking(@PathVariable("id") booking: Booking?): Booking = booking ?: throw BookingNotFound()
 
     @DeleteMapping("/{id}")
     fun deleteBooking(@PathVariable("id") id: Int) = bookingRepository.delete(id)
@@ -66,13 +65,12 @@ class BookingController(private val bookingRepository: BookingRepository, privat
     @Suppress("UnsafeCallOnNullableType")
     @PostMapping()
     fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: Errors? = null): ResponseEntity<Booking> {
-        val bookable = bookableRepository.findOne(bookingRequest.bookableId) ?: throw InvalidBookable()
-
         if (errors?.hasErrors() == true) {
             val errorMessage = errors.allErrors.joinToString(",", transform = { it.defaultMessage })
 
             throw InvalidBooking(errorMessage)
         }
+        val bookable = bookableRepository.findOne(bookingRequest.bookableId) ?: throw InvalidBookable()
 
         val startDateTimeTruncated = bookingRequest.start!!.truncatedTo(ChronoUnit.MINUTES)
         val endDateTimeTruncated = bookingRequest.end!!.truncatedTo(ChronoUnit.MINUTES)
@@ -91,8 +89,7 @@ class BookingController(private val bookingRepository: BookingRepository, privat
             endDateTimeTruncated.atZone(bookable.location.timeZone).toInstant()
         )
 
-        val unavailable = bookingRepository.getAllBookings()
-            .filter { it.bookableId == bookable.id }
+        val unavailable = bookingRepository.findByBookable(bookable)
             .any {
                 interval.overlaps(
                     Interval.of(
@@ -104,11 +101,13 @@ class BookingController(private val bookingRepository: BookingRepository, privat
             throw BookableNotAvailable()
         }
 
-        val booking = bookingRepository.insertBooking(
-            bookingRequest.bookableId!!,
-            bookingRequest.subject!!,
-            startDateTimeTruncated,
-            endDateTimeTruncated
+        val booking = bookingRepository.save(
+            Booking(
+                bookable = bookable,
+                subject = bookingRequest.subject!!,
+                start = startDateTimeTruncated,
+                end = endDateTimeTruncated
+            )
         )
 
         return ResponseEntity
