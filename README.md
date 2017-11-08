@@ -78,6 +78,7 @@ The example values specified above are the values used in integration, staging, 
 * [Production](https://bookit-api.buildit.tools)
 
 ### Swagger Docs
+
 * [Integration](https://integration-bookit-api.buildit.tools/swagger-ui.html)
 * [Staging](https://staging-bookit-api.buildit.tools/swagger-ui.html)
 * [Production](https://bookit-api.buildit.tools/swagger-ui.html)
