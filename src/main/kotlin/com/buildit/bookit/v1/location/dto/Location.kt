@@ -14,7 +14,7 @@ import javax.persistence.Id
 @Entity
 data class Location(
     @Id @GeneratedValue
-    val id: Int,
+    val id: Int? = null,
     @Column(unique = true, nullable = false)
     val name: String,
     @Column(nullable = false)

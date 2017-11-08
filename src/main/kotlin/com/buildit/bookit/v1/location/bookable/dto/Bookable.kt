@@ -4,16 +4,16 @@ import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.location.dto.Location
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.NaturalId
-import javax.annotation.Generated
 import javax.persistence.Column
 import javax.persistence.Embeddable
 import javax.persistence.Embedded
 import javax.persistence.Entity
+import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.ManyToOne
 
 interface IBookable {
-    val id: Int
+    val id: Int?
     val location: Location
     val name: String
     val disposition: Disposition
@@ -21,8 +21,8 @@ interface IBookable {
 
 @Entity
 data class Bookable(
-    @Id @Generated
-    override val id: Int,
+    @Id @GeneratedValue
+    override val id: Int? = null,
     @ManyToOne(optional = false)
     @NaturalId
     override val location: Location,
