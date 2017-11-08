@@ -103,10 +103,10 @@ class BookingController(private val bookingRepository: BookingRepository, privat
 
         val booking = bookingRepository.save(
             Booking(
-                bookable = bookable,
-                subject = bookingRequest.subject!!,
-                start = startDateTimeTruncated,
-                end = endDateTimeTruncated
+                bookable,
+                bookingRequest.subject!!,
+                startDateTimeTruncated,
+                endDateTimeTruncated
             )
         )
 

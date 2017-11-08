@@ -26,6 +26,6 @@ class LocationRepositoryTests @Autowired constructor(
 
         // assert
         expect(locations).has.size(2)
-        expect(locations).to.contain(Location(1, "NYC", ZoneId.of("America/New_York")))
+        expect(locations).to.contain(Location("NYC", ZoneId.of("America/New_York"), 1))
     }
 }

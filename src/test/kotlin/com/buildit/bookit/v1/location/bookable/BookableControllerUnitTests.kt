@@ -20,8 +20,8 @@ import java.time.ZoneId
 
 class BookableControllerUnitTests {
     private val NYC = ZoneId.of("America/New_York")
-    private val location = Location(1, "NYC", NYC)
-    val availableBookable = Bookable(1, location, "The best bookable ever", Disposition())
+    private val location = Location("NYC", NYC, 1)
+    val availableBookable = Bookable(location, "The best bookable ever", Disposition(), 1)
 
     val bookableRepo = mock<BookableRepository> {
         on { findOne(1) }.doReturn(availableBookable)
@@ -52,7 +52,7 @@ class BookableControllerUnitTests {
 
                 @Test
                 fun `throws exception for invalid bookable and location combination`() {
-                    assertThat({ bookableController.getBookable(Location(2, "LON", ZoneId.of("Europe/London")), availableBookable) }, throws<BookableNotFound>())
+                    assertThat({ bookableController.getBookable(Location("LON", ZoneId.of("Europe/London"), 2), availableBookable) }, throws<BookableNotFound>())
                 }
 
                 @Test
@@ -100,7 +100,7 @@ class BookableControllerUnitTests {
 
                 @Nested
                 inner class `with bookings` {
-                    private val booking = Booking(1, 1, "Booking", today.atTime(9, 15), today.atTime(10, 15))
+                    private val booking = Booking(1, "Booking", today.atTime(9, 15), today.atTime(10, 15), 1)
                     private val bookingRepo = mock<BookingRepository> {
                         on { getAllBookings() }.doReturn(listOf(booking))
                     }
@@ -138,7 +138,7 @@ class BookableControllerUnitTests {
                     @Test
                     fun `ignores bookings for other bookables`() {
                         val bookingRepo = mock<BookingRepository> {
-                            on { getAllBookings() }.doReturn(listOf(Booking(1, 2, "Booking", today.atTime(9, 15), today.atTime(10, 15))))
+                            on { getAllBookings() }.doReturn(listOf(Booking(2, "Booking", today.atTime(9, 15), today.atTime(10, 15), 1)))
                         }
                         val controller = BookableController(bookableRepo, bookingRepo)
 

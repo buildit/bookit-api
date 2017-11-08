@@ -41,7 +41,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
     private val mapper: ObjectMapper
 ) {
     private val NYC = ZoneId.of("America/New_York")
-    private val location = Location(1, "NYC", NYC)
+    private val location = Location("NYC", NYC, 1)
     private val startDateTime = now(NYC).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
     private val endDateTime = now(NYC).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
 
@@ -62,7 +62,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
         @BeforeEach
         fun setupMock() {
             whenever(bookingRepo.getAllBookings())
-                .doReturn(listOf(Booking(1, 1, "The Booking", startDateTime, endDateTime)))
+                .doReturn(listOf(Booking(1, "The Booking", startDateTime, endDateTime, 1)))
         }
 
         @Test
@@ -92,9 +92,9 @@ class BookingControllerMockMvcTests @Autowired constructor(
         @BeforeEach
         fun createMock() {
             whenever(bookingRepo.insertBooking(1, subject, startDateTime, endDateTime))
-                .doReturn(Booking(1, 1, subject, startDateTime, endDateTime))
+                .doReturn(Booking(1, subject, startDateTime, endDateTime, 1))
             whenever(bookableRepo.findOne(1))
-                .doReturn(listOf(Bookable(1, location, "Foo", Disposition())))
+                .doReturn(listOf(Bookable(location, "Foo", Disposition(), 1)))
         }
 
         @Test

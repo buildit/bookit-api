@@ -28,6 +28,6 @@ class BookableRepositoryTests @Autowired constructor(
         val bookable = bookableRepo.findOne(1)
 
         // assert
-        expect(bookable).to.equal(Bookable(1, Location(1, "NYC", ZoneId.of("America/New_York")), "Red", Disposition()))
+        expect(bookable).to.equal(Bookable(Location("NYC", ZoneId.of("America/New_York"), 1), "Red", Disposition(), 1))
     }
 }

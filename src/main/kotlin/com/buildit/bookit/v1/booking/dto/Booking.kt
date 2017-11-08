@@ -32,8 +32,6 @@ data class BookingRequest(
  */
 @Entity
 data class Booking(
-    @Id @GeneratedValue
-    val id: Int? = null,
     @ManyToOne(optional = false)
     val bookable: Bookable,
     @Column(nullable = false)
@@ -43,7 +41,9 @@ data class Booking(
     val start: LocalDateTime,
     @Column(nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    val end: LocalDateTime
+    val end: LocalDateTime,
+    @Id @GeneratedValue
+    val id: Int? = null
 )
 
 fun Booking.interval(timeZone: ZoneId): Interval =

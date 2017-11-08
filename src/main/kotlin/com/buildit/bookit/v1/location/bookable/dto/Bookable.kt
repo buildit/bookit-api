@@ -21,8 +21,6 @@ interface IBookable {
 
 @Entity
 data class Bookable(
-    @Id @GeneratedValue
-    override val id: Int? = null,
     @ManyToOne(optional = false)
     @NaturalId
     override val location: Location,
@@ -30,7 +28,9 @@ data class Bookable(
     @NaturalId
     override val name: String,
     @Embedded
-    override val disposition: Disposition = Disposition()) : IBookable
+    override val disposition: Disposition = Disposition(),
+    @Id @GeneratedValue
+    override val id: Int? = null) : IBookable
 
 @Embeddable
 data class Disposition(

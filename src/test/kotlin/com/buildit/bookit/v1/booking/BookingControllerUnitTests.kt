@@ -26,7 +26,7 @@ class BookingControllerUnitTests {
     inner class `|v1|booking` {
         private val clock: Clock = Clock.systemUTC()
         private val NYC = ZoneId.of("America/New_York")
-        private val location = Location(1, "NYC", NYC)
+        private val location = Location("NYC", NYC, 1)
 
         @Nested
         inner class `get request` {
@@ -39,8 +39,8 @@ class BookingControllerUnitTests {
                 bookingRepo = mock {
                     on { getAllBookings() }.doReturn(
                         listOf(
-                            Booking(1, 10, "Booking", startDateTime, endDateTime),
-                            Booking(2, 20, "Another Booking", startDateTime, endDateTime)
+                            Booking(10, "Booking", startDateTime, endDateTime, 1),
+                            Booking(20, "Another Booking", startDateTime, endDateTime, 2)
                         )
                     )
                 }
@@ -80,7 +80,7 @@ class BookingControllerUnitTests {
 
             private val start = LocalDateTime.now(NYC).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
-            private val createdBooking = Booking(1, 999999, "MyRequest", start, end)
+            private val createdBooking = Booking(999999, "MyRequest", start, end, 1)
 
             @BeforeEach
             fun setup() {
@@ -88,12 +88,12 @@ class BookingControllerUnitTests {
                 val bookingRepository = mock<BookingRepository> {
                     on { insertBooking(999999, "MyRequest", start, end) }.doReturn(createdBooking)
                     on { getAllBookings() }.doReturn(listOf(
-                        Booking(1, 999999, "Before", start.minusHours(1), end.minusHours(1)),
-                        Booking(2, 999999, "After", start.plusHours(1), end.plusHours(1))
+                        Booking(999999, "Before", start.minusHours(1), end.minusHours(1), 1),
+                        Booking(999999, "After", start.plusHours(1), end.plusHours(1), 2)
                     ))
                 }
                 val bookableRepo = mock<BookableRepository> {
-                    on { findOne(999999) }.doReturn(listOf(Bookable(999999, location, "Bookable", Disposition())))
+                    on { findOne(999999) }.doReturn(listOf(Bookable(location, "Bookable", Disposition(), 999999)))
                 }
 
                 bookingController = BookingController(bookingRepository, bookableRepo, clock)

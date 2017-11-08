@@ -36,7 +36,7 @@ class BookableControllerMockMvcTests @Autowired constructor(
     fun setupMocks() {
         val NYC = ZoneId.of("America/New_York")
         whenever(bookableRepo.findOne(1))
-            .doReturn(listOf(Bookable(1, Location(1, "NYC", NYC), "The best bookable ever", Disposition())))
+            .doReturn(listOf(Bookable(Location("NYC", NYC, 1), "The best bookable ever", Disposition(), 1)))
     }
 
     @Test

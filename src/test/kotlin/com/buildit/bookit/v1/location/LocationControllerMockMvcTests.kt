@@ -32,7 +32,7 @@ class LocationControllerMockMvcTests @Autowired constructor(
     @BeforeEach
     fun setupMocks() {
         whenever(locationRepo.findOne(1))
-            .doReturn(Location(1, "The best location ever", ZoneId.of("America/New_York")))
+            .doReturn(Location("The best location ever", ZoneId.of("America/New_York"), 1))
     }
 
     @Test

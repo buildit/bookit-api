@@ -13,12 +13,12 @@ import javax.persistence.Id
  */
 @Entity
 data class Location(
-    @Id @GeneratedValue
-    val id: Int? = null,
     @Column(unique = true, nullable = false)
     val name: String,
     @Column(nullable = false)
-    val timeZone: ZoneId)
+    val timeZone: ZoneId,
+    @Id @GeneratedValue
+    val id: Int? = null)
 
 /**
  * 404 location not found

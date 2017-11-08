@@ -15,11 +15,11 @@ class LocationControllerUnitTests {
     val mockRepository = mock<LocationRepository> {
         on { findAll() }.doReturn(
             listOf(
-                Location(1, "NYC", ZoneId.of("Americas/New_York")),
-                Location(2, "DEN", ZoneId.of("Americas/Denver"))
+                Location("NYC", ZoneId.of("Americas/New_York"), 1),
+                Location("DEN", ZoneId.of("Americas/Denver"), 2)
             )
         )
-        on { findOne(1) }.doReturn(Location(1, "NYC", ZoneId.of("Americas/New_York")))
+        on { findOne(1) }.doReturn(Location("NYC", ZoneId.of("Americas/New_York"), 1))
     }
 
     @Nested
