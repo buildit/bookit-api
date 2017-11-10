@@ -15,39 +15,21 @@ The project uses:
 You will need to have a 1.8 JVM installed to run.  Gradle will take care of the 
 dependencies.
 
-## Quick start
+## Quick Start
 
 We have bundled a gradle wrapper so you can run the below commands.  Alternatively, you can use gradle if you have it installed.
+    
+| Command                                           |     Description                                  | Notes                    
+| :---                                              | :---                                             | :---                            
+| `./gradlew`                                       | Builds the project                               |                          
+| `./gradlew tasks`                                 | Lists available tasks in the project             |                          
+| `./gradlew check`                                 | Runs linting, unit tests, static analysis, etc   | Good for pre-push checking                         
+| `./gradlew test`                                  | Runs unit/integration tests                      |                          
+| `./gradlew test-e2e`                              | Runs end-to-end tests                            | Requires running server  
+| `./gradlew bootRun`                               | Runs server                                      | Magically runs `schema.sql` and loads basic test data from `data.sql`.
+| `SPRING_DATASOURCE_PLATFORM=dev ./gradlew bootRun`| Runs server                                      | Magically runs `schema.sql` and loads more voluminous `dev-data.sql` file into the Derby database.                         
 
-You can build the project by running:
-```$sh
-./gradlew
-```  
 
-You can see the list of available tasks in the project by running:
-```$sh
-./gradlew tasks
-```  
-
-You can run tests by running the following:
-```$sh
-./gradlew test
-```
-
-You can run all checks (linting, unit tests, static analysis) by running the following:
-```$sh
-./gradlew check
-```
-
-You can run e2e tests by running the following:
-```$sh
-./gradlew test-e2e
-```
-
-You can run the web server by running the following:
-```$sh
-./gradlew bootRun
-```
 
 ## Configuration Properties
 
@@ -55,14 +37,16 @@ Following the [12 Factor App methodology](https://12factor.net) configuration is
 
 In addition to the [common Spring Boot properties](https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html), Bookit API honors the following:
 
-| Parameter             | Description | Example |
-| :---                  | :---          | :---   |       
-| BOOKIT_DATABASE_URL    | The JDBC Connection URL | jdbc:mysql:aurora://aurora.bookit.internal/bookit  |
-| BOOKIT_DATABASE_DRIVER    | The JDBC Driver Class (can be inferred via BOOKIT_DATABASE_URL, required if using MariaDB) | org.mariadb.jdbc.Driver |
-| BOOKIT_DATABASE_USER | The username to use when logging into database | admin |
-| BOOKIT_DATABASE_PASSWORD | The password to use when logging into the database | _password_ |
+| Parameter                | Description   | Example 
+| :---                     | :---          | :---          
+| BOOKIT_DATABASE_URL      | The JDBC Connection URL                                                                    | jdbc:mysql:aurora://aurora.bookit.internal/bookit
+| BOOKIT_DATABASE_DRIVER   | The JDBC Driver Class (can be inferred via BOOKIT_DATABASE_URL, required if using MariaDB) | org.mariadb.jdbc.Driver
+| BOOKIT_DATABASE_USER     | The username to use when logging into database                                             | admin
+| BOOKIT_DATABASE_PASSWORD | The password to use when logging into the database                                         | _password_
 
 The example values specified above are the values used in integration, staging, and production.  BOOKIT_DATABASE_PASSWORD is acquired via the appropriate AWS SSM Parameter Store value.
+
+> _Note that when running via `./gradlew bootRun`, the database is magically configured to use an in-memory (Derby) database.  See Quick Start, above._
 
 
 ## Build information
