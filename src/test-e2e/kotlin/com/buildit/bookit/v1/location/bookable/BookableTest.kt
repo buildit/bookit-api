@@ -34,7 +34,7 @@ class `Bookable E2E Tests` {
                         {
                             "id": 1,
                             "locationId": 1,
-                            "name": "Red",
+                            "name": "Red Room",
                             "disposition": {
                                 "closed": false,
                                 "reason": ""
@@ -45,27 +45,50 @@ class `Bookable E2E Tests` {
         JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
     }
 
+    private val allBookables = """
+                            [
+                                {
+                                    "id": 1,
+                                    "locationId": 1,
+                                    "name": "Red Room",
+                                    "disposition": {
+                                        "closed": false,
+                                        "reason": ""
+                                    },
+                                    bookings: []
+                                },
+                                {
+                                    "id": 2
+                                },
+                                {
+                                    "id": 3
+                                },
+                                {
+                                    "id": 4
+                                },
+                                {
+                                    "id": 5
+                                },
+                                {
+                                    "id": 6,
+                                    "locationId": 1,
+                                    "name": "Yellow Room",
+                                    "disposition": {
+                                        "closed": true,
+                                        "reason": "Closed for remodeling"
+                                    },
+                                    bookings: []
+                                }
+                            ]
+                        """.trimIndent()
+
     @Test
     fun `get all bookables`() {
         // act
         val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable", String::class.java)
 
         // assert
-        val expectedResponse = """
-                        [
-                            {
-                                "id": 1,
-                                "locationId": 1,
-                                "name": "Red",
-                                "disposition": {
-                                    "closed": false,
-                                    "reason": ""
-                                },
-                                bookings: []
-                            }
-                        ]
-                    """.trimIndent()
-        JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
+        JSONAssert.assertEquals(allBookables, response.body, JSONCompareMode.LENIENT)
     }
 
     @Nested
@@ -83,21 +106,7 @@ class `Bookable E2E Tests` {
             val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=$today&end=$today&expand=bookings", String::class.java)
 
             // assert
-            val expectedResponse = """
-                        [
-                            {
-                                "id": 1,
-                                "locationId": 1,
-                                "name": "Red",
-                                "disposition": {
-                                    "closed": false,
-                                    "reason": ""
-                                },
-                                bookings: []
-                            }
-                        ]
-                    """.trimIndent()
-            JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
+            JSONAssert.assertEquals(allBookables, response.body, JSONCompareMode.LENIENT)
         }
 
         @Nested
@@ -129,7 +138,7 @@ class `Bookable E2E Tests` {
                             {
                                 "id": 1,
                                 "locationId": 1,
-                                "name": "Red",
+                                "name": "Red Room",
                                 "disposition": {
                                     "closed": false,
                                     "reason": ""
@@ -137,10 +146,25 @@ class `Bookable E2E Tests` {
                                 bookings: [
                                     ${createResponse?.body}
                                 ]
+                            },
+                            {
+                                "id": 2
+                            },
+                            {
+                                "id": 3
+                            },
+                            {
+                                "id": 4
+                            },
+                            {
+                                "id": 5
+                            },
+                            {
+                                "id": 6
                             }
                         ]
                     """.trimIndent()
-                JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
+                JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.LENIENT)
             }
 
             @Test
@@ -149,21 +173,7 @@ class `Bookable E2E Tests` {
                 val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=${today.plusDays(1)}&expand=bookings", String::class.java)
 
                 // assert
-                val expectedResponse = """
-                        [
-                            {
-                                "id": 1,
-                                "locationId": 1,
-                                "name": "Red",
-                                "disposition": {
-                                    "closed": false,
-                                    "reason": ""
-                                },
-                                bookings: []
-                            }
-                        ]
-                    """.trimIndent()
-                JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
+                JSONAssert.assertEquals(allBookables, response.body, JSONCompareMode.LENIENT)
             }
 
             @AfterEach

@@ -19,7 +19,7 @@ class BookableRepositoryTests @Autowired constructor(
     fun getAllBookables() {
         val bookableRepository = BookableDatabaseRepository(jdbcTemplate)
         val bookables = bookableRepository.getAllBookables()
-        expect(bookables.size).to.be.equal(1)
-        expect(bookables).to.contain(Bookable(1, 1, "Red", Disposition()))
+        expect(bookables.size).to.be.equal(6)
+        expect(bookables).to.contain(Bookable(1, 1, "Red Room", Disposition()))
     }
 }
