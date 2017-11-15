@@ -55,6 +55,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
     ): Collection<BookableResource> {
         val location = locationRepository.getLocations().find { it.id == locationId } ?: throw LocationNotFound()
         val timeZone = ZoneId.of(location.timeZone)
+        // TODO these probably need to be consistent w/ GetAllBooking's filters...
         val start = startDate ?: LocalDate.now(timeZone)
         val end = endDate ?: start
 

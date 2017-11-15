@@ -2,9 +2,11 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
+import com.buildit.bookit.v1.booking.dto.interval
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
@@ -15,11 +17,13 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.threeten.extra.Interval
 import java.net.URI
 import java.time.Clock
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -50,7 +54,38 @@ class BookingController(private val bookingRepository: BookingRepository, privat
     /**
      */
     @GetMapping
-    fun getAllBookings(): ResponseEntity<Collection<Booking>> = ResponseEntity.ok(bookingRepository.getAllBookings())
+    fun getAllBookings(
+        @RequestParam("start", required = false)
+        @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
+        startDateInclusive: LocalDate? = null,
+        @RequestParam("end", required = false)
+        @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
+        endDateExclusive: LocalDate? = null
+    ): Collection<Booking> {
+        val start = startDateInclusive ?: LocalDate.MIN
+        val end = endDateExclusive ?: LocalDate.MAX
+
+        if (!start.isBefore(end)) {
+            throw EndBeforeStartException()
+        }
+
+        val allBookings = bookingRepository.getAllBookings()
+        if (start == LocalDate.MIN && end == LocalDate.MAX)
+            return allBookings
+
+        val locationTimezones = locationRepository.getLocations().associate { Pair(it.id, ZoneId.of(it.timeZone)) }
+        val bookableTimezones = bookableRepository.getAllBookables().associate { Pair(it.id, locationTimezones[it.locationId]) }
+
+        return allBookings
+            .filter { booking ->
+                val timezone = bookableTimezones[booking.bookableId] ?: throw IllegalStateException("Encountered an incomplete booking: $booking.  Not able to determine booking's timezone.")
+                val desiredInterval = Interval.of(
+                    start.atStartOfDay(timezone).toInstant(),
+                    end.atStartOfDay(timezone).toInstant()
+                )
+                desiredInterval.overlaps(booking.interval(timezone))
+            }
+    }
 
     /**
      * Get a booking
