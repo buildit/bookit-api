@@ -69,12 +69,12 @@ class BookingController(private val bookingRepository: BookingRepository, privat
             throw EndBeforeStartException()
         }
 
-        var allBookings = bookingRepository.getAllBookings()
+        val allBookings = bookingRepository.getAllBookings()
         if (start == LocalDate.MIN && end == LocalDate.MAX)
             return allBookings
 
-        var locationTimezones = locationRepository.getLocations().associate { Pair(it.id, ZoneId.of(it.timeZone)) }
-        var bookableTimezones = bookableRepository.getAllBookables().associate { Pair(it.id, locationTimezones[it.locationId]) }
+        val locationTimezones = locationRepository.getLocations().associate { Pair(it.id, ZoneId.of(it.timeZone)) }
+        val bookableTimezones = bookableRepository.getAllBookables().associate { Pair(it.id, locationTimezones[it.locationId]) }
 
         return allBookings
             .filter { booking ->
