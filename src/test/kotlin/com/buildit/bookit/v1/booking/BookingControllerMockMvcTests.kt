@@ -4,7 +4,6 @@ import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
-import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockito_kotlin.doReturn
@@ -42,6 +41,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
 ) {
     private val NYC = ZoneId.of("America/New_York")
     private val location = Location("NYC", NYC, 1)
+    private val bookable = Bookable(location, "Bookable")
     private val startDateTime = now(NYC).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
     private val endDateTime = now(NYC).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
 
@@ -61,8 +61,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
     inner class GetBooking {
         @BeforeEach
         fun setupMock() {
-            whenever(bookingRepo.getAllBookings())
-                .doReturn(listOf(Booking(1, "The Booking", startDateTime, endDateTime, 1)))
+            whenever(bookingRepo.findAll())
+                .doReturn(listOf(Booking(bookable, "The Booking", startDateTime, endDateTime, 1)))
         }
 
         @Test
@@ -88,13 +88,14 @@ class BookingControllerMockMvcTests @Autowired constructor(
     @Nested
     inner class CreateBooking {
         private val subject = "New Meeting"
+        private val booking = Booking(bookable, subject, startDateTime, endDateTime, 1)
 
         @BeforeEach
         fun createMock() {
-            whenever(bookingRepo.insertBooking(1, subject, startDateTime, endDateTime))
-                .doReturn(Booking(1, subject, startDateTime, endDateTime, 1))
-            whenever(bookableRepo.findOne(1))
-                .doReturn(listOf(Bookable(location, "Foo", Disposition(), 1)))
+            whenever(bookingRepo.save(booking))
+                .doReturn(booking)
+            whenever(bookableRepo.findOne(bookable.id))
+                .doReturn(listOf(bookable))
         }
 
         @Test

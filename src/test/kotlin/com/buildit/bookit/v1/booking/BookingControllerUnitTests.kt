@@ -5,7 +5,6 @@ import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
-import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
@@ -27,20 +26,23 @@ class BookingControllerUnitTests {
         private val clock: Clock = Clock.systemUTC()
         private val NYC = ZoneId.of("America/New_York")
         private val location = Location("NYC", NYC, 1)
+        private val bookable1 = Bookable(location, "Bookable1")
+        private val bookable2 = Bookable(location, "Bookable2")
 
         @Nested
         inner class `get request` {
             private lateinit var bookingRepo: BookingRepository
+            private val startDateTime = LocalDateTime.parse("2017-09-26T09:00")
+            private val endDateTime = LocalDateTime.parse("2017-09-26T10:00")
+            private val booking = Booking(bookable1, "Booking", startDateTime, endDateTime, 1)
 
             @BeforeEach
             fun setup() {
-                val startDateTime = LocalDateTime.parse("2017-09-26T09:00")
-                val endDateTime = LocalDateTime.parse("2017-09-26T10:00")
                 bookingRepo = mock {
-                    on { getAllBookings() }.doReturn(
+                    on { findAll() }.doReturn(
                         listOf(
-                            Booking(10, "Booking", startDateTime, endDateTime, 1),
-                            Booking(20, "Another Booking", startDateTime, endDateTime, 2)
+                            booking,
+                            Booking(bookable2, "Another Booking", startDateTime, endDateTime, 2)
                         )
                     )
                 }
@@ -61,13 +63,13 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `getBooking() for existing booking returns that booking`() {
-                    val booking = BookingController(bookingRepo, mock {}, clock).getBooking(1)
+                    val booking = BookingController(bookingRepo, mock {}, clock).getBooking(booking)
                     expect(booking.id).to.be.equal(1)
                 }
 
                 @Test
                 fun `getBooking() for nonexistent booking throws exception`() {
-                    fun action() = BookingController(bookingRepo, mock {}, clock).getBooking(3)
+                    fun action() = BookingController(bookingRepo, mock {}, clock).getBooking(null)
                     assertThat({ action() }, throws<BookingNotFound>())
                 }
             }
@@ -80,20 +82,20 @@ class BookingControllerUnitTests {
 
             private val start = LocalDateTime.now(NYC).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
-            private val createdBooking = Booking(999999, "MyRequest", start, end, 1)
+            private val createdBooking = Booking(bookable1, "MyRequest", start, end, 1)
 
             @BeforeEach
             fun setup() {
 
                 val bookingRepository = mock<BookingRepository> {
-                    on { insertBooking(999999, "MyRequest", start, end) }.doReturn(createdBooking)
-                    on { getAllBookings() }.doReturn(listOf(
-                        Booking(999999, "Before", start.minusHours(1), end.minusHours(1), 1),
-                        Booking(999999, "After", start.plusHours(1), end.plusHours(1), 2)
+                    on { save(createdBooking) }.doReturn(createdBooking)
+                    on { findAll() }.doReturn(listOf(
+                        Booking(bookable1, "Before", start.minusHours(1), end.minusHours(1), 1),
+                        Booking(bookable1, "After", start.plusHours(1), end.plusHours(1), 2)
                     ))
                 }
                 val bookableRepo = mock<BookableRepository> {
-                    on { findOne(999999) }.doReturn(listOf(Bookable(location, "Bookable", Disposition(), 999999)))
+                    on { findOne(bookable1.id) }.doReturn(listOf(bookable1))
                 }
 
                 bookingController = BookingController(bookingRepository, bookableRepo, clock)

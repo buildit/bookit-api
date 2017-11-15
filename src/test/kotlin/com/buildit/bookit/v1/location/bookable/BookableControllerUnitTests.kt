@@ -100,9 +100,9 @@ class BookableControllerUnitTests {
 
                 @Nested
                 inner class `with bookings` {
-                    private val booking = Booking(1, "Booking", today.atTime(9, 15), today.atTime(10, 15), 1)
+                    private val booking = Booking(availableBookable, "Booking", today.atTime(9, 15), today.atTime(10, 15), 1)
                     private val bookingRepo = mock<BookingRepository> {
-                        on { getAllBookings() }.doReturn(listOf(booking))
+                        on { findAll() }.doReturn(listOf(booking))
                     }
 
                     private val controller = BookableController(bookableRepo, bookingRepo)
@@ -138,7 +138,7 @@ class BookableControllerUnitTests {
                     @Test
                     fun `ignores bookings for other bookables`() {
                         val bookingRepo = mock<BookingRepository> {
-                            on { getAllBookings() }.doReturn(listOf(Booking(2, "Booking", today.atTime(9, 15), today.atTime(10, 15), 1)))
+                            on { findAll() }.doReturn(listOf(Booking(Bookable(location, "other bookable", Disposition(), 2), "Booking", today.atTime(9, 15), today.atTime(10, 15), 1)))
                         }
                         val controller = BookableController(bookableRepo, bookingRepo)
 
