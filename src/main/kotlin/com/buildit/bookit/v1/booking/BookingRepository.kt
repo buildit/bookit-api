@@ -18,7 +18,7 @@ class BookingDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : Bookin
     private val tableName = "BOOKING"
 
     // replace this with a s
-    private var bookingIdGenerator = AtomicInteger(0)
+    private var bookingIdGenerator = AtomicInteger(10000)
 
     override fun getAllBookings(): Collection<Booking> = jdbcTemplate.query(
         "SELECT BOOKING_ID, BOOKABLE_ID, SUBJECT, START_DATE, END_DATE FROM $tableName") { rs, _ ->

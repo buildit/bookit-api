@@ -40,7 +40,7 @@ class BookingRepositoryTests @Autowired constructor(
         val booking = bookingRepo.insertBooking(1, "My Inserted", start, end)
 
         // assert
-        expect(booking.id).to.be.equal(1)
+        expect(booking.id).to.be.equal(10001)
         expect(booking.bookableId).to.be.equal(1)
         expect(booking.subject).to.be.equal("My Inserted")
         expect(booking.start).to.be.equal(start)
