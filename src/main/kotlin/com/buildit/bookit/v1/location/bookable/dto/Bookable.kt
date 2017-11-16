@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.ManyToOne
 
+@Suppress("VariableMinLength")
 interface IBookable {
     val id: Int?
     val location: Location

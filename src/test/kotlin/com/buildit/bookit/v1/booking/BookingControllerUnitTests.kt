@@ -20,7 +20,6 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 class BookingControllerUnitTests {
-
     @Nested
     inner class `|v1|booking` {
         private val clock: Clock = Clock.systemUTC()
@@ -50,7 +49,6 @@ class BookingControllerUnitTests {
 
             @Nested
             inner class `invoking getAllBookings()` {
-
                 @Test
                 fun `returns all existing bookings`() {
                     val bookings = BookingController(bookingRepo, mock {}, clock).getAllBookings().body
@@ -60,7 +58,6 @@ class BookingControllerUnitTests {
 
             @Nested
             inner class `invoking getBooking()` {
-
                 @Test
                 fun `getBooking() for existing booking returns that booking`() {
                     val booking = BookingController(bookingRepo, mock {}, clock).getBooking(booking)
@@ -75,18 +72,15 @@ class BookingControllerUnitTests {
             }
         }
 
-
         @Nested
         inner class `createBooking` {
             private lateinit var bookingController: BookingController
-
             private val start = LocalDateTime.now(NYC).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
             private val createdBooking = Booking(bookable1, "MyRequest", start, end, 1)
 
             @BeforeEach
             fun setup() {
-
                 val bookingRepository = mock<BookingRepository> {
                     on { save(createdBooking) }.doReturn(createdBooking)
                     on { findAll() }.doReturn(listOf(
