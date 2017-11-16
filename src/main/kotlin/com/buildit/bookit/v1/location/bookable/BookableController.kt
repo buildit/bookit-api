@@ -33,7 +33,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
      * Get a bookable
      */
     @GetMapping(value = "/{bookableId}")
-    fun getBookable(@PathVariable("locationId") location: Int, @PathVariable("bookableId") bookable: Int): BookableResource {
+    fun getBookable(@PathVariable("locationId") location: String, @PathVariable("bookableId") bookable: String): BookableResource {
         locationRepository.getLocations().find { it.id == location } ?: throw LocationNotFound()
         return BookableResource(bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound())
     }
@@ -43,7 +43,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
      */
     @GetMapping
     fun getAllBookables(
-        @PathVariable("locationId") locationId: Int,
+        @PathVariable("locationId") locationId: String,
         @RequestParam("start", required = false)
         @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
         startDate: LocalDate? = null,

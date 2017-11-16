@@ -38,28 +38,16 @@ class BookableControllerMockMvcTests @Autowired constructor(
     @BeforeEach
     fun setupMocks() {
         whenever(locationRepo.getLocations())
-            .doReturn(listOf(Location(1, "NYC", "America/New_York")))
+            .doReturn(listOf(Location("location-guid", "NYC", "America/New_York")))
         whenever(bookableRepo.getAllBookables())
-            .doReturn(listOf(Bookable(1, 1, "The best bookable ever", Disposition())))
+            .doReturn(listOf(Bookable("bookable-guid", "guid", "The best bookable ever", Disposition())))
     }
 
     @Test
     fun getExistingBookableTest() {
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/1/bookable/1"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/location-guid/bookable/bookable-guid"))
             .andExpect(status().isOk)
             .andExpect(jsonPath<String>("$.name", equalToIgnoringCase("The best bookable ever")))
             .andExpect(jsonPath<Boolean>("$.disposition.closed", equalTo(false)))
-    }
-
-    @Test
-    fun getBadLocation() {
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/nyc/bookable/1"))
-            .andExpect(status().isBadRequest)
-    }
-
-    @Test
-    fun getBadBooking() {
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/1/bookable/foo"))
-            .andExpect(status().isBadRequest)
     }
 }

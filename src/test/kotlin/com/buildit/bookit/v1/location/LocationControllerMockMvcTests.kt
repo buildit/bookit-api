@@ -31,20 +31,14 @@ class LocationControllerMockMvcTests @Autowired constructor(
     @BeforeEach
     fun setupMocks() {
         whenever(locationRepo.getLocations())
-            .doReturn(listOf(Location(1, "The best location ever", "America/New_York")))
+            .doReturn(listOf(Location("guid", "The best location ever", "America/New_York")))
     }
 
     @Test
     fun `get known location`() {
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/1"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/guid"))
             .andExpect(status().isOk)
             .andExpect(jsonPath<String>("$.name", equalToIgnoringCase("The best location ever")))
             .andExpect(jsonPath<String>("$.timeZone", equalToIgnoringCase("America/New_York")))
-    }
-
-    @Test
-    fun `bad location id fails`() {
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/location/notanumber"))
-            .andExpect(status().isBadRequest)
     }
 }

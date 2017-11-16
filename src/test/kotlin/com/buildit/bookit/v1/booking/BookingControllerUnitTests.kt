@@ -28,15 +28,15 @@ class BookingControllerUnitTests {
     private lateinit var bookableRepo: BookableRepository
     private val clock: Clock = Clock.systemUTC()
     private val today: LocalDate = LocalDate.now(ZoneId.of("America/New_York"))
-    private val nycBookable1 = Bookable(1, 1, "NYC Bookable 1", Disposition())
-    private val nycBookable2 = Bookable(2, 1, "NYC Bookable 2", Disposition())
+    private val nycBookable1 = Bookable("guid", "guid-nyc", "NYC Bookable 1", Disposition())
+    private val nycBookable2 = Bookable("guid", "guid-nyc", "NYC Bookable 2", Disposition())
 
     @BeforeEach
     fun setup() {
         locationRepo = mock {
             on { getLocations() }.doReturn(listOf(
-                Location(1, "NYC", "America/New_York"),
-                Location(2, "LON", "Europe/London")
+                Location("guid-nyc", "NYC", "America/New_York"),
+                Location("guid-euro", "LON", "Europe/London")
             ))
         }
 
@@ -51,10 +51,10 @@ class BookingControllerUnitTests {
         inner class `GET` {
             private lateinit var bookingRepo: BookingRepository
 
-            private val bookingToday = Booking(1, nycBookable1.id, "Booking today", today.atTime(9, 15), today.atTime(10, 15))
-            private val bookingTomorrow = Booking(2, nycBookable1.id, "Booking tomorrow", today.plusDays(1).atTime(9, 15), today.plusDays(1).atTime(10, 15))
-            private val bookingTodayDifferentBookable = Booking(3, nycBookable2.id, "Booking today, different bookable", today.atTime(11, 0), today.atTime(11, 30))
-            private val bookingYesterday = Booking(4, nycBookable1.id, "Booking yesterday", today.minusDays(1).atTime(9, 15), today.minusDays(1).atTime(10, 15))
+            private val bookingToday = Booking("guid1", nycBookable1.id, "Booking today", today.atTime(9, 15), today.atTime(10, 15))
+            private val bookingTomorrow = Booking("guid2", nycBookable1.id, "Booking tomorrow", today.plusDays(1).atTime(9, 15), today.plusDays(1).atTime(10, 15))
+            private val bookingTodayDifferentBookable = Booking("guid3", nycBookable2.id, "Booking today, different bookable", today.atTime(11, 0), today.atTime(11, 30))
+            private val bookingYesterday = Booking("guid4", nycBookable1.id, "Booking yesterday", today.minusDays(1).atTime(9, 15), today.minusDays(1).atTime(10, 15))
 
             @BeforeEach
             fun setup() {
@@ -125,13 +125,13 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `getBooking() for existing booking returns that booking`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking(1)
-                    expect(booking.id).to.be.equal(1)
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking("guid1")
+                    expect(booking.id).to.be.equal("guid1")
                 }
 
                 @Test
                 fun `getBooking() for nonexistent booking throws exception`() {
-                    fun action() = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking(99999)
+                    fun action() = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking("guid-not-there")
                     assertThat({ action() }, throws<BookingNotFound>())
                 }
             }
@@ -141,15 +141,15 @@ class BookingControllerUnitTests {
         inner class `POST` {
             private val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
-            private val createdBooking = Booking(1, nycBookable1.id, "MyRequest", start, end)
+            private val createdBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end)
 
             @BeforeEach
             fun setup() {
                 val bookingRepository = mock<BookingRepository> {
                     on { insertBooking(nycBookable1.id, "MyRequest", start, end) }.doReturn(createdBooking)
                     on { getAllBookings() }.doReturn(listOf(
-                        Booking(1, nycBookable1.id, "Before", start.minusHours(1), end.minusHours(1)),
-                        Booking(2, nycBookable1.id, "After", start.plusHours(1), end.plusHours(1))
+                        Booking("guid1", nycBookable1.id, "Before", start.minusHours(1), end.minusHours(1)),
+                        Booking("guid2", nycBookable1.id, "After", start.plusHours(1), end.plusHours(1))
                     ))
                 }
                 bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, clock)
@@ -177,7 +177,7 @@ class BookingControllerUnitTests {
 
             @Test
             fun `should validate bookable exists`() {
-                val request = BookingRequest(999999, "MyRequest", start, end)
+                val request = BookingRequest("guid-not-there", "MyRequest", start, end)
                 fun action() = bookingController.createBooking(request)
                 assertThat({ action() }, throws<InvalidBookable>())
             }

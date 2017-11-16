@@ -22,13 +22,13 @@ import java.time.ZoneId
 class BookableControllerUnitTests {
     val locationRepo = mock<LocationRepository> {
         on { getLocations() }.doReturn(listOf(
-            Location(1, "NYC", "America/New_York"),
-            Location(2, "LON", "Europe/London")
+            Location("guid1", "NYC", "America/New_York"),
+            Location("guid2", "LON", "Europe/London")
         ))
     }
-    val nycBookable1 = Bookable(1, 1, "NYC Bookable 1", Disposition())
-    val nycBookable2 = Bookable(2, 1, "NYC Bookable 2", Disposition())
-    val londonBookable = Bookable(3, 2, "London Bookable 1", Disposition())
+    val nycBookable1 = Bookable("guid1", "guid1", "NYC Bookable 1", Disposition())
+    val nycBookable2 = Bookable("guid2", "guid1", "NYC Bookable 2", Disposition())
+    val londonBookable = Bookable("guid3", "guid2", "London Bookable 1", Disposition())
 
     val bookableRepo = mock<BookableRepository> {
         on { getAllBookables() }.doReturn(listOf(nycBookable1, nycBookable2, londonBookable))
@@ -44,7 +44,7 @@ class BookableControllerUnitTests {
             @Nested inner class `that is known` {
                 @Test
                 fun `should return bookable1`() {
-                    val bookable = bookableController.getBookable(1, 1)
+                    val bookable = bookableController.getBookable("guid1", "guid1")
 
                     expect(bookable).to.be.equal(BookableResource(nycBookable1))
                 }
@@ -54,12 +54,12 @@ class BookableControllerUnitTests {
             inner class `that is unknown` {
                 @Test
                 fun `throws exception for invalid bookable`() {
-                    assertThat({ bookableController.getBookable(1, 99) }, throws<BookableNotFound>())
+                    assertThat({ bookableController.getBookable("guid1", "guid-not-there") }, throws<BookableNotFound>())
                 }
 
                 @Test
                 fun `throws exception for invalid location`() {
-                    assertThat({ bookableController.getBookable(-1, 1) }, throws<LocationNotFound>())
+                    assertThat({ bookableController.getBookable("guid-not-there", "guid1") }, throws<LocationNotFound>())
                 }
             }
         }
@@ -70,14 +70,14 @@ class BookableControllerUnitTests {
             inner class `for location` {
                 @Test
                 fun `returns all bookables`() {
-                    val allBookables = bookableController.getAllBookables(1)
+                    val allBookables = bookableController.getAllBookables("guid1")
                     expect(allBookables).to.contain(BookableResource(nycBookable1))
                     expect(allBookables).to.contain(BookableResource(nycBookable2))
                 }
 
                 @Test
                 fun `with invalid location throws exception`() {
-                    assertThat({ bookableController.getAllBookables(-1) }, throws<LocationNotFound>())
+                    assertThat({ bookableController.getAllBookables("guid-not-there") }, throws<LocationNotFound>())
                 }
             }
 
@@ -89,7 +89,7 @@ class BookableControllerUnitTests {
                 @Test
                 fun `requires startDate before endDate`() {
                     assertThat({
-                        bookableController.getAllBookables(1, today, today.minusDays(1), expandBookings)
+                        bookableController.getAllBookables("guid1", today, today.minusDays(1), expandBookings)
                     },
                         throws<EndBeforeStartException>())
                 }
@@ -97,15 +97,15 @@ class BookableControllerUnitTests {
                 @Test
                 fun `finds an available bookable - no bookings`() {
                     expect(
-                        bookableController.getAllBookables(1, today, today, expandBookings))
+                        bookableController.getAllBookables("guid1", today, today, expandBookings))
                         .to.contain(BookableResource(nycBookable1, emptyList()))
                 }
 
                 @Nested
                 inner class `with bookings` {
-                    private val booking1 = Booking(1, nycBookable1.id, "Booking 1", today.atTime(9, 15), today.atTime(10, 15))
-                    private val booking2 = Booking(2, nycBookable1.id, "Booking 2", today.atTime(11, 0), today.atTime(11, 30))
-                    private val booking3 = Booking(3, nycBookable2.id, "Booking 3, different bookable", today.atTime(11, 0), today.atTime(11, 30))
+                    private val booking1 = Booking("guid1", nycBookable1.id, "Booking 1", today.atTime(9, 15), today.atTime(10, 15))
+                    private val booking2 = Booking("guid2", nycBookable1.id, "Booking 2", today.atTime(11, 0), today.atTime(11, 30))
+                    private val booking3 = Booking("guid3", nycBookable2.id, "Booking 3, different bookable", today.atTime(11, 0), today.atTime(11, 30))
 
                     private val bookingRepo = mock<BookingRepository> {
                         on { getAllBookings() }.doReturn(listOf(booking1, booking2, booking3))
@@ -115,7 +115,7 @@ class BookableControllerUnitTests {
 
                     @Test
                     fun `finds bookable - with bookings`() {
-                        val bookables = controller.getAllBookables(1, today, today, expandBookings)
+                        val bookables = controller.getAllBookables("guid1", today, today, expandBookings)
                         expect(bookables).to.contain(BookableResource(nycBookable1, listOf(booking1, booking2)))
                         expect(bookables).to.contain(BookableResource(nycBookable2, listOf(booking3)))
                     }
@@ -123,21 +123,21 @@ class BookableControllerUnitTests {
                     @Test
                     fun `endDate defaults to startDate`() {
                         expect(
-                            controller.getAllBookables(1, today, expand = expandBookings))
+                            controller.getAllBookables("guid1", today, expand = expandBookings))
                             .to.contain(BookableResource(nycBookable1, listOf(booking1, booking2)))
                     }
 
                     @Test
                     fun `startDate defaults to today`() {
                         expect(
-                            controller.getAllBookables(1, endDate = today, expand = expandBookings))
+                            controller.getAllBookables("guid1", endDate = today, expand = expandBookings))
                             .to.contain(BookableResource(nycBookable1, listOf(booking1, booking2)))
                     }
 
                     @Test
                     fun `finds bookable - no bookings on date`() {
                         expect(
-                            controller.getAllBookables(1, today.plusDays(1), today.plusDays(1), expandBookings))
+                            controller.getAllBookables("guid1", today.plusDays(1), today.plusDays(1), expandBookings))
                             .to.contain(BookableResource(nycBookable1, emptyList()))
                     }
 
@@ -146,14 +146,14 @@ class BookableControllerUnitTests {
                         val bookingRepo = mock<BookingRepository> {
                             on { getAllBookings() }.doReturn(
                                 listOf(
-                                    Booking(1, 2, "Booking", today.atTime(9, 15), today.atTime(10, 15))
+                                    Booking("guid1", "guid2", "Booking", today.atTime(9, 15), today.atTime(10, 15))
                                 )
                             )
                         }
                         val controller = BookableController(bookableRepo, locationRepo, bookingRepo)
 
                         expect(
-                            controller.getAllBookables(1, expand = expandBookings))
+                            controller.getAllBookables("guid1", expand = expandBookings))
                             .to.contain(BookableResource(nycBookable1, emptyList()))
                     }
                 }

@@ -14,51 +14,43 @@ import java.time.LocalDateTime
  */
 @ExtendWith(SpringExtension::class)
 @JdbcTest
-class BookingRepositoryTests @Autowired constructor(
-    val jdbcTemplate: JdbcTemplate
-) {
+class BookingRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTemplate) {
+    val start = LocalDateTime.parse("2017-04-21T10:00")
+    val end = LocalDateTime.parse("2017-04-21T11:00")
+    val bookingRepo = BookingDatabaseRepository(jdbcTemplate)
+
     @Test
     fun getAllBookingsNoBookings() {
-        // arrange
-        val bookingRepo = BookingDatabaseRepository(jdbcTemplate)
-
-        // act
         val bookings = bookingRepo.getAllBookings()
 
-        // assert
         expect(bookings.size).to.be.equal(0)
     }
 
     @Test
     fun insertBooking() {
-        // arrange
-        val start = LocalDateTime.parse("2017-04-21T10:00")
-        val end = LocalDateTime.parse("2017-04-21T11:00")
-        val bookingRepo = BookingDatabaseRepository(jdbcTemplate)
+        val booking = bookingRepo.insertBooking("guid", "My Inserted", start, end)
 
-        // act
-        val booking = bookingRepo.insertBooking(1, "My Inserted", start, end)
-
-        // assert
-        expect(booking.id).to.be.equal(10001)
-        expect(booking.bookableId).to.be.equal(1)
+        expect(booking.id).not.to.be.`null`
+        expect(booking.bookableId).to.be.equal("guid")
         expect(booking.subject).to.be.equal("My Inserted")
         expect(booking.start).to.be.equal(start)
         expect(booking.end).to.be.equal(end)
     }
 
     @Test
-    fun getAllBookings1Booking() {
-        // arrange
-        val start = LocalDateTime.parse("2017-04-21T10:00")
-        val end = LocalDateTime.parse("2017-04-21T11:00")
-        val bookingRepo = BookingDatabaseRepository(jdbcTemplate)
-        val booking = bookingRepo.insertBooking(1, "My Inserted", start, end)
+    fun deleteBooking() {
+        val booking = bookingRepo.insertBooking("guid", "My Inserted", start, end)
+        expect(bookingRepo.getAllBookings()).to.have.size(1)
+        bookingRepo.delete(booking.id)
+        expect(bookingRepo.getAllBookings()).to.be.empty
+    }
 
-        // act
+    @Test
+    fun getAllBookings1Booking() {
+        val booking = bookingRepo.insertBooking("guid", "My Inserted", start, end)
+
         val bookings = bookingRepo.getAllBookings()
 
-        // assert
         expect(bookings).to.contain(booking)
     }
 }

@@ -14,7 +14,7 @@ class LocationDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : Locat
     override fun getLocations(): Collection<Location> = jdbcTemplate.query(
         "SELECT LOCATION_ID, LOCATION_NAME, LOCATION_TZ FROM LOCATION") { rs, _ ->
         Location(
-            rs.getInt("LOCATION_ID"),
+            rs.getString("LOCATION_ID"),
             rs.getString("LOCATION_NAME"),
             rs.getString("LOCATION_TZ")
         )

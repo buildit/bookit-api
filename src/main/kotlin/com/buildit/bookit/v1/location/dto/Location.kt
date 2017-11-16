@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 /**
  * Location response
  */
-data class Location(val id: Int,
+data class Location(val id: String,
                     val name: String,
                     val timeZone: String)
 

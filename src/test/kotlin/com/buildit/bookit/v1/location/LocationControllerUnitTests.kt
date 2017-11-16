@@ -14,8 +14,8 @@ class LocationControllerUnitTests {
     val mockRepository = mock<LocationRepository> {
         on { getLocations() }.doReturn(
             listOf(
-                Location(1, "NYC", "Americas/New_York"),
-                Location(1, "DEN", "Americas/Denver")
+                Location("guid1", "NYC", "Americas/New_York"),
+                Location("guid2", "DEN", "Americas/Denver")
             )
         )
     }
@@ -38,7 +38,7 @@ class LocationControllerUnitTests {
                 @Test
                 fun `should return the location`() {
                     val locationController = LocationController(mockRepository)
-                    expect(locationController.getLocation(1).name).to.be.equal("NYC")
+                    expect(locationController.getLocation("guid1").name).to.be.equal("NYC")
                 }
             }
 
@@ -47,7 +47,7 @@ class LocationControllerUnitTests {
                 @Test
                 fun `should throw an exception`() {
                     val locationController = LocationController(mockRepository)
-                    assertThat({ locationController.getLocation(2) }, throws<LocationNotFound>())
+                    assertThat({ locationController.getLocation("guid99") }, throws<LocationNotFound>())
                 }
             }
         }
