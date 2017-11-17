@@ -18,12 +18,12 @@ class `Location E2E Tests` {
         val expectedResponse = """
                         [
                             {
-                                "id": 1,
+                                "id": "b1177996-75e2-41da-a3e9-fcdd75d1ab31",
                                 "name": "NYC",
                                 "timeZone": "America/New_York"
                             },
                             {
-                                "id": 2,
+                                "id": "43ec3f7d-348d-427f-8c13-102ca0362a62",
                                 "name": "LON",
                                 "timeZone": "Europe/London"
                             }

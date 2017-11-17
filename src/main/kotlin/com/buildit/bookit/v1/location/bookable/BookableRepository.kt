@@ -17,8 +17,8 @@ class BookableDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : Booka
         "SELECT BOOKABLE_ID, LOCATION_ID, BOOKABLE_NAME, DISPOSITION_CLOSED, DISPOSITION_REASON FROM $tableName") { rs, _ ->
 
         Bookable(
-            rs.getInt("BOOKABLE_ID"),
-            rs.getInt("LOCATION_ID"),
+            rs.getString("BOOKABLE_ID"),
+            rs.getString("LOCATION_ID"),
             rs.getString("BOOKABLE_NAME"),
             Disposition(rs.getBoolean("DISPOSITION_CLOSED"), rs.getString("DISPOSITION_REASON"))
         )

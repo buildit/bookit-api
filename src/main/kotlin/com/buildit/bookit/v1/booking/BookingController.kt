@@ -51,8 +51,6 @@ class BookableNotAvailable : RuntimeException("Bookable is not available.  Pleas
 @RequestMapping("/v1/booking")
 @Transactional
 class BookingController(private val bookingRepository: BookingRepository, private val bookableRepository: BookableRepository, private val locationRepository: LocationRepository, private val clock: Clock) {
-    /**
-     */
     @GetMapping
     fun getAllBookings(
         @RequestParam("start", required = false)
@@ -87,19 +85,13 @@ class BookingController(private val bookingRepository: BookingRepository, privat
             }
     }
 
-    /**
-     * Get a booking
-     */
     @GetMapping("/{id}")
-    fun getBooking(@PathVariable("id") bookingId: Int): Booking =
+    fun getBooking(@PathVariable("id") bookingId: String): Booking =
         bookingRepository.getAllBookings().find { it.id == bookingId } ?: throw BookingNotFound()
 
     @DeleteMapping("/{id}")
-    fun deleteBooking(@PathVariable("id") id: Int) = bookingRepository.delete(id)
+    fun deleteBooking(@PathVariable("id") id: String) = bookingRepository.delete(id)
 
-    /**
-     * Create a booking
-     */
     @Suppress("UnsafeCallOnNullableType")
     @PostMapping()
     fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: Errors? = null): ResponseEntity<Booking> {

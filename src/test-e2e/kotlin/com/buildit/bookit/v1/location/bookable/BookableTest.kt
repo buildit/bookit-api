@@ -27,13 +27,13 @@ class `Bookable E2E Tests` {
     @Test
     fun `get 1 bookable`() {
         // act
-        val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable/1", String::class.java)
+        val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable/aab6d676-d3cb-4b9b-b285-6e63058aeda8", String::class.java)
 
         // assert
         val expectedResponse = """
                         {
-                            "id": 1,
-                            "locationId": 1,
+                            "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                            "locationId": "b1177996-75e2-41da-a3e9-fcdd75d1ab31",
                             "name": "Red Room",
                             "disposition": {
                                 "closed": false,
@@ -48,8 +48,8 @@ class `Bookable E2E Tests` {
     private val allBookables = """
                             [
                                 {
-                                    "id": 1,
-                                    "locationId": 1,
+                                    "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                                    "locationId": "b1177996-75e2-41da-a3e9-fcdd75d1ab31",
                                     "name": "Red Room",
                                     "disposition": {
                                         "closed": false,
@@ -58,20 +58,20 @@ class `Bookable E2E Tests` {
                                     bookings: []
                                 },
                                 {
-                                    "id": 2
+                                    "id": "1c824c61-7539-41d7-b723-d4447826ba50"
                                 },
                                 {
-                                    "id": 3
+                                    "id": "23787564-e99d-4741-b285-4d17cc29bf8d"
                                 },
                                 {
-                                    "id": 4
+                                    "id": "a7b68976-8dda-44f2-8e39-4e2b6c3514cd"
                                 },
                                 {
-                                    "id": 5
+                                    "id": "25708e84-cf1b-45aa-b062-0af903328a52"
                                 },
                                 {
-                                    "id": 6,
-                                    "locationId": 1,
+                                    "id": "cc4bd7e5-00f6-4903-86a2-abf5423edb84",
+                                    "locationId": "b1177996-75e2-41da-a3e9-fcdd75d1ab31",
                                     "name": "Yellow Room",
                                     "disposition": {
                                         "closed": true,
@@ -85,7 +85,7 @@ class `Bookable E2E Tests` {
     @Test
     fun `get all bookables`() {
         // act
-        val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable", String::class.java)
+        val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable", String::class.java)
 
         // assert
         JSONAssert.assertEquals(allBookables, response.body, JSONCompareMode.LENIENT)
@@ -95,7 +95,7 @@ class `Bookable E2E Tests` {
     inner class `Search for bookables` {
         @Test
         fun `should require start before end`() {
-            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=$today&end=${today.minusDays(1)}", String::class.java)
+            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?start=$today&end=${today.minusDays(1)}", String::class.java)
 
             expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
         }
@@ -103,7 +103,7 @@ class `Bookable E2E Tests` {
         @Test
         fun `should find available bookable`() {
             // act
-            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=$today&end=$today&expand=bookings", String::class.java)
+            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?start=$today&end=$today&expand=bookings", String::class.java)
 
             // assert
             JSONAssert.assertEquals(allBookables, response.body, JSONCompareMode.LENIENT)
@@ -118,7 +118,7 @@ class `Bookable E2E Tests` {
                 val goodRequest =
                     """
                             {
-                                "bookableId": 1,
+                                "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
                                 "subject": "My new meeting",
                                 "start": "$inOneHour",
                                 "end": "$inTwoHours"
@@ -130,14 +130,14 @@ class `Bookable E2E Tests` {
             @Test
             fun `should find bookable with bookings`() {
                 // act
-                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?expand=bookings", String::class.java)
+                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?expand=bookings", String::class.java)
 
                 // assert
                 val expectedResponse = """
                         [
                             {
-                                "id": 1,
-                                "locationId": 1,
+                                "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                                "locationId": "b1177996-75e2-41da-a3e9-fcdd75d1ab31",
                                 "name": "Red Room",
                                 "disposition": {
                                     "closed": false,
@@ -148,19 +148,19 @@ class `Bookable E2E Tests` {
                                 ]
                             },
                             {
-                                "id": 2
+                                "id": "1c824c61-7539-41d7-b723-d4447826ba50"
                             },
                             {
-                                "id": 3
+                                "id": "23787564-e99d-4741-b285-4d17cc29bf8d"
                             },
                             {
-                                "id": 4
+                                "id": "a7b68976-8dda-44f2-8e39-4e2b6c3514cd"
                             },
                             {
-                                "id": 5
+                                "id": "25708e84-cf1b-45aa-b062-0af903328a52"
                             },
                             {
-                                "id": 6
+                                "id": "cc4bd7e5-00f6-4903-86a2-abf5423edb84"
                             }
                         ]
                     """.trimIndent()
@@ -170,7 +170,7 @@ class `Bookable E2E Tests` {
             @Test
             fun `should find bookable with no bookings on different day`() {
                 // act
-                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/1/bookable?start=${today.plusDays(1)}&expand=bookings", String::class.java)
+                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?start=${today.plusDays(1)}&expand=bookings", String::class.java)
 
                 // assert
                 JSONAssert.assertEquals(allBookables, response.body, JSONCompareMode.LENIENT)

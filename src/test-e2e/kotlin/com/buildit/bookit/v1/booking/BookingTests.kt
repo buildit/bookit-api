@@ -30,13 +30,12 @@ class `Booking E2E Tests` {
     private val bookingForTomorrow =
         """
                 {
-                    "bookableId": 1,
+                    "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
                     "subject": "My new meeting",
                     "start": "$tomorrow",
                     "end": "$tomorrowPlusAnHour"
                 }
                 """
-
     @Nested
     inner class `Get bookings` {
         @Nested
@@ -44,7 +43,7 @@ class `Booking E2E Tests` {
             private val expectedBooking = """
                         [
                           {
-                            "bookableId": 1,
+                            "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
                             "subject": "My new meeting"
                           }
                         ]
@@ -57,6 +56,7 @@ class `Booking E2E Tests` {
             @BeforeEach
             fun `put booking in place`() {
                 response = post(bookingForTomorrow, "/v1/booking")
+                expect(response?.statusCode?.is2xxSuccessful).to.be.`true`
             }
 
             @Test
@@ -69,7 +69,6 @@ class `Booking E2E Tests` {
             fun `overlapping start date returns bookings`() {
                 val start = DateTimeFormatter.ISO_LOCAL_DATE.format(now)
                 val response = get("/v1/booking?start=$start")
-
                 JSONAssert.assertEquals(expectedBooking, response.body, JSONCompareMode.LENIENT)
             }
 
@@ -121,8 +120,8 @@ class `Booking E2E Tests` {
                 response = post(bookingForTomorrow, "/v1/booking")
 
                 val jsonResponse = JSONObject(response?.body)
-                expect(jsonResponse.getInt("id")).to.be.above(0)
-                expect(jsonResponse.get("bookableId")).to.be.equal(1)
+                expect(jsonResponse.getString("id")).not.to.be.`null`
+                expect(jsonResponse.get("bookableId")).not.to.be.`null`
                 expect(jsonResponse.get("subject")).to.be.equal("My new meeting")
             }
 
@@ -137,7 +136,7 @@ class `Booking E2E Tests` {
             val requestWithPastDate =
                 """
                 {
-                    "bookableId": 1,
+                    "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
                     "subject": "My meeting in the past",
                     "start": "$yesterday",
                     "end": "${yesterday.plusHours(1)}"
@@ -158,7 +157,7 @@ class `Booking E2E Tests` {
             val requestWithEndBeforeStart =
                 """
                 {
-                    "bookableId": 1,
+                    "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
                     "subject": "My meeting with bad date order",
                     "start": "$tomorrow",
                     "end": "${tomorrow.minusHours(1)}"
@@ -179,7 +178,7 @@ class `Booking E2E Tests` {
             val requestWithNonDates =
                 """
                 {
-                    "bookableId": 1,
+                    "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
                     "subject": "My meeting with bad dates",
                     "start": "foo",
                     "end": "bar"

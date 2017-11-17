@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull
  */
 data class BookingRequest(
     @field:NotNull(message = "bookableId is required")
-    val bookableId: Int?,
+    val bookableId: String?,
     @field:NotBlank(message = "subject is required and cannot be blank")
     val subject: String?,
     @field:NotNull(message = "start is required")
@@ -25,8 +25,8 @@ data class BookingRequest(
  * Booking response
  */
 data class Booking(
-    val id: Int,
-    val bookableId: Int,
+    val id: String,
+    val bookableId: String,
     val subject: String,
     @field:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     val start: LocalDateTime,
