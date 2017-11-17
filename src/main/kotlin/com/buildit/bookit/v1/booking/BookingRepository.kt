@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 interface BookingRepository {
     fun getAllBookings(): Collection<Booking>
@@ -16,7 +16,6 @@ interface BookingRepository {
 @Repository
 class BookingDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : BookingRepository {
     private val tableName = "BOOKING"
-
 
     override fun getAllBookings(): Collection<Booking> = jdbcTemplate.query(
         "SELECT BOOKING_ID, BOOKABLE_ID, SUBJECT, START_DATE, END_DATE FROM $tableName") { rs, _ ->
