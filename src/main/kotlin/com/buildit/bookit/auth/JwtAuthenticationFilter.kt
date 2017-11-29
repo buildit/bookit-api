@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse
 class JwtAuthenticationFilter(authManager: AuthenticationManager) : BasicAuthenticationFilter(authManager) {
     private val TOKEN_PREFIX = "Bearer "
     private val HEADER_STRING = "Authorization"
+    private val log = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
 
     override fun doFilterInternal(req: HttpServletRequest,
                                   res: HttpServletResponse,
@@ -73,7 +74,6 @@ class JwtAuthenticationFilter(authManager: AuthenticationManager) : BasicAuthent
         return null
     }
 
-
     private inner class OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
         override fun resolveSigningKey(header: JwsHeader<*>, claims: Claims): Key? {
             return loadPublicKey(header.getKeyId())
@@ -97,7 +97,7 @@ class JwtAuthenticationFilter(authManager: AuthenticationManager) : BasicAuthent
             //TODO: cache content to file to prevent access internet everytime.
 
             // Key Info (RSA PublicKey)
-            val openidConfigStr = URL("https://login.microsoftonline.com/common/.well-known/openid-configuration").readText()
+            val openidConfigStr = URL("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration").readText()
             if (log.isDebugEnabled) {
                 log.debug("AAD OpenID Config: {}", openidConfigStr)
             }
@@ -131,7 +131,7 @@ class JwtAuthenticationFilter(authManager: AuthenticationManager) : BasicAuthent
              */
 
                 // read certification
-                var cer: X509Certificate? = null
+                var cer: X509Certificate?
                 try {
                     val fact = CertificateFactory.getInstance("X.509")
                     val stream = ByteArrayInputStream(keyStr.toByteArray(StandardCharsets.US_ASCII))
@@ -167,10 +167,5 @@ class JwtAuthenticationFilter(authManager: AuthenticationManager) : BasicAuthent
             }
             return keyStr
         }
-
-    }
-
-    companion object {
-        private val log = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
     }
 }

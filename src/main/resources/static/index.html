@@ -4,23 +4,10 @@
 <header>
     <script src="https://secure.aadcdn.microsoftonline-p.com/lib/1.0.15/js/adal.min.js"></script>
     <script>
-        var qs = (function (a) {
-            if (a == "") return {};
-            var b = {};
-            for (var i = 0; i < a.length; ++i) {
-                var p = a[i].split('=', 2);
-                if (p.length == 1)
-                    b[p[0]] = "";
-                else
-                    b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
-            }
-            return b;
-        })(window.location.search.substr(1).split('&'));
-
         const azureConfig = {
             instance: 'https://login.microsoftonline.com/',
             tenant: 'common', // TODO change to common?
-            clientId: qs['clientId'],
+            clientId: 'ENTER YOUR CLIENT ID HERE',
             cacheLocation: 'localStorage', // enable this for IE, as sessionStorage does not work for localhost.
             endpoints: {
                 graphApiUri: "https://graph.microsoft.com"
@@ -49,7 +36,7 @@
 </header>
 <body>
 <!-- show login info -->
-<div id="info">N/A</div>
+<div id="info">N/A (make sure you entered your client id in the javascript of this page)</div>
 <button onClick="login()">Login</button>
 <button onClick="logout()">Logout</button>
 <script>

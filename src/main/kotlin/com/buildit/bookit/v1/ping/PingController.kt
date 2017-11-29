@@ -19,5 +19,5 @@ class PingController(val bookitProperties: BookitProperties) {
      * Gets ping information
      */
     @GetMapping
-    fun ping(user: Principal?): Ping = Ping(bookitProperties, user)
+    fun ping(user: Principal? = null): Ping = Ping(bookitProperties, user)
 }
