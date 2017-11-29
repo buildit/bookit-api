@@ -11,7 +11,7 @@ buildscript {
     ext['h2.version'] = '1.4.196'
 
     // these are our additions (some become defaults in spring boot 2.x)
-    ext['kotlin.version'] = '1.1.60'
+    ext['kotlin.version'] = '1.2.0'
     ext['junit-jupiter.version'] = '5.0.1'
     ext['junit-platform.version'] = '1.0.1'
     ext['expekt.version'] = '0.5.0'
@@ -38,11 +38,11 @@ buildscript {
 
 plugins {
     id 'org.springframework.boot' version '1.5.8.RELEASE'
-    id 'org.jetbrains.kotlin.jvm' version '1.1.51'
-    id 'org.jetbrains.kotlin.plugin.spring' version '1.1.51'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.0'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.2.0'
     id 'org.jmailen.kotlinter' version '1.5.0'
 //    id 'com.gorylenko.gradle-git-properties' version '1.4.17'
-    id "io.gitlab.arturbosch.detekt" version "1.0.0.RC5"
+    id "io.gitlab.arturbosch.detekt" version "1.0.0.RC5-5"
 }
 
 repositories {
@@ -78,7 +78,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
         jvmTarget = "1.8"
         // Kotlin 1.2
-//        allWarningsAsErrors = true
+        allWarningsAsErrors = true
     }
 }
 
