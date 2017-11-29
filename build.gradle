@@ -21,6 +21,8 @@ buildscript {
     ext['jacoco.version'] = '0.7.9'
     ext['threeten.version'] = '1.2'
     ext['ktlint.version'] = '0.11.1'
+    ext['jjwt.version'] = '0.7.0'
+    ext['json.version'] = '20160810'
 
     repositories {
         mavenCentral()
@@ -171,6 +173,11 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-jdbc')
 
+    // security
+    compile('org.springframework.boot:spring-boot-starter-security')
+    compile("io.jsonwebtoken:jjwt:${property('jjwt.version')}")
+    compile("org.json:json:${property('json.version')}")
+
     // for kotlin data classes
     compile("com.fasterxml.jackson.module:jackson-module-kotlin")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
@@ -201,6 +208,7 @@ dependencies {
     testCompile("com.natpryce:hamkrest:${property('hamkrest.version')}")
     testCompile("com.nhaarman:mockito-kotlin-kt1.1:${property('mockito-kotlin.version')}")
     testCompile("com.github.sbrannen:spring-test-junit5:1.0.0")
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 
     testRuntime("org.junit.jupiter:junit-jupiter-engine:${property('junit-jupiter.version')}")
     testRuntime("org.junit.platform:junit-platform-console:${property('junit-platform.version')}")

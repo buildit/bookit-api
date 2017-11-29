@@ -1,11 +1,17 @@
 /* Licensed under Apache-2.0 */
 package com.buildit.bookit
 
+import com.buildit.bookit.auth.JwtAuthenticationFilter
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
@@ -55,6 +61,26 @@ class WebMvcConfiguration {
             registry
                 .addMapping("/**")
                 .allowedOrigins("*")
+        }
+    }
+}
+
+@Configuration
+@EnableWebSecurity
+class WebSecurityConfiguration {
+    @Bean
+    fun securityConfigurer() = object : WebSecurityConfigurerAdapter() {
+        override fun configure(security: HttpSecurity) {
+            security.authorizeRequests().antMatchers("/", "/index.html").permitAll()
+
+            // we only host RESTful API and every services are protected.
+            security.authorizeRequests().anyRequest().authenticated()
+
+            // we are using token based authentication. csrf is not required.
+            security.csrf().disable()
+
+            security.addFilterBefore(JwtAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter::class.java)
+            security.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         }
     }
 }
