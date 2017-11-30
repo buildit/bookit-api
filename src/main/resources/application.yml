@@ -5,7 +5,7 @@ management:
 security:
   user:
     name: admin
-    password: ${bookit.user.password:password}
+    password: ${bookit.admin.password:password}
 springfox:
   documentation.swagger.v2.path: /api-docs
 spring:
