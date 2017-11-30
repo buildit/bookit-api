@@ -71,6 +71,8 @@ class WebSecurityConfiguration {
     @Bean
     fun securityConfigurer() = object : WebSecurityConfigurerAdapter() {
         override fun configure(security: HttpSecurity) {
+            security.cors()
+            security.httpBasic()
             security.authorizeRequests().antMatchers("/", "/index.html").permitAll()
 
             // we only host RESTful API and every services are protected.

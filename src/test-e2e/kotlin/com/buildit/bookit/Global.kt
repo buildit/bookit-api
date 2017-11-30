@@ -16,5 +16,5 @@ fun String.toEntity(): HttpEntity<String> {
 
 object Global {
     val URI = System.getenv("ENDPOINT_URI") ?: "http://localhost:8080"
-    val REST_TEMPLATE = TestRestTemplate(RestTemplateBuilder().rootUri(URI).build())
+    val REST_TEMPLATE = TestRestTemplate(RestTemplateBuilder().rootUri(URI).basicAuthorization("admin", "password").build())
 }

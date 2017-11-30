@@ -2,8 +2,10 @@
 
 management:
   context-path: /management
-  security:
-    enabled: false
+security:
+  user:
+    name: admin
+    password: ${bookit.user.password:password}
 springfox:
   documentation.swagger.v2.path: /api-docs
 spring:
@@ -15,3 +17,7 @@ spring:
     password: ${bookit.database.password:}
     url: ${bookit.database.url:}
     driver-class-name: ${bookit.database.driver:}
+logging:
+  level:
+    org.springframework.security: DEBUG
+#    org.springframework.web.client.RestTemplate: DEBUG
