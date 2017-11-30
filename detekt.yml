@@ -19,7 +19,6 @@ test-pattern: # Configure exclusions for test sources
     - 'TooManyFunctions'
     - 'LargeClass'
     - 'UseDataClass'
-    - 'SpacingBetweenPackageAndImports'
 
 style:
   MaxLineLength:

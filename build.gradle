@@ -23,6 +23,7 @@ buildscript {
     ext['ktlint.version'] = '0.11.1'
     ext['jjwt.version'] = '0.7.0'
     ext['json.version'] = '20160810'
+    ext['detekt.version'] = 'RC5-6'
 
     repositories {
         mavenCentral()
@@ -42,7 +43,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.spring' version '1.2.0'
     id 'org.jmailen.kotlinter' version '1.5.0'
 //    id 'com.gorylenko.gradle-git-properties' version '1.4.17'
-    id "io.gitlab.arturbosch.detekt" version "1.0.0.RC5-5"
+    id "io.gitlab.arturbosch.detekt" version "1.0.0.RC5-6"
 }
 
 repositories {
@@ -100,6 +101,7 @@ kotlinter {
 }
 
 detekt {
+    version = "1.0.0.${property('detekt.version')}"
     profile("main") {
         input = "$projectDir/src"
         config = "$projectDir/detekt.yml"
