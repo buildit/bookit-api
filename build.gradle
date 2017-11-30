@@ -91,6 +91,10 @@ springBoot {
     buildInfo()
 }
 
+bootRun {
+    addResources = true
+}
+
 configurations {
     testE2eCompile.extendsFrom testCompile
     testE2eRuntime.extendsFrom testRuntime
