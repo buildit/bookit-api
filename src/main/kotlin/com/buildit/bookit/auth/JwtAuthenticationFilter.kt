@@ -1,5 +1,6 @@
 package com.buildit.bookit.auth
 
+import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
@@ -35,11 +36,12 @@ class JwtAuthenticationFilter(authManager: AuthenticationManager) : BasicAuthent
         chain.doFilter(req, res)
     }
 
+    @Suppress("ReturnCount")
     private fun getAuthentication(request: HttpServletRequest): UsernamePasswordAuthenticationToken? {
         val token = request.getHeader(tokenHeader)
         if (token != null) {
             val jwtToken = token.replace(tokenPrefix, "")
-            if ((listOf("localhost", "integration").any { request.serverName.startsWith(it) }) && jwtToken == "FAKE") {
+            if (listOf("localhost", "integration").any { request.serverName.startsWith(it) } && jwtToken == "FAKE") {
                 log.info("Request token FAKE success.")
                 return UsernamePasswordAuthenticationToken("fakeuser", null, ArrayList<GrantedAuthority>())
             }
@@ -50,11 +52,10 @@ class JwtAuthenticationFilter(authManager: AuthenticationManager) : BasicAuthent
                     .parseClaimsJws(jwtToken)
                     .body
                     .subject
-            } catch (e: Exception) {
+            } catch (e: JwtException) {
                 log.info("Unable to parse token", e)
                 null
             }
-
 
             if (user != null) {
                 log.info("Request token verification success: $user")

@@ -5,6 +5,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.http.client.ClientHttpRequestInterceptor
 
 fun String.toEntity(): HttpEntity<String> {
     val headers = HttpHeaders()
@@ -16,5 +17,11 @@ fun String.toEntity(): HttpEntity<String> {
 
 object Global {
     val URI = System.getenv("ENDPOINT_URI") ?: "http://localhost:8080"
-    val REST_TEMPLATE = TestRestTemplate(RestTemplateBuilder().rootUri(URI).basicAuthorization("admin", "password").build())
+    val BASIC_AUTH_REST_TEMPLATE = TestRestTemplate(RestTemplateBuilder().rootUri(URI).basicAuthorization("admin", "password").build())
+    val ANONYMOUS_REST_TEMPLATE = TestRestTemplate(RestTemplateBuilder().rootUri(URI).build())
+    val BEARER_AUTH_REST_TEMPLATE = TestRestTemplate(RestTemplateBuilder().rootUri(URI).additionalInterceptors(ClientHttpRequestInterceptor { request, body, execution ->
+        request.headers["Authorization"] = "Bearer FAKE"
+        execution.execute(request, body)
+    }).build())
+    val REST_TEMPLATE = BEARER_AUTH_REST_TEMPLATE
 }
