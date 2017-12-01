@@ -51,7 +51,7 @@ internal class OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
 
         val jwkConfig = JSONObject(jwkConfigStr)
         val keys = jwkConfig.getJSONArray("keys")
-        for (i in 0..keys.length()) {
+        for (i in 0 until keys.length()) {
             val key = keys.getJSONObject(i)
 
             val kid = key.getString("kid")
