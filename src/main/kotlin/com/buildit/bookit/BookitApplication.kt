@@ -73,7 +73,7 @@ class WebSecurityConfiguration {
         override fun configure(security: HttpSecurity) {
             security.cors()
             security.httpBasic()
-            security.authorizeRequests().antMatchers("/", "/index.html").permitAll()
+            security.authorizeRequests().antMatchers("/", "/index.html", "/swagger-ui.html").permitAll()
 
             // we only host RESTful API and every services are protected.
             security.authorizeRequests().anyRequest().authenticated()
