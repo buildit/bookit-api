@@ -14,7 +14,7 @@ import java.security.cert.Certificate
 import java.security.cert.CertificateFactory
 
 internal class OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
-    private val log = LoggerFactory.getLogger(OpenidSigningKeyResolver::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     override fun resolveSigningKey(header: JwsHeader<*>, claims: Claims): Key? = loadPublicKey(header.getKeyId())
 

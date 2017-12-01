@@ -14,7 +14,6 @@ import java.security.Principal
 @RestController
 @RequestMapping("/v1/ping")
 class PingController(val bookitProperties: BookitProperties) {
-    private val logger = LoggerFactory.getLogger(PingController::class.java)
     /**
      * Gets ping information
      */

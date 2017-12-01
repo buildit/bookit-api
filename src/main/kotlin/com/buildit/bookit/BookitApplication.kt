@@ -2,6 +2,7 @@
 package com.buildit.bookit
 
 import com.buildit.bookit.auth.JwtAuthenticationFilter
+import com.buildit.bookit.auth.OpenIdAuthenticator
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -10,7 +11,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -79,8 +80,10 @@ class WebSecurityConfiguration {
             // we are using token based authentication. csrf is not required.
             security.csrf().disable()
 
-            security.addFilterBefore(JwtAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter::class.java)
-            security.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            security.addFilterBefore(
+                JwtAuthenticationFilter(authenticationManager(), OpenIdAuthenticator()),
+                BasicAuthenticationFilter::class.java)
+            security.sessionManagement().sessionCreationPolicy(STATELESS)
         }
     }
 }
