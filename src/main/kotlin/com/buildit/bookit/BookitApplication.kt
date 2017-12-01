@@ -73,7 +73,20 @@ class WebSecurityConfiguration {
     @Bean
     fun securityConfigurer() = object : WebSecurityConfigurerAdapter() {
         override fun configure(security: HttpSecurity) {
-            security.authorizeRequests().antMatchers("/", "/index.html").permitAll()
+            security.cors()
+            security.httpBasic()
+            security.authorizeRequests().antMatchers(
+                "/",
+                "/index.html",
+                // these are just swagger stuffs
+                "/swagger-ui.html",
+                "/swagger-resources/**",
+                "/webjars/springfox-swagger-ui/**",
+                "/api-docs/**",
+                "/v2/api-docs",
+                "/configuration/ui",
+                "/configuration/security"
+            ).permitAll()
 
             // we only host RESTful API and every services are protected.
             security.authorizeRequests().anyRequest().authenticated()
