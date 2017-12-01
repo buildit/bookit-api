@@ -3,6 +3,7 @@ package com.buildit.bookit
 
 import com.buildit.bookit.auth.JwtAuthenticationFilter
 import com.buildit.bookit.auth.OpenIdAuthenticator
+import com.buildit.bookit.auth.SecurityContextHolderWrapper
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -81,7 +82,9 @@ class WebSecurityConfiguration {
             security.csrf().disable()
 
             security.addFilterBefore(
-                JwtAuthenticationFilter(authenticationManager(), OpenIdAuthenticator()),
+                JwtAuthenticationFilter(authenticationManager(),
+                    OpenIdAuthenticator(),
+                    SecurityContextHolderWrapper()),
                 BasicAuthenticationFilter::class.java)
             security.sessionManagement().sessionCreationPolicy(STATELESS)
         }
