@@ -6,6 +6,6 @@ import org.springframework.security.core.context.SecurityContextHolder
 /**
  * Because Spring guys decided a static call is a cool way to go.
  */
-open class SecurityContextHolderWrapper {
+class SecurityContextHolderWrapper {
     fun obtainContext(): SecurityContext = SecurityContextHolder.getContext()
 }

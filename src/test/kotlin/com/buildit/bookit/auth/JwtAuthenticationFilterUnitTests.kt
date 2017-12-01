@@ -44,7 +44,7 @@ class JwtAuthenticationFilterUnitTests {
             request.addHeader("Authorization", "Bearer test")
 
             val jwtAuthenticator = mock<JwtAuthenticator> {
-                on { getAuthentication("test") }
+                on { getAuthentication("test", request) }
                     .doReturn(goodSpringAuthToken)
             }
 
@@ -59,7 +59,7 @@ class JwtAuthenticationFilterUnitTests {
             request.addHeader("Authorization", "Bearer test")
 
             val jwtAuthenticator = mock<JwtAuthenticator> {
-                on { getAuthentication("test") }
+                on { getAuthentication("test", request) }
                     .doReturn(nullSpringAuthToken)
             }
 
@@ -81,8 +81,18 @@ class JwtAuthenticationFilterUnitTests {
         }
 
         @Test
-        fun `no bearer token`() {
+        fun `not a bearer token`() {
             request.addHeader("Authorization", "NotBearer test")
+
+            val filter = JwtAuthenticationFilter(mock {}, mock {}, securityContextHolderWrapper)
+            filter.doFilter(request, response, filterChain)
+            verify(securityContext, never()).authentication = goodSpringAuthToken
+            verify(filterChain, times(1)).doFilter(request, response)
+        }
+
+        @Test
+        fun `no bearer token value`() {
+            request.addHeader("Authorization", "Bearer  ")
 
             val filter = JwtAuthenticationFilter(mock {}, mock {}, securityContextHolderWrapper)
             filter.doFilter(request, response, filterChain)

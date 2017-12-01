@@ -25,7 +25,7 @@ internal class JwtAuthenticationFilter(
         }
 
         val jwt = header.replace(tokenPrefix, "")
-        securityContextWrapper.obtainContext().authentication = jwtAuthenticator.getAuthentication(jwt)
+        securityContextWrapper.obtainContext().authentication = jwtAuthenticator.getAuthentication(jwt, req)
 
         chain.doFilter(req, res)
     }
