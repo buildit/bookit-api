@@ -12,7 +12,6 @@ import javax.crypto.spec.SecretKeySpec
 import javax.servlet.http.HttpServletRequest
 import javax.xml.bind.DatatypeConverter
 
-
 interface JwtAuthenticator {
     fun getAuthentication(jwtToken: String, request: HttpServletRequest): UsernamePasswordAuthenticationToken?
 }
@@ -20,7 +19,7 @@ interface JwtAuthenticator {
 class OpenIdAuthenticator : JwtAuthenticator {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    @Suppress("ReturnCount")
+    @Suppress("ReturnCount", "TooGenericExceptionCaught")
     override fun getAuthentication(jwtToken: String, request: HttpServletRequest): UsernamePasswordAuthenticationToken? {
         // if (listOf("localhost", "integration").any { request.serverName.startsWith(it) } && jwtToken == "FAKE") {
         // parse the token.
@@ -34,7 +33,6 @@ class OpenIdAuthenticator : JwtAuthenticator {
             if (listOf("localhost", "integration").any { request.serverName.startsWith(it) }) {
                 log.info("Attempt FAKE token validation.")
                 try {
-
                     //We will sign our JWT with our ApiKey secret
                     val apiKeySecretBytes = DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secret".toByteArray()))
                     val signingKey = SecretKeySpec(apiKeySecretBytes, SignatureAlgorithm.HS256.jcaName)
