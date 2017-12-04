@@ -29,7 +29,7 @@ class OpenIdAuthenticator : JwtAuthenticator {
                 .parseClaimsJws(jwtToken)
                 .body
                 .subject
-        } catch (e: Exception) {
+        } catch (e: RuntimeException) {
             if (listOf("localhost", "integration").any { request.serverName.startsWith(it) }) {
                 log.info("Attempt FAKE token validation.")
                 try {
