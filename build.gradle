@@ -25,6 +25,7 @@ buildscript {
     ext['jjwt.version'] = '0.7.0'
     ext['json.version'] = '20160810'
     ext['detekt.version'] = 'RC5-6'
+    ext['nimbus-jose-jwt.version'] = '5.1'
 
     repositories {
         mavenCentral()
@@ -182,8 +183,9 @@ dependencies {
 
     // security
     compile('org.springframework.boot:spring-boot-starter-security')
-    compile("io.jsonwebtoken:jjwt:${property('jjwt.version')}")
-    compile("org.json:json:${property('json.version')}")
+    compile("com.nimbusds:nimbus-jose-jwt:${property('nimbus-jose-jwt.version')}")
+//    compile("io.jsonwebtoken:jjwt:${property('jjwt.version')}")
+//    compile("org.json:json:${property('json.version')}")
 
     // for kotlin data classes
     compile("com.fasterxml.jackson.module:jackson-module-kotlin")

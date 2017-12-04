@@ -4,6 +4,11 @@ package com.buildit.bookit
 import com.buildit.bookit.auth.JwtAuthenticationFilter
 import com.buildit.bookit.auth.OpenIdAuthenticator
 import com.buildit.bookit.auth.SecurityContextHolderWrapper
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.jwk.source.RemoteJWKSet
+import com.nimbusds.jose.proc.JWSVerificationKeySelector
+import com.nimbusds.jose.proc.SecurityContext
+import com.nimbusds.jwt.proc.DefaultJWTProcessor
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -21,6 +26,7 @@ import springfox.documentation.builders.RequestHandlerSelectors
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2
+import java.net.URL
 import java.time.Clock
 
 /**
@@ -95,9 +101,27 @@ class WebSecurityConfiguration {
             // we are using token based authentication. csrf is not required.
             security.csrf().disable()
 
+            // Set up a JWT processor to parse the tokens and then check their signature
+// and validity time window (bounded by the "iat", "nbf" and "exp" claims)
+            val jwtProcessor = DefaultJWTProcessor<SecurityContext>()
+
+// The public RSA keys to validate the signatures will be sourced from the
+// OAuth 2.0 server's JWK set, published at a well-known URL. The RemoteJWKSet
+// object caches the retrieved keys to speed up subsequent look-ups and can
+// also gracefully handle key-rollover
+            val keySource = RemoteJWKSet<SecurityContext>(URL("https://login.microsoftonline.com/organizations/discovery/v2.0/keys"))
+
+// The expected JWS algorithm of the access tokens (agreed out-of-band)
+            val expectedJWSAlg = JWSAlgorithm.RS256
+
+// Configure the JWT processor with a key selector to feed matching public
+// RSA keys sourced from the JWK set URL
+            val keySelector = JWSVerificationKeySelector(expectedJWSAlg, keySource)
+            jwtProcessor.setJWSKeySelector(keySelector)
+
             security.addFilterBefore(
                 JwtAuthenticationFilter(authenticationManager(),
-                    OpenIdAuthenticator(),
+                    OpenIdAuthenticator(jwtProcessor),
                     SecurityContextHolderWrapper()),
                 BasicAuthenticationFilter::class.java)
             security.sessionManagement().sessionCreationPolicy(STATELESS)
