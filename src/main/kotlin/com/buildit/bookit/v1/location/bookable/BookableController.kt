@@ -32,7 +32,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
     /**
      * Get a bookable
      */
-    @GetMapping(value = "/{bookableId}")
+    @GetMapping("/{bookableId}")
     fun getBookable(@PathVariable("locationId") location: String, @PathVariable("bookableId") bookable: String): BookableResource {
         locationRepository.getLocations().find { it.id == location } ?: throw LocationNotFound()
         return BookableResource(bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound())

@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.security.test.context.support.WithMockUser
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
@@ -28,6 +30,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
 import java.time.LocalDateTime.now
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -37,14 +42,18 @@ import java.time.temporal.ChronoUnit
  */
 @ExtendWith(SpringExtension::class)
 @WebMvcTest(BookingController::class)
+@WithMockUser
 class BookingControllerMockMvcTests @Autowired constructor(
-    private val mvc: MockMvc,
+    private val context: WebApplicationContext,
     private val mapper: ObjectMapper
 ) {
     private val NYC = "America/New_York"
     private val NYC_TZ = ZoneId.of(NYC)
     private val startDateTime = now(NYC_TZ).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
     private val endDateTime = now(NYC_TZ).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
+
+    @Autowired
+    private lateinit var mvc: MockMvc
 
     @MockBean
     lateinit var bookingRepo: BookingRepository
@@ -54,6 +63,14 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
     @MockBean
     lateinit var locationRepo: LocationRepository
+
+    @BeforeEach
+    fun configureSecurityFilters() {
+        mvc = MockMvcBuilders
+            .webAppContextSetup(context)
+            .apply<DefaultMockMvcBuilder>(SecurityMockMvcConfigurers.springSecurity())
+            .build()
+    }
 
     @BeforeEach
     fun setupMocks() {
@@ -68,6 +85,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
     }
 
     @Nested
+    @WithMockUser
     inner class GetBooking {
         @BeforeEach
         fun setupMock() {
@@ -90,6 +108,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
     }
 
     @Nested
+    @WithMockUser
     inner class CreateBooking {
         private val subject = "New Meeting"
 

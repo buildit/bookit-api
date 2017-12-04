@@ -3,6 +3,9 @@ failFast: true
 build:
   failThreshold: 1
 
+exclude-rules:
+  - 'ForbiddenComment'
+
 test-pattern: # Configure exclusions for test sources
   active: true
   patterns: # Test file regexes
@@ -21,6 +24,8 @@ style:
   MaxLineLength:
     active: false
   ThrowsCount:
+    active: false
+  ForbiddenComment:
     active: false
 
 complexity:
