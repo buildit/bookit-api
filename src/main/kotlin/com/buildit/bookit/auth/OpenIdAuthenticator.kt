@@ -17,7 +17,8 @@ class OpenIdAuthenticator : JwtAuthenticator {
 
     @Suppress("ReturnCount")
     override fun getAuthentication(jwtToken: String, request: HttpServletRequest): UsernamePasswordAuthenticationToken? {
-        if (listOf("localhost", "integration").any { request.serverName.startsWith(it) } && jwtToken == "FAKE") {
+        // if (listOf("localhost", "integration").any { request.serverName.startsWith(it) } && jwtToken == "FAKE") {
+        if (listOf("localhost", "integration").any { request.serverName.startsWith(it) }) {
             log.info("Request token FAKE success.")
             return UsernamePasswordAuthenticationToken("fakeuser", null, ArrayList<GrantedAuthority>())
         }
