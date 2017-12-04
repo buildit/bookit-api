@@ -1,5 +1,6 @@
 package com.buildit.bookit.auth
 
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
@@ -76,7 +77,7 @@ class JwtAuthenticationFilterUnitTests {
         fun `no auth header`() {
             val filter = JwtAuthenticationFilter(mock {}, mock {}, securityContextHolderWrapper)
             filter.doFilter(request, response, filterChain)
-            verify(securityContext, never()).authentication = goodSpringAuthToken
+            verify(securityContext, never()).authentication = any()
             verify(filterChain, times(1)).doFilter(request, response)
         }
 
@@ -86,7 +87,7 @@ class JwtAuthenticationFilterUnitTests {
 
             val filter = JwtAuthenticationFilter(mock {}, mock {}, securityContextHolderWrapper)
             filter.doFilter(request, response, filterChain)
-            verify(securityContext, never()).authentication = goodSpringAuthToken
+            verify(securityContext, never()).authentication = any()
             verify(filterChain, times(1)).doFilter(request, response)
         }
 
@@ -96,7 +97,7 @@ class JwtAuthenticationFilterUnitTests {
 
             val filter = JwtAuthenticationFilter(mock {}, mock {}, securityContextHolderWrapper)
             filter.doFilter(request, response, filterChain)
-            verify(securityContext, never()).authentication = goodSpringAuthToken
+            verify(securityContext, never()).authentication = any()
             verify(filterChain, times(1)).doFilter(request, response)
         }
     }
