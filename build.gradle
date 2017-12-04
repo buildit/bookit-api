@@ -24,7 +24,7 @@ buildscript {
     ext['ktlint.version'] = '0.11.1'
     ext['jjwt.version'] = '0.7.0'
     ext['json.version'] = '20160810'
-    ext['detekt.version'] = 'RC5-6'
+    ext['detekt.version'] = '1.0.0.RC5-6'
 
     repositories {
         mavenCentral()
@@ -106,7 +106,7 @@ kotlinter {
 }
 
 detekt {
-    version = "1.0.0.${property('detekt.version')}"
+    version = "${property('detekt.version')}"
     profile("main") {
         input = "$projectDir/src"
         config = "$projectDir/detekt.yml"
