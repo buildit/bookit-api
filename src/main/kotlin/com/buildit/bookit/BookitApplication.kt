@@ -89,6 +89,7 @@ class WebSecurityConfiguration {
             ).permitAll()
 
             // we only host RESTful API and every services are protected.
+            security.authorizeRequests().antMatchers("/v1/ping").permitAll()
             security.authorizeRequests().anyRequest().authenticated()
 
             // we are using token based authentication. csrf is not required.
