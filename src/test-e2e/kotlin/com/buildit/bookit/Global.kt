@@ -11,7 +11,6 @@ import org.springframework.http.client.ClientHttpRequestInterceptor
 import java.util.Base64
 import javax.xml.bind.DatatypeConverter
 
-
 fun String.toEntity(): HttpEntity<String> {
     val headers = HttpHeaders()
     headers.contentType = MediaType.APPLICATION_JSON
