@@ -15,8 +15,7 @@ import java.security.cert.CertificateFactory
 
 internal object OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
     private val log = LoggerFactory.getLogger(this::class.java)
-    @Suppress("LateinitUsage")
-    private lateinit var jwkConfig: JSONObject
+    private var jwkConfig: JSONObject = fetchJwkConfig()
 
     override fun resolveSigningKey(header: JwsHeader<*>, claims: Claims): Key? = loadPublicKey(header.getKeyId())
 
@@ -32,9 +31,6 @@ internal object OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
      * (There are about three keys which are rotated about everyday.)
      */
     private fun loadPublicKey(soughtKid: String): PublicKey? {
-        if (!::jwkConfig.isInitialized) {
-            jwkConfig = fetchJwkConfig()
-        }
         val key = jwkConfig.getJSONArray("keys").filterIsInstance(JSONObject::class.java).find { it.getString("kid") == soughtKid }
         return if (key != null) {
             parsePublicKey(key)
