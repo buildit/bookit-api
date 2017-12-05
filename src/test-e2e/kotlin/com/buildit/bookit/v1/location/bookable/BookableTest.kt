@@ -21,8 +21,8 @@ import java.time.ZoneId
 class `Bookable E2E Tests` {
     val now = LocalDateTime.now(ZoneId.of("America/New_York"))
     val today = LocalDate.now(ZoneId.of("America/New_York"))
-    val inOneHour = now.plusHours(1)
-    val inTwoHours = now.plusHours(2)
+    val inOneMinute = now.plusMinutes(1)
+    val inTwoMinutes = now.plusMinutes(2)
 
     @Test
     fun `get 1 bookable`() {
@@ -120,8 +120,8 @@ class `Bookable E2E Tests` {
                             {
                                 "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
                                 "subject": "My new meeting",
-                                "start": "$inOneHour",
-                                "end": "$inTwoHours"
+                                "start": "$inOneMinute",
+                                "end": "$inTwoMinutes"
                             }
                             """
                 createResponse = Global.REST_TEMPLATE.postForEntity("/v1/booking", goodRequest.toEntity(), String::class.java)
