@@ -11,6 +11,7 @@ springfox:
 spring:
   jackson:
     serialization.write-dates-as-timestamps: false
+    default-property-inclusion: non_absent
   datasource:
     name: bookit
     username: ${bookit.database.user:}
