@@ -91,7 +91,7 @@ class `Security E2E Tests` {
                 .setSubject("fakeuser")
                 .setExpiration(Date(System.currentTimeMillis() - 3600000))
                 .signWith(SignatureAlgorithm.HS256, apiKeySecretBytes)
-                .compact().dropLast(1)
+                .compact()
 
             request.headers["Authorization"] = "Bearer $jwt"
             execution.execute(request, body)
@@ -110,7 +110,7 @@ class `Security E2E Tests` {
                 .setSubject("fakeuser")
                 .setNotBefore(Date(System.currentTimeMillis() + 3600000))
                 .signWith(SignatureAlgorithm.HS256, apiKeySecretBytes)
-                .compact().dropLast(1)
+                .compact()
 
             request.headers["Authorization"] = "Bearer $jwt"
             execution.execute(request, body)
@@ -128,7 +128,7 @@ class `Security E2E Tests` {
             val jwt = Jwts.builder()
                 .setSubject("fakeuser")
                 .signWith(SignatureAlgorithm.HS256, apiKeySecretBytes)
-                .compact().dropLast(1)
+                .compact().drop(1)
 
             request.headers["Authorization"] = "Bearer $jwt"
             execution.execute(request, body)
