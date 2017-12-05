@@ -13,7 +13,7 @@ import java.security.PublicKey
 import java.security.cert.Certificate
 import java.security.cert.CertificateFactory
 
-internal class OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
+internal object OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
     private val log = LoggerFactory.getLogger(this::class.java)
     @Suppress("LateinitUsage")
     private lateinit var jwkConfig: JSONObject

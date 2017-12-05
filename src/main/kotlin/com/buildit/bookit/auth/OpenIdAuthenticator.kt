@@ -25,7 +25,7 @@ class OpenIdAuthenticator : JwtAuthenticator {
         // parse the token.
         val user: String? = try {
             Jwts.parser()
-                .setSigningKeyResolver(OpenidSigningKeyResolver())
+                .setSigningKeyResolver(OpenidSigningKeyResolver)
                 .parseClaimsJws(jwtToken)
                 .body
                 .subject
