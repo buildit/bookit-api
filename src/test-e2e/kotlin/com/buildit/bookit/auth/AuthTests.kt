@@ -103,12 +103,12 @@ class `Security E2E Tests` {
     }
 
     @Test
-    fun `issued after now`() {
+    fun `not before now`() {
         testRestTemplate.restTemplate.interceptors.add(ClientHttpRequestInterceptor { request, body, execution ->
             val apiKeySecretBytes = DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secret".toByteArray()))
             val jwt = Jwts.builder()
                 .setSubject("fakeuser")
-                .setIssuedAt(Date(System.currentTimeMillis() + 3600000))
+                .setNotBefore(Date(System.currentTimeMillis() + 3600000))
                 .signWith(SignatureAlgorithm.HS256, apiKeySecretBytes)
                 .compact().dropLast(1)
 
