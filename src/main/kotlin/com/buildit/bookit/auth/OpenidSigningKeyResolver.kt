@@ -13,8 +13,9 @@ import java.security.PublicKey
 import java.security.cert.Certificate
 import java.security.cert.CertificateFactory
 
-internal class OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
+internal object OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
     private val log = LoggerFactory.getLogger(this::class.java)
+    private var jwkConfig: JSONObject = fetchJwkConfig()
 
     override fun resolveSigningKey(header: JwsHeader<*>, claims: Claims): Key? = loadPublicKey(header.getKeyId())
 
@@ -30,9 +31,41 @@ internal class OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
      * (There are about three keys which are rotated about everyday.)
      */
     private fun loadPublicKey(soughtKid: String): PublicKey? {
-        // TODO: cache content to file to prevent access internet every time.
+        val key = jwkConfig.getJSONArray("keys").filterIsInstance(JSONObject::class.java).find { it.getString("kid") == soughtKid }
+        return if (key != null) {
+            parsePublicKey(key)
+        } else {
+            jwkConfig = fetchJwkConfig()
+            val newKey = jwkConfig.getJSONArray("keys").filterIsInstance(JSONObject::class.java).find { it.getString("kid") == soughtKid }
+            newKey?.let { parsePublicKey(it) }
+        }
+    }
 
-        // Key Info (RSA PublicKey)
+    private fun parsePublicKey(key: JSONObject): PublicKey? {
+        val keyStr = makePemCertificate(key)
+        /*
+         * go to https://jwt.io/ and copy'n'paste the jwt token to the left side, it will be decoded on the right side,
+         * copy'n'past the public key (from ----BEGIN... to END CERT...) to the verify signature, it will show signature verified.
+         */
+
+        // read certification
+        val cer: Certificate?
+        val fact = CertificateFactory.getInstance("X.509")
+        val stream = ByteArrayInputStream(keyStr.toByteArray(StandardCharsets.US_ASCII))
+        cer = fact.generateCertificate(stream)
+        if (log.isTraceEnabled) {
+            log.trace("AAD OpenID X509Certificate: {}", cer)
+        }
+
+        // get public key from certification
+        val publicKey = cer.publicKey
+        if (log.isDebugEnabled) {
+            log.debug("AAD OpenID X509Certificate publicKey: {}", publicKey)
+        }
+        return publicKey
+    }
+
+    private fun fetchJwkConfig(): JSONObject {
         val openidConfigStr = URL("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration").readText()
         if (log.isDebugEnabled) {
             log.debug("AAD OpenID Config: {}", openidConfigStr)
@@ -49,37 +82,7 @@ internal class OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
             log.debug("AAD OpenID JWK Config: {}", jwkConfigStr)
         }
 
-        val jwkConfig = JSONObject(jwkConfigStr)
-        val keys = jwkConfig.getJSONArray("keys")
-        for (i in 0 until keys.length()) {
-            val key = keys.getJSONObject(i)
-
-            val kid = key.getString("kid")
-            if (soughtKid == kid) {
-                val keyStr = makePemCertificate(key)
-                /*
-                 * go to https://jwt.io/ and copy'n'paste the jwt token to the left side, it will be decoded on the right side,
-                 * copy'n'past the public key (from ----BEGIN... to END CERT...) to the verify signature, it will show signature verified.
-                 */
-
-                // read certification
-                val cer: Certificate?
-                val fact = CertificateFactory.getInstance("X.509")
-                val stream = ByteArrayInputStream(keyStr.toByteArray(StandardCharsets.US_ASCII))
-                cer = fact.generateCertificate(stream)
-                if (log.isTraceEnabled) {
-                    log.trace("AAD OpenID X509Certificate: {}", cer)
-                }
-
-                // get public key from certification
-                val publicKey = cer.publicKey
-                if (log.isDebugEnabled) {
-                    log.debug("AAD OpenID X509Certificate publicKey: {}", publicKey)
-                }
-                return publicKey
-            }
-        }
-        return null
+        return JSONObject(jwkConfigStr)
     }
 
     private fun makePemCertificate(key: JSONObject): String {
