@@ -13,3 +13,7 @@ phases:
     commands:
       - chmod +x ./gradlew
       - ./gradlew -Dorg.gradle.daemon=false test-e2e
+
+  post_build:
+    commands:
+      - aws s3 cp --recursive --acl public-read ./build/reports ${REPORTS_BUCKET}/
