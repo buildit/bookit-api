@@ -34,7 +34,7 @@ buildscript {
     }
     dependencies {
         classpath("org.junit.platform:junit-platform-gradle-plugin:${property('junit-platform.version')}")
-        classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.0'
+        classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.2'
     }
 }
 
@@ -227,6 +227,7 @@ task 'test-e2e'(
     group: 'Verification'
 ) {
     dependsOn testE2eClasses
+    finalizedBy 'junitHtmlReport'
 
     outputs.upToDateWhen { false }
     classpath = sourceSets.'test-e2e'.runtimeClasspath
