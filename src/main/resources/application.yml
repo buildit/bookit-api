@@ -22,3 +22,4 @@ logging:
   level:
     org.springframework.security: DEBUG
 #    org.springframework.web.client.RestTemplate: DEBUG
+    org.pac4j: DEBUG

@@ -25,6 +25,8 @@ buildscript {
     ext['jjwt.version'] = '0.7.0'
     ext['json.version'] = '20160810'
     ext['detekt.version'] = '1.0.0.RC5-6'
+    ext['spring-security-pac4j.version'] = '3.0.0'
+    ext['pac4j.version'] = '2.2.0'
 
     repositories {
         mavenCentral()
@@ -182,8 +184,12 @@ dependencies {
 
     // security
     compile('org.springframework.boot:spring-boot-starter-security')
-    compile("io.jsonwebtoken:jjwt:${property('jjwt.version')}")
-    compile("org.json:json:${property('json.version')}")
+    compile("org.pac4j:spring-security-pac4j:${property('spring-security-pac4j.version')}")
+    compile("org.pac4j:pac4j-oidc:${property('pac4j.version')}")
+    compile("org.pac4j:pac4j-jwt:${property('pac4j.version')}")
+
+//    compile("io.jsonwebtoken:jjwt:${property('jjwt.version')}")
+//    compile("org.json:json:${property('json.version')}")
 
     // for kotlin data classes
     compile("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -215,6 +221,8 @@ dependencies {
     testCompile("com.natpryce:hamkrest:${property('hamkrest.version')}")
     testCompile("com.nhaarman:mockito-kotlin:${property('mockito-kotlin.version')}")
     testCompile("com.github.sbrannen:spring-test-junit5:1.0.0")
+    testCompile("io.jsonwebtoken:jjwt:${property('jjwt.version')}")
+    testCompile("org.json:json:${property('json.version')}")
 
     testRuntime("org.junit.jupiter:junit-jupiter-engine:${property('junit-jupiter.version')}")
     testRuntime("org.junit.platform:junit-platform-console:${property('junit-platform.version')}")
