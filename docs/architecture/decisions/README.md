@@ -6,3 +6,4 @@
 * [4. Security](0004-security.md)
 * [5. Use id_token from Microsoft as Bearer token](0005-use-id-token-from-microsoft-as-bearer-token.md)
 * [6. Use Okta as Identity provider](0006-use-okta-as-identity-provider.md)
+* [7. Use Pac4J to validate tokens](0007-use-pac4j-to-validate-tokens.md)

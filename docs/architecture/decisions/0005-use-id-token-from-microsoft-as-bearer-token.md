@@ -10,6 +10,8 @@ Amends [4. Security](0004-security.md)
 
 Alternative considered [6. Use Okta as Identity provider](0006-use-okta-as-identity-provider.md)
 
+Alternative considered [7. Use Pac4J to validate tokens](0007-use-pac4j-to-validate-tokens.md)
+
 ## Context
 
 In the interest of time and getting something to work, we are going to break up the steps further
