@@ -18,6 +18,11 @@ spring:
     password: ${bookit.database.password:}
     url: ${bookit.database.url:}
     driver-class-name: ${bookit.database.driver:}
+okta:
+  oauth2:
+    issuer: https://dev-621718.oktapreview.com/oauth2/default
+    clientId: 0oad25jpgsJEyvhpQ0h7
+    audience: api://default
 logging:
   level:
     org.springframework.security: DEBUG
