@@ -8,6 +8,8 @@ Accepted
 
 Amended by [5. Use id_token from Microsoft as Bearer token](0005-use-id-token-from-microsoft-as-bearer-token.md)
 
+Amended by [6. Use Okta as Identity provider](0006-use-okta-as-identity-provider.md)
+
 ## Context
 
 Bookit needs the concept of a user so it can identify who booked what bookable and allow certain users to overrule a booking.

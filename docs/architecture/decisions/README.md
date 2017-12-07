@@ -5,3 +5,4 @@
 * [3. Use JUnit for tests instead of Spek](0003-use-junit-for-tests-instead-of-spek.md)
 * [4. Security](0004-security.md)
 * [5. Use id_token from Microsoft as Bearer token](0005-use-id-token-from-microsoft-as-bearer-token.md)
+* [6. Use Okta as Identity provider](0006-use-okta-as-identity-provider.md)

@@ -8,6 +8,8 @@ Accepted
 
 Amends [4. Security](0004-security.md)
 
+Alternative considered [6. Use Okta as Identity provider](0006-use-okta-as-identity-provider.md)
+
 ## Context
 
 In the interest of time and getting something to work, we are going to break up the steps further
