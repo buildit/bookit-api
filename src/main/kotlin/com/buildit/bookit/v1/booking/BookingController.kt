@@ -6,6 +6,8 @@ import com.buildit.bookit.v1.booking.dto.interval
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
+import com.buildit.bookit.v1.location.bookable.dto.Bookable
+import com.buildit.bookit.v1.location.dto.Location
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -26,7 +28,7 @@ import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoUnit.MINUTES
 import javax.validation.Valid
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
@@ -50,7 +52,10 @@ class BookableNotAvailable : RuntimeException("Bookable is not available.  Pleas
 @RestController
 @RequestMapping("/v1/booking")
 @Transactional
-class BookingController(private val bookingRepository: BookingRepository, private val bookableRepository: BookableRepository, private val locationRepository: LocationRepository, private val clock: Clock) {
+class BookingController(private val bookingRepository: BookingRepository,
+                        private val bookableRepository: BookableRepository,
+                        private val locationRepository: LocationRepository,
+                        private val clock: Clock) {
     @GetMapping
     fun getAllBookings(
         @RequestParam("start", required = false)
@@ -104,35 +109,10 @@ class BookingController(private val bookingRepository: BookingRepository, privat
             throw InvalidBooking(errorMessage)
         }
 
-        val startDateTimeTruncated = bookingRequest.start!!.truncatedTo(ChronoUnit.MINUTES)
-        val endDateTimeTruncated = bookingRequest.end!!.truncatedTo(ChronoUnit.MINUTES)
+        val startDateTimeTruncated = bookingRequest.start!!.truncatedTo(MINUTES)
+        val endDateTimeTruncated = bookingRequest.end!!.truncatedTo(MINUTES)
 
-        val now = LocalDateTime.now(clock.withZone(ZoneId.of(location.timeZone)))
-        if (!startDateTimeTruncated.isAfter(now)) {
-            throw StartInPastException()
-        }
-
-        if (!endDateTimeTruncated.isAfter(startDateTimeTruncated)) {
-            throw EndBeforeStartException()
-        }
-
-        val interval = Interval.of(
-            startDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant(),
-            endDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant()
-        )
-
-        val unavailable = bookingRepository.getAllBookings()
-            .filter { it.bookableId == bookable.id }
-            .any {
-                interval.overlaps(
-                    Interval.of(
-                        it.start.atZone(ZoneId.of(location.timeZone)).toInstant(),
-                        it.end.atZone(ZoneId.of(location.timeZone)).toInstant()))
-            }
-
-        if (unavailable) {
-            throw BookableNotAvailable()
-        }
+        validateBooking(location, startDateTimeTruncated, endDateTimeTruncated, bookable)
 
         val booking = bookingRepository.insertBooking(
             bookingRequest.bookableId!!,
@@ -144,5 +124,34 @@ class BookingController(private val bookingRepository: BookingRepository, privat
         return ResponseEntity
             .created(URI("/v1/booking/${booking.id}"))
             .body(booking)
+    }
+
+    private fun validateBooking(location: Location, startDateTimeTruncated: LocalDateTime, endDateTimeTruncated: LocalDateTime, bookable: Bookable) {
+        val now = LocalDateTime.now(clock.withZone(ZoneId.of(location.timeZone)))
+        if (!startDateTimeTruncated.isAfter(now)) {
+            throw StartInPastException()
+        }
+
+        if (!endDateTimeTruncated.isAfter(startDateTimeTruncated)) {
+            throw EndBeforeStartException()
+        }
+
+        val interval = Interval.of(
+                startDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant(),
+                endDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant()
+        )
+
+        val unavailable = bookingRepository.getAllBookings()
+                .filter { it.bookableId == bookable.id }
+                .any {
+                    interval.overlaps(
+                        Interval.of(
+                            it.start.atZone(ZoneId.of(location.timeZone)).toInstant(),
+                            it.end.atZone(ZoneId.of(location.timeZone)).toInstant()))
+                }
+
+        if (unavailable) {
+            throw BookableNotAvailable()
+        }
     }
 }
