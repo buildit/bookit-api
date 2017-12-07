@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 /**
  * Test /v1/location/<location>/bookable like a black box
@@ -144,7 +145,15 @@ class `Bookable E2E Tests` {
                                     "reason": ""
                                 },
                                 bookings: [
-                                    ${createResponse?.body}
+                                    {
+                                        "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                                        "subject": "My new meeting",
+                                        "start": "${inOneMinute.truncatedTo(ChronoUnit.MINUTES)}",
+                                        "end": "${inTwoMinutes.truncatedTo(ChronoUnit.MINUTES)}",
+                                        "user": {
+                                            "name": "Fake User"
+                                        }
+                                    }
                                 ]
                             },
                             {
