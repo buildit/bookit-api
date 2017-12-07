@@ -103,41 +103,43 @@ class BookableControllerUnitTests {
 
                 @Nested
                 inner class `with bookings` {
-                    private val booking1 = Booking("guid1", nycBookable1.id, "Booking 1", today.atTime(9, 15), today.atTime(10, 15))
-                    private val booking2 = Booking("guid2", nycBookable1.id, "Booking 2", today.atTime(11, 0), today.atTime(11, 30))
-                    private val booking3 = Booking("guid3", nycBookable2.id, "Booking 3, different bookable", today.atTime(11, 0), today.atTime(11, 30))
+                    private val bookingToday = Booking("guid1", nycBookable1.id, "Booking 1", today.atTime(9, 15), today.atTime(10, 15))
+                    private val bookingToday2 = Booking("guid2", nycBookable1.id, "Booking 2", today.atTime(11, 0), today.atTime(11, 30))
+                    private val bookingTodayDifferentBookable = Booking("guid3", nycBookable2.id, "Booking 3, different bookable", today.atTime(11, 0), today.atTime(11, 30))
+                    private val bookingYesterday = Booking("guid4", nycBookable1.id, "Booking 4, yesterday", today.minusDays(1).atTime(11, 0), today.minusDays(1).atTime(11, 30))
+                    private val bookingTomorrow = Booking("guid5", nycBookable1.id, "Booking 5, tomorrow", today.plusDays(1).atTime(11, 0), today.plusDays(1).atTime(11, 30))
 
                     private val bookingRepo = mock<BookingRepository> {
-                        on { getAllBookings() }.doReturn(listOf(booking1, booking2, booking3))
+                        on { getAllBookings() }.doReturn(listOf(bookingToday, bookingToday2, bookingTodayDifferentBookable, bookingYesterday, bookingTomorrow))
                     }
 
                     private val controller = BookableController(bookableRepo, locationRepo, bookingRepo)
 
                     @Test
                     fun `finds bookable - with bookings`() {
-                        val bookables = controller.getAllBookables("guid1", today, today, expandBookings)
-                        expect(bookables).to.contain(BookableResource(nycBookable1, listOf(booking1, booking2)))
-                        expect(bookables).to.contain(BookableResource(nycBookable2, listOf(booking3)))
+                        val bookables = controller.getAllBookables("guid1", today, today.plusDays(1), expandBookings)
+                        expect(bookables).to.contain(BookableResource(nycBookable1, listOf(bookingToday, bookingToday2)))
+                        expect(bookables).to.contain(BookableResource(nycBookable2, listOf(bookingTodayDifferentBookable)))
                     }
 
                     @Test
-                    fun `endDate defaults to startDate`() {
+                    fun `endDate defaults to end of time`() {
                         expect(
                             controller.getAllBookables("guid1", today, expand = expandBookings))
-                            .to.contain(BookableResource(nycBookable1, listOf(booking1, booking2)))
+                            .to.contain(BookableResource(nycBookable1, listOf(bookingToday, bookingToday2, bookingTomorrow)))
                     }
 
                     @Test
-                    fun `startDate defaults to today`() {
+                    fun `startDate defaults to beginning of time`() {
                         expect(
-                            controller.getAllBookables("guid1", endDate = today, expand = expandBookings))
-                            .to.contain(BookableResource(nycBookable1, listOf(booking1, booking2)))
+                            controller.getAllBookables("guid1", endDateExclusive = today, expand = expandBookings))
+                            .to.contain(BookableResource(nycBookable1, listOf(bookingYesterday)))
                     }
 
                     @Test
                     fun `finds bookable - no bookings on date`() {
                         expect(
-                            controller.getAllBookables("guid1", today.plusDays(1), today.plusDays(1), expandBookings))
+                            controller.getAllBookables("guid1", today.plusDays(2), today.plusDays(3), expandBookings))
                             .to.contain(BookableResource(nycBookable1, emptyList()))
                     }
 

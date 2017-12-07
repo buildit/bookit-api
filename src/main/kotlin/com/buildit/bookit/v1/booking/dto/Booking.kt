@@ -31,7 +31,13 @@ data class Booking(
     @field:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     val start: LocalDateTime,
     @field:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    val end: LocalDateTime
+    val end: LocalDateTime,
+    val user: User = User()
+)
+
+data class User(
+    val id: String = "12345",
+    val name: String = "Fake User"
 )
 
 fun Booking.interval(timeZone: ZoneId): Interval =

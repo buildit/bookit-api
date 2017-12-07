@@ -46,18 +46,17 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         @PathVariable("locationId") locationId: String,
         @RequestParam("start", required = false)
         @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
-        startDate: LocalDate? = null,
+        startDateInclusive: LocalDate? = null,
         @RequestParam("end", required = false)
         @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
-        endDate: LocalDate? = null,
+        endDateExclusive: LocalDate? = null,
         @RequestParam("expand", required = false)
         expand: List<String>? = emptyList()
     ): Collection<BookableResource> {
         val location = locationRepository.getLocations().find { it.id == locationId } ?: throw LocationNotFound()
         val timeZone = ZoneId.of(location.timeZone)
-        // TODO these probably need to be consistent w/ GetAllBooking's filters...
-        val start = startDate ?: LocalDate.now(timeZone)
-        val end = endDate ?: start
+        val start = startDateInclusive ?: LocalDate.MIN
+        val end = endDateExclusive ?: LocalDate.MAX
 
         if (end.isBefore(start)) {
             throw EndBeforeStartException()
@@ -65,7 +64,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
 
         val desiredInterval = Interval.of(
             start.atStartOfDay(timeZone).toInstant(),
-            end.plusDays(1).atStartOfDay(timeZone).toInstant()
+            end.atStartOfDay(timeZone).toInstant()
         )
 
         return bookableRepository.getAllBookables()
