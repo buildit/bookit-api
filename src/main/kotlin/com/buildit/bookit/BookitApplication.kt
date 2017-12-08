@@ -63,6 +63,7 @@ class WebMvcConfiguration {
             registry
                 .addMapping("/**")
                 .allowedOrigins("*")
+                .allowedMethods("GET", "HEAD", "POST", "DELETE")
         }
     }
 }
