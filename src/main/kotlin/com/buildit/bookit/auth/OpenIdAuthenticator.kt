@@ -49,7 +49,7 @@ class OpenIdAuthenticator : JwtAuthenticator {
 
         if (user != null) {
             log.info("Request token verification success: $user")
-            return UsernamePasswordAuthenticationToken(UserPrincipal(user["oid", String::class.java], user["given_name", String::class.java], user["family_name", String::class.java]), null, ArrayList<GrantedAuthority>())
+            return UsernamePasswordAuthenticationToken(UserPrincipal(user["oid", String::class.java], user["given_name", String::class.java] ?: "", user["family_name", String::class.java] ?: user["name", String::class.java] ?: user.subject), null, ArrayList<GrantedAuthority>())
         }
 
         log.info("Request token verification failure.")
