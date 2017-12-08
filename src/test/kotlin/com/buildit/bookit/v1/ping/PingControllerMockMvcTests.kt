@@ -1,15 +1,16 @@
 package com.buildit.bookit.v1.ping
 
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.equalToIgnoringCase
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.test.context.support.WithAnonymousUser
 import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -24,7 +25,7 @@ import org.springframework.web.context.WebApplicationContext
  * Tests PingController spring integration
  */
 @ExtendWith(SpringExtension::class)
-@WebMvcTest(PingController::class)
+@WebMvcTest(PingController::class, includeFilters = [ComponentScan.Filter(EnableWebSecurity::class)])
 @WithMockUser
 class PingControllerMockMvcTests @Autowired constructor(
     private val context: WebApplicationContext
@@ -45,24 +46,22 @@ class PingControllerMockMvcTests @Autowired constructor(
         mvc.perform(get("/v1/ping"))
             .andExpect(status().isOk)
             .andExpect(jsonPath<String>("$.status", equalToIgnoringCase("up")))
-            .andExpect(jsonPath("$.user", Matchers.notNullValue()))
+            .andExpect(jsonPath("$.user", notNullValue()))
     }
 
     @Test
     @WithAnonymousUser
     fun `ping no user - v1|ping`() {
         mvc.perform(get("/v1/ping"))
-            .andExpect(unauthenticated())
-//            .andExpect(status().isOk)
-//            .andExpect(jsonPath("$.user", nullValue()))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.user").doesNotExist())
     }
 
     @Test
     @WithAnonymousUser
     fun `ping no user - root|`() {
         mvc.perform(get("/"))
-            .andExpect(unauthenticated())
-//            .andExpect(status().isOk)
-//            .andExpect(jsonPath("$.user", nullValue()))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.user").doesNotExist())
     }
 }
