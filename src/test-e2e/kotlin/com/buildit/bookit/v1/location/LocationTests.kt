@@ -29,6 +29,6 @@ class `Location E2E Tests` {
                             }
                         ]
                     """.trimIndent()
-        JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
+        JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.LENIENT)
     }
 }
