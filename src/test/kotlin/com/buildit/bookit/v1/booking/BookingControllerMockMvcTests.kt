@@ -2,7 +2,6 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
-import com.buildit.bookit.v1.booking.dto.User
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
@@ -91,7 +90,12 @@ class BookingControllerMockMvcTests @Autowired constructor(
         @BeforeEach
         fun setupMock() {
             whenever(bookingRepo.getAllBookings())
-                .doReturn(listOf(Booking("guid", "guid", "The Booking", startDateTime, endDateTime, User(name = "Fake User"))))
+                .doReturn(listOf(Booking("guid",
+                    "guid",
+                    "The Booking",
+                    startDateTime,
+                    endDateTime,
+                    BookingController.getLoggedInUser())))
         }
 
         @Test
@@ -99,7 +103,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
             mvc.perform(get("/v1/booking/guid"))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath<String>("$.subject", equalToIgnoringCase("The Booking")))
-                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("Fake User")))
+                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("Fake DB User")))
         }
     }
 
@@ -116,8 +120,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @BeforeEach
         fun createMock() {
-            whenever(bookingRepo.insertBooking("guid", subject, startDateTime, endDateTime))
-                .doReturn(Booking("guid", "guid", subject, startDateTime, endDateTime, User(name = "Fake User")))
+            whenever(bookingRepo.insertBooking("guid", subject, startDateTime, endDateTime, BookingController.getLoggedInUser()))
+                .doReturn(Booking("guid", "guid", subject, startDateTime, endDateTime, BookingController.getLoggedInUser()))
             whenever(bookableRepo.getAllBookables())
                 .doReturn(listOf(Bookable("guid", "guid", "Foo", Disposition())))
         }
@@ -131,7 +135,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
                 .andExpect(jsonPath<String>("$.subject", equalToIgnoringCase(subject)))
                 .andExpect(jsonPath<String>("$.start", equalToIgnoringCase(startDateTime.toString())))
                 .andExpect(jsonPath<String>("$.end", equalToIgnoringCase(endDateTime.toString())))
-                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("Fake User")))
+                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("Fake DB User")))
         }
 
         @Test

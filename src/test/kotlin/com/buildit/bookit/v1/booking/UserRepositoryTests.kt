@@ -18,9 +18,9 @@ class UserRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTemplate)
     val userRepo = UserDatabaseRepository(jdbcTemplate)
 
     @Test
-    fun getAllUsersNoUsers() {
+    fun getAllUsers() {
         val users = userRepo.getAllUsers()
-        expect(users.size).to.be.equal(0)
+        expect(users.size).to.be.equal(1) // User defined in data.sql
     }
 
     @Test

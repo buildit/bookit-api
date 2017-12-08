@@ -151,7 +151,7 @@ class `Bookable E2E Tests` {
                                         "start": "${inOneMinute.truncatedTo(ChronoUnit.MINUTES)}",
                                         "end": "${inTwoMinutes.truncatedTo(ChronoUnit.MINUTES)}",
                                         "user": {
-                                            "name": "Fake User"
+                                            "name": "Fake DB User"
                                         }
                                     }
                                 ]

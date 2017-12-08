@@ -2,6 +2,7 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
+import com.buildit.bookit.v1.booking.dto.User
 import com.buildit.bookit.v1.booking.dto.interval
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
@@ -56,6 +57,12 @@ class BookingController(private val bookingRepository: BookingRepository,
                         private val bookableRepository: BookableRepository,
                         private val locationRepository: LocationRepository,
                         private val clock: Clock) {
+
+    companion object {
+        // Returns actual DB user for E2E tests.  Is there a better way?
+        fun getLoggedInUser() = User("c40c724e-36c3-465f-9094-6e02e13d1802", "Fake DB User")
+    }
+
     @GetMapping
     fun getAllBookings(
         @RequestParam("start", required = false)
@@ -118,7 +125,8 @@ class BookingController(private val bookingRepository: BookingRepository,
             bookingRequest.bookableId!!,
             bookingRequest.subject!!,
             startDateTimeTruncated,
-            endDateTimeTruncated
+            endDateTimeTruncated,
+            getLoggedInUser()
         )
 
         return ResponseEntity
@@ -137,18 +145,18 @@ class BookingController(private val bookingRepository: BookingRepository,
         }
 
         val interval = Interval.of(
-                startDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant(),
-                endDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant()
+            startDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant(),
+            endDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant()
         )
 
         val unavailable = bookingRepository.getAllBookings()
-                .filter { it.bookableId == bookable.id }
-                .any {
-                    interval.overlaps(
-                        Interval.of(
-                            it.start.atZone(ZoneId.of(location.timeZone)).toInstant(),
-                            it.end.atZone(ZoneId.of(location.timeZone)).toInstant()))
-                }
+            .filter { it.bookableId == bookable.id }
+            .any {
+                interval.overlaps(
+                    Interval.of(
+                        it.start.atZone(ZoneId.of(location.timeZone)).toInstant(),
+                        it.end.atZone(ZoneId.of(location.timeZone)).toInstant()))
+            }
 
         if (unavailable) {
             throw BookableNotAvailable()
