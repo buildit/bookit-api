@@ -27,6 +27,9 @@ object Global {
         val apiKeySecretBytes = DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secret".toByteArray()))
         val jwt = Jwts.builder()
             .setSubject("fakeuser")
+            .claim("oid", "9e14c6ff-764e-4bd7-96f6-1d4bc2593a3e")
+            .claim("given_name", "Fake")
+            .claim("family_name", "User")
             .signWith(SignatureAlgorithm.HS256, apiKeySecretBytes)
             .compact()
         request.headers["Authorization"] = "Bearer $jwt"

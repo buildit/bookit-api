@@ -1,12 +1,12 @@
 package com.buildit.bookit.auth
 
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
-import java.util.ArrayList
 import java.util.Base64
 import javax.crypto.spec.SecretKeySpec
 import javax.servlet.http.HttpServletRequest
@@ -21,14 +21,11 @@ class OpenIdAuthenticator : JwtAuthenticator {
 
     @Suppress("ReturnCount", "TooGenericExceptionCaught")
     override fun getAuthentication(jwtToken: String, request: HttpServletRequest): UsernamePasswordAuthenticationToken? {
-        // if (listOf("localhost", "integration").any { request.serverName.startsWith(it) } && jwtToken == "FAKE") {
-        // parse the token.
-        val user: String? = try {
+        val user: Claims? = try {
             Jwts.parser()
                 .setSigningKeyResolver(OpenidSigningKeyResolver)
                 .parseClaimsJws(jwtToken)
                 .body
-                .subject
         } catch (e: RuntimeException) {
             if (listOf("localhost", "integration").any { request.serverName.startsWith(it) }) {
                 log.info("Attempt FAKE token validation.")
@@ -40,7 +37,6 @@ class OpenIdAuthenticator : JwtAuthenticator {
                         .setSigningKey(signingKey)
                         .parseClaimsJws(jwtToken)
                         .body
-                        .subject
                 } catch (ex: JwtException) {
                     log.info("Unable to parse FAKE token", ex)
                     null
@@ -53,10 +49,11 @@ class OpenIdAuthenticator : JwtAuthenticator {
 
         if (user != null) {
             log.info("Request token verification success: $user")
-            return UsernamePasswordAuthenticationToken(user, null, ArrayList<GrantedAuthority>())
+            return UsernamePasswordAuthenticationToken(UserPrincipal(user["oid", String::class.java], user["given_name", String::class.java] ?: "", user["family_name", String::class.java] ?: user["name", String::class.java] ?: user.subject), null, ArrayList<GrantedAuthority>())
         }
 
         log.info("Request token verification failure.")
         return null
     }
 }
+
