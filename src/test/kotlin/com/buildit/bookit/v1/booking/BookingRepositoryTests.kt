@@ -1,6 +1,8 @@
 package com.buildit.bookit.v1.booking
 
+import com.buildit.bookit.v1.booking.dto.User
 import com.winterbe.expekt.expect
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +20,14 @@ class BookingRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTempla
     val start = LocalDateTime.parse("2017-04-21T10:00")
     val end = LocalDateTime.parse("2017-04-21T11:00")
     val bookingRepo = BookingDatabaseRepository(jdbcTemplate)
+    val userRepo = UserDatabaseRepository(jdbcTemplate)
+
+    lateinit var creatingUser: User
+
+    @BeforeEach
+    fun createUser() {
+        creatingUser = userRepo.insertUser("external-userid-guid", "Test", "User")
+    }
 
     @Test
     fun getAllBookingsNoBookings() {
@@ -28,7 +38,12 @@ class BookingRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTempla
 
     @Test
     fun insertBooking() {
-        val booking = bookingRepo.insertBooking("guid", "My Inserted", start, end)
+        val booking = bookingRepo.insertBooking(
+            "guid", "" +
+            "My Inserted",
+            start,
+            end,
+            creatingUser)
 
         expect(booking.id).not.to.be.`null`
         expect(booking.bookableId).to.be.equal("guid")
@@ -39,7 +54,7 @@ class BookingRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTempla
 
     @Test
     fun deleteBooking() {
-        val booking = bookingRepo.insertBooking("guid", "My Inserted", start, end)
+        val booking = bookingRepo.insertBooking("guid", "My Inserted", start, end, creatingUser)
         expect(bookingRepo.getAllBookings()).to.have.size(1)
         bookingRepo.delete(booking.id)
         expect(bookingRepo.getAllBookings()).to.be.empty
@@ -47,7 +62,7 @@ class BookingRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTempla
 
     @Test
     fun getAllBookings1Booking() {
-        val booking = bookingRepo.insertBooking("guid", "My Inserted", start, end)
+        val booking = bookingRepo.insertBooking("guid", "My Inserted", start, end, creatingUser)
 
         val bookings = bookingRepo.getAllBookings()
 
