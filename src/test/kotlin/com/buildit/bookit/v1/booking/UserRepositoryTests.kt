@@ -1,6 +1,5 @@
 package com.buildit.bookit.v1.user
 
-import com.buildit.bookit.v1.booking.UserDatabaseRepository
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

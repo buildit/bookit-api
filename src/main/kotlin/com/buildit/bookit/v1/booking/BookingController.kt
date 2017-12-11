@@ -9,6 +9,7 @@ import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.dto.Location
+import com.buildit.bookit.v1.user.UserService
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -58,7 +59,7 @@ class BookingController(private val bookingRepository: BookingRepository,
                         private val bookableRepository: BookableRepository,
                         private val locationRepository: LocationRepository,
                         private val clock: Clock,
-                        private val userRegistrar: UserRegistrar
+                        private val userService: UserService
 ) {
 
     @GetMapping
@@ -120,7 +121,7 @@ class BookingController(private val bookingRepository: BookingRepository,
 
         validateBooking(location, startDateTimeTruncated, endDateTimeTruncated, bookable)
 
-        val user = userRegistrar.register(userPrincipal)
+        val user = userService.register(userPrincipal)
 
         val booking = bookingRepository.insertBooking(
             bookingRequest.bookableId!!,

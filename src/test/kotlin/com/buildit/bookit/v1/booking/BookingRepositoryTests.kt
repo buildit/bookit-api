@@ -1,6 +1,7 @@
 package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.User
+import com.buildit.bookit.v1.user.UserDatabaseRepository
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

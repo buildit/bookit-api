@@ -1,10 +1,8 @@
-package com.buildit.bookit.v1.booking
+package com.buildit.bookit.v1.user
 
-import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.dto.User
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import java.util.UUID
@@ -52,8 +50,3 @@ class UserDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : UserRepos
         )
 }
 
-@Component
-class UserRegistrar {
-    fun register(principal: UserPrincipal): User =
-        User(principal.subject, "${principal.givenName} ${principal.familyName}")
-}

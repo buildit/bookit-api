@@ -10,6 +10,7 @@ import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
+import com.buildit.bookit.v1.user.UserService
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import com.nhaarman.mockito_kotlin.any
@@ -147,7 +148,7 @@ class BookingControllerUnitTests {
             private val expectedBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end, User())
             private val userPrincipal = UserPrincipal("foo", "bar", "baz")
 
-            private lateinit var userRegistrar: UserRegistrar
+            private lateinit var userService: UserService
 
             @BeforeEach
             fun setup() {
@@ -159,11 +160,11 @@ class BookingControllerUnitTests {
                     ))
                 }
 
-                userRegistrar = mock {
+                userService = mock {
                     on { register(any()) }.doReturn(User())
                 }
 
-                bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, clock, userRegistrar)
+                bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, clock, userService)
             }
 
             @Test

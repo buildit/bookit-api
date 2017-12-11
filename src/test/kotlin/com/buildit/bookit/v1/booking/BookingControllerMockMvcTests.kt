@@ -10,6 +10,7 @@ import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
+import com.buildit.bookit.v1.user.UserService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
@@ -70,7 +71,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
     lateinit var locationRepo: LocationRepository
 
     @MockBean
-    lateinit var userRegistrar: UserRegistrar
+    lateinit var userService: UserService
 
     @BeforeEach
     fun configureSecurityFilters() {
@@ -139,7 +140,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @Test
         fun `valid booking is created`() {
-            whenever(userRegistrar.register(any())).doReturn(user)
+            whenever(userService.register(any())).doReturn(user)
 
             val request = BookingRequest("guid", subject, startDateTime, endDateTime)
 
