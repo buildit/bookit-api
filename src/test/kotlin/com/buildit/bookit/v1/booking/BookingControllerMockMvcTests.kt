@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.booking
 
+import com.buildit.bookit.auth.SecurityContextHolderWrapper
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.buildit.bookit.v1.location.LocationRepository
@@ -8,7 +9,9 @@ import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.reset
 import com.nhaarman.mockito_kotlin.whenever
 import org.hamcrest.Matchers.equalToIgnoringCase
@@ -21,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -64,6 +69,12 @@ class BookingControllerMockMvcTests @Autowired constructor(
     @MockBean
     lateinit var locationRepo: LocationRepository
 
+    @MockBean
+    lateinit var securityContextHolderWrapper: SecurityContextHolderWrapper
+
+    @MockBean
+    lateinit var userRegistrar: UserRegistrar
+
     @BeforeEach
     fun configureSecurityFilters() {
         mvc = MockMvcBuilders
@@ -95,7 +106,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
                     "The Booking",
                     startDateTime,
                     endDateTime,
-                    BookingController.getLoggedInUser())))
+                    UserRegistrar.getFakeLoggedInUser())))
         }
 
         @Test
@@ -120,14 +131,20 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @BeforeEach
         fun createMock() {
-            whenever(bookingRepo.insertBooking("guid", subject, startDateTime, endDateTime, BookingController.getLoggedInUser()))
-                .doReturn(Booking("guid", "guid", subject, startDateTime, endDateTime, BookingController.getLoggedInUser()))
+            whenever(bookingRepo.insertBooking("guid", subject, startDateTime, endDateTime, UserRegistrar.getFakeLoggedInUser()))
+                .doReturn(Booking("guid", "guid", subject, startDateTime, endDateTime, UserRegistrar.getFakeLoggedInUser()))
             whenever(bookableRepo.getAllBookables())
                 .doReturn(listOf(Bookable("guid", "guid", "Foo", Disposition())))
         }
 
         @Test
         fun `valid booking is created`() {
+            val securityContext = mock<SecurityContext> {
+                on { authentication }.doReturn(mock<UsernamePasswordAuthenticationToken> {})
+            }
+            whenever(securityContextHolderWrapper.obtainContext()).doReturn(securityContext)
+            whenever(userRegistrar.register(any())).doReturn(UserRegistrar.getFakeLoggedInUser())
+
             val request = BookingRequest("guid", subject, startDateTime, endDateTime)
 
             mvc.perform(post(request))

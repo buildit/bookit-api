@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.booking
 
+import com.buildit.bookit.auth.SecurityContextHolderWrapper
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.buildit.bookit.v1.location.LocationRepository
@@ -10,12 +11,15 @@ import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContext
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -64,7 +68,7 @@ class BookingControllerUnitTests {
                         )
                     )
                 }
-                bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, clock)
+                bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, clock, mock {}, mock {})
             }
 
             @Nested
@@ -124,13 +128,13 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `getBooking() for existing booking returns that booking`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking("guid1")
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock, mock {}, mock {}).getBooking("guid1")
                     expect(booking.id).to.be.equal("guid1")
                 }
 
                 @Test
                 fun `getBooking() for nonexistent booking throws exception`() {
-                    fun action() = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking("guid-not-there")
+                    fun action() = BookingController(bookingRepo, mock {}, mock {}, clock, mock {}, mock {}).getBooking("guid-not-there")
                     assertThat({ action() }, throws<BookingNotFound>())
                 }
             }
@@ -140,28 +144,46 @@ class BookingControllerUnitTests {
         inner class `POST` {
             private val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
-            private val createdBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end, BookingController.getLoggedInUser())
+
+            private val expectedBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end, UserRegistrar.getFakeLoggedInUser())
+
+            private lateinit var userRegistrar: UserRegistrar
+            private lateinit var securityWrapper: SecurityContextHolderWrapper
 
             @BeforeEach
             fun setup() {
                 val bookingRepository = mock<BookingRepository> {
-                    on { insertBooking(nycBookable1.id, "MyRequest", start, end, BookingController.getLoggedInUser()) }.doReturn(createdBooking)
+                    on { insertBooking(nycBookable1.id, "MyRequest", start, end, UserRegistrar.getFakeLoggedInUser()) }.doReturn(expectedBooking)
                     on { getAllBookings() }.doReturn(listOf(
                         Booking("guid1", nycBookable1.id, "Before", start.minusHours(1), end.minusHours(1)),
                         Booking("guid2", nycBookable1.id, "After", start.plusHours(1), end.plusHours(1))
                     ))
                 }
-                bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, clock)
+
+                val securityContext = mock<SecurityContext> {
+                    on { authentication }.doReturn(mock<UsernamePasswordAuthenticationToken> {})
+                }
+
+                securityWrapper = mock {
+                    on { obtainContext() }.doReturn(securityContext)
+                }
+
+                userRegistrar = mock {
+                    on { register(any()) }.doReturn(UserRegistrar.getFakeLoggedInUser())
+                }
+
+                bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, clock, securityWrapper, userRegistrar)
             }
 
             @Test
             fun `should create a booking`() {
                 val request = BookingRequest(nycBookable1.id, "MyRequest", start, end)
+                userRegistrar.register(securityWrapper.obtainContext().authentication)
 
                 val response = bookingController.createBooking(request)
                 val booking = response.body
 
-                expect(booking).to.equal(createdBooking)
+                expect(booking).to.equal(expectedBooking)
             }
 
             @Test
@@ -171,7 +193,7 @@ class BookingControllerUnitTests {
                 val response = bookingController.createBooking(request)
                 val booking = response.body
 
-                expect(booking).to.equal(createdBooking)
+                expect(booking).to.equal(expectedBooking)
             }
 
             @Test

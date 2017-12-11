@@ -1,8 +1,8 @@
 package com.buildit.bookit.v1.booking
 
+import com.buildit.bookit.auth.SecurityContextHolderWrapper
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
-import com.buildit.bookit.v1.booking.dto.User
 import com.buildit.bookit.v1.booking.dto.interval
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
@@ -56,12 +56,10 @@ class BookableNotAvailable : RuntimeException("Bookable is not available.  Pleas
 class BookingController(private val bookingRepository: BookingRepository,
                         private val bookableRepository: BookableRepository,
                         private val locationRepository: LocationRepository,
-                        private val clock: Clock) {
-
-    companion object {
-        // Returns actual DB user for E2E tests.  Is there a better way?
-        fun getLoggedInUser() = User("c40c724e-36c3-465f-9094-6e02e13d1802", "Fake DB User")
-    }
+                        private val clock: Clock,
+                        private val securityContextHolderWrapper: SecurityContextHolderWrapper,
+                        private val userRegistrar: UserRegistrar
+) {
 
     @GetMapping
     fun getAllBookings(
@@ -107,6 +105,7 @@ class BookingController(private val bookingRepository: BookingRepository,
     @Suppress("UnsafeCallOnNullableType")
     @PostMapping()
     fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: Errors? = null): ResponseEntity<Booking> {
+
         val bookable = bookableRepository.getAllBookables().find { it.id == bookingRequest.bookableId } ?: throw InvalidBookable()
         val location = locationRepository.getLocations().single { it.id == bookable.locationId }
 
@@ -121,12 +120,14 @@ class BookingController(private val bookingRepository: BookingRepository,
 
         validateBooking(location, startDateTimeTruncated, endDateTimeTruncated, bookable)
 
+        val user = userRegistrar.register(securityContextHolderWrapper.obtainContext().authentication)
+
         val booking = bookingRepository.insertBooking(
             bookingRequest.bookableId!!,
             bookingRequest.subject!!,
             startDateTimeTruncated,
             endDateTimeTruncated,
-            getLoggedInUser()
+            user
         )
 
         return ResponseEntity
