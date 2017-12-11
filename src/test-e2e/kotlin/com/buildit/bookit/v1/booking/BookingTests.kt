@@ -2,6 +2,8 @@ package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.Global
 import com.buildit.bookit.toEntity
+import com.natpryce.hamkrest.assertion.assertThat
+import com.natpryce.hamkrest.throws
 import com.winterbe.expekt.expect
 import org.json.JSONObject
 import org.junit.jupiter.api.AfterEach
@@ -36,6 +38,7 @@ class `Booking E2E Tests` {
                     "end": "$tomorrowPlusAnHour"
                 }
                 """
+
     @Nested
     inner class `Get bookings` {
         @Nested
@@ -197,5 +200,21 @@ class `Booking E2E Tests` {
 
     private fun post(request: String, url: String) =
         Global.REST_TEMPLATE.postForEntity(url, request.toEntity(), String::class.java)
+
+    @Nested
+    inner class `DELETE a booking` {
+        @Test
+        fun `should delete a created meeting`() {
+            response = post(bookingForTomorrow, "/v1/booking")
+
+            assertThat({ response?.headers?.location?.let { Global.REST_TEMPLATE.delete(it) } }, !throws<Exception>())
+        }
+
+        @Test
+        fun `should delete a non existent meeting`() {
+            assertThat({ Global.REST_TEMPLATE.delete("/v1/booking/12345") }, !throws<Exception>())
+        }
+
+    }
 }
 

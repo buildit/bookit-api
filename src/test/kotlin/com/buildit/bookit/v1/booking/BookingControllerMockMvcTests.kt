@@ -26,6 +26,7 @@ import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfig
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -210,5 +211,11 @@ class BookingControllerMockMvcTests @Autowired constructor(
             post("/v1/booking")
                 .contentType(APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
+    }
+
+    @Test
+    fun `nonexistent booking is deleted`() {
+        mvc.perform(delete("/v1/booking/999"))
+            .andExpect(status().isNoContent)
     }
 }

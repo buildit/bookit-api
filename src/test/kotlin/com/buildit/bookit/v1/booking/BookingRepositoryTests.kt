@@ -53,10 +53,16 @@ class BookingRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTempla
     }
 
     @Test
-    fun deleteBooking() {
+    fun `delete existing booking`() {
         val booking = bookingRepo.insertBooking("guid", "My Inserted", start, end, creatingUser)
         expect(bookingRepo.getAllBookings()).to.have.size(1)
         bookingRepo.delete(booking.id)
+        expect(bookingRepo.getAllBookings()).to.be.empty
+    }
+
+    @Test
+    fun `delete booking does not exist`() {
+        bookingRepo.delete("12345")
         expect(bookingRepo.getAllBookings()).to.be.empty
     }
 

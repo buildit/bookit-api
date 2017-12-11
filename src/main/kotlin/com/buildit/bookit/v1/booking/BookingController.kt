@@ -102,6 +102,7 @@ class BookingController(private val bookingRepository: BookingRepository,
         bookingRepository.getAllBookings().find { it.id == bookingId } ?: throw BookingNotFound()
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     fun deleteBooking(@PathVariable("id") id: String) = bookingRepository.delete(id)
 
     @Suppress("UnsafeCallOnNullableType")

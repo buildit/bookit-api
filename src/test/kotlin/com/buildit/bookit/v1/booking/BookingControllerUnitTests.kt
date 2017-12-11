@@ -12,6 +12,7 @@ import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -203,6 +204,24 @@ class BookingControllerUnitTests {
 
                 fun action() = bookingController.createBooking(request)
                 assertThat({ action() }, throws<BookableNotAvailable>())
+            }
+        }
+
+        @Nested
+        inner class `DELETE` {
+            private lateinit var bookingRepo: BookingRepository
+
+            @BeforeEach
+            fun setup() {
+                bookingRepo = mock {}
+                bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, clock)
+            }
+
+            @Test
+            fun `should delete a booking`() {
+                bookingController.deleteBooking("12345")
+
+                verify(bookingRepo).delete("12345")
             }
         }
     }
