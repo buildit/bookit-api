@@ -7,7 +7,6 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.test.context.support.WithSecurityContext
 import org.springframework.security.test.context.support.WithSecurityContextFactory
 import java.lang.annotation.Inherited
-import kotlin.reflect.KClass
 
 @WithSecurityContext(factory = WithMockCustomUserSecurityContextFactory::class)
 @Retention(AnnotationRetention.RUNTIME)
@@ -19,8 +18,8 @@ annotation class WithMockCustomUser(
 )
 
 @Suppress("UnsafeCast")
-fun makeUser(kClass: KClass<out Any>): User =
-    kClass.annotations.find { it.annotationClass == WithMockCustomUser::class }.let {
+fun Any.makeUser(): User =
+    this::class.annotations.find { it.annotationClass == WithMockCustomUser::class }.let {
         val ann = it as WithMockCustomUser
         return User(ann.subject, "${ann.givenName} ${ann.familyName}")
     }

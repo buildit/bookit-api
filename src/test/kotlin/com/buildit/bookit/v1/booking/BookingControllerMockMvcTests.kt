@@ -127,7 +127,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
     inner class CreateBooking {
         private val subject = "New Meeting"
 
-        private val user = makeUser(this::class)
+        private val user = makeUser()
 
         @BeforeEach
         fun createMock() {
