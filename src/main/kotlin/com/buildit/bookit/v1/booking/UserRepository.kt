@@ -1,9 +1,9 @@
 package com.buildit.bookit.v1.booking
 
+import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.dto.User
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert
-import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -54,16 +54,6 @@ class UserDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : UserRepos
 
 @Component
 class UserRegistrar {
-    companion object {
-        // Returns actual DB user for E2E tests.  Is there a better way?
-        fun getFakeLoggedInUser() = User("c40c724e-36c3-465f-9094-6e02e13d1802", "Fake DB User")
-    }
-
-//    fun register(authentication: Authentication): User {
-//        val token: UsernamePasswordAuthenticationToken? = authentication.principal as? UsernamePasswordAuthenticationToken
-//        val principal: UserPrincipal? = token?.principal as? UserPrincipal?
-//        return User(principal?.subject ?: "broken", "${principal?.givenName} ${principal?.familyName}")
-//    }
-
-    fun register(authentication: Authentication) = User()
+    fun register(principal: UserPrincipal): User =
+        User(principal.subject, "${principal.givenName} ${principal.familyName}")
 }

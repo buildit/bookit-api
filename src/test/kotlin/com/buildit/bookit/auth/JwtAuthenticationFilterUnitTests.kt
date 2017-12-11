@@ -1,18 +1,17 @@
 package com.buildit.bookit.auth
 
-import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
+import com.winterbe.expekt.expect
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
 import javax.servlet.FilterChain
 
 class JwtAuthenticationFilterUnitTests {
@@ -21,21 +20,13 @@ class JwtAuthenticationFilterUnitTests {
 
     private val filterChain: FilterChain = mock()
 
-    private val securityContext: SecurityContext = mock()
-
     private lateinit var request: MockHttpServletRequest
     private lateinit var response: MockHttpServletResponse
-
-    private lateinit var securityContextHolderWrapper: SecurityContextHolderWrapper
 
     @BeforeEach
     fun `set up`() {
         request = MockHttpServletRequest()
         response = MockHttpServletResponse()
-
-        securityContextHolderWrapper = mock {
-            on { obtainContext() }.doReturn(securityContext)
-        }
     }
 
     @Nested
@@ -49,9 +40,9 @@ class JwtAuthenticationFilterUnitTests {
                     .doReturn(goodSpringAuthToken)
             }
 
-            val filter = JwtAuthenticationFilter(mock {}, jwtAuthenticator, securityContextHolderWrapper)
+            val filter = JwtAuthenticationFilter(mock {}, jwtAuthenticator)
             filter.doFilter(request, response, filterChain)
-            verify(securityContext, times(1)).authentication = goodSpringAuthToken
+            expect(SecurityContextHolder.getContext().authentication).to.equal(goodSpringAuthToken)
             verify(filterChain, times(1)).doFilter(request, response)
         }
 
@@ -64,9 +55,9 @@ class JwtAuthenticationFilterUnitTests {
                     .doReturn(nullSpringAuthToken)
             }
 
-            val filter = JwtAuthenticationFilter(mock {}, jwtAuthenticator, securityContextHolderWrapper)
+            val filter = JwtAuthenticationFilter(mock {}, jwtAuthenticator)
             filter.doFilter(request, response, filterChain)
-            verify(securityContext, times(1)).authentication = nullSpringAuthToken
+            expect(SecurityContextHolder.getContext().authentication).to.equal(nullSpringAuthToken)
             verify(filterChain, times(1)).doFilter(request, response)
         }
     }
@@ -75,9 +66,9 @@ class JwtAuthenticationFilterUnitTests {
     inner class `with malformed header` {
         @Test
         fun `no auth header`() {
-            val filter = JwtAuthenticationFilter(mock {}, mock {}, securityContextHolderWrapper)
+            val filter = JwtAuthenticationFilter(mock {}, mock {})
             filter.doFilter(request, response, filterChain)
-            verify(securityContext, never()).authentication = any()
+            expect(SecurityContextHolder.getContext().authentication).to.be.`null`
             verify(filterChain, times(1)).doFilter(request, response)
         }
 
@@ -85,9 +76,9 @@ class JwtAuthenticationFilterUnitTests {
         fun `not a bearer token`() {
             request.addHeader("Authorization", "NotBearer test")
 
-            val filter = JwtAuthenticationFilter(mock {}, mock {}, securityContextHolderWrapper)
+            val filter = JwtAuthenticationFilter(mock {}, mock {})
             filter.doFilter(request, response, filterChain)
-            verify(securityContext, never()).authentication = any()
+            expect(SecurityContextHolder.getContext().authentication).to.be.`null`
             verify(filterChain, times(1)).doFilter(request, response)
         }
 
@@ -95,9 +86,9 @@ class JwtAuthenticationFilterUnitTests {
         fun `no bearer token value`() {
             request.addHeader("Authorization", "Bearer  ")
 
-            val filter = JwtAuthenticationFilter(mock {}, mock {}, securityContextHolderWrapper)
+            val filter = JwtAuthenticationFilter(mock {}, mock {})
             filter.doFilter(request, response, filterChain)
-            verify(securityContext, never()).authentication = any()
+            expect(SecurityContextHolder.getContext().authentication).to.be.`null`
             verify(filterChain, times(1)).doFilter(request, response)
         }
     }

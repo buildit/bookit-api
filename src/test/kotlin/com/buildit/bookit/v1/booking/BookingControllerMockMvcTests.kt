@@ -1,8 +1,10 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.auth.SecurityContextHolderWrapper
+import com.buildit.bookit.auth.WithMockCustomUser
+import com.buildit.bookit.auth.makeUser
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
+import com.buildit.bookit.v1.booking.dto.User
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
@@ -11,7 +13,6 @@ import com.buildit.bookit.v1.location.dto.Location
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.reset
 import com.nhaarman.mockito_kotlin.whenever
 import org.hamcrest.Matchers.equalToIgnoringCase
@@ -23,10 +24,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContext
-import org.springframework.security.test.context.support.WithMockUser
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -46,8 +46,8 @@ import java.time.temporal.ChronoUnit
  * Booking controller spring mvc integration tests
  */
 @ExtendWith(SpringExtension::class)
-@WebMvcTest(BookingController::class)
-@WithMockUser
+@WebMvcTest(BookingController::class, includeFilters = [ComponentScan.Filter(EnableWebSecurity::class)])
+@WithMockCustomUser
 class BookingControllerMockMvcTests @Autowired constructor(
     private val context: WebApplicationContext,
     private val mapper: ObjectMapper
@@ -68,9 +68,6 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
     @MockBean
     lateinit var locationRepo: LocationRepository
-
-    @MockBean
-    lateinit var securityContextHolderWrapper: SecurityContextHolderWrapper
 
     @MockBean
     lateinit var userRegistrar: UserRegistrar
@@ -96,17 +93,18 @@ class BookingControllerMockMvcTests @Autowired constructor(
     }
 
     @Nested
-    @WithMockUser
+    @WithMockCustomUser
     inner class GetBooking {
         @BeforeEach
         fun setupMock() {
+
             whenever(bookingRepo.getAllBookings())
                 .doReturn(listOf(Booking("guid",
                     "guid",
                     "The Booking",
                     startDateTime,
                     endDateTime,
-                    UserRegistrar.getFakeLoggedInUser())))
+                    User())))
         }
 
         @Test
@@ -114,7 +112,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
             mvc.perform(get("/v1/booking/guid"))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath<String>("$.subject", equalToIgnoringCase("The Booking")))
-                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("Fake DB User")))
+                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("Fake User")))
         }
     }
 
@@ -125,25 +123,23 @@ class BookingControllerMockMvcTests @Autowired constructor(
     }
 
     @Nested
-    @WithMockUser
+    @WithMockCustomUser
     inner class CreateBooking {
         private val subject = "New Meeting"
 
+        private val user = makeUser(this::class)
+
         @BeforeEach
         fun createMock() {
-            whenever(bookingRepo.insertBooking("guid", subject, startDateTime, endDateTime, UserRegistrar.getFakeLoggedInUser()))
-                .doReturn(Booking("guid", "guid", subject, startDateTime, endDateTime, UserRegistrar.getFakeLoggedInUser()))
+            whenever(bookingRepo.insertBooking("guid", subject, startDateTime, endDateTime, user))
+                .doReturn(Booking("guid", "guid", subject, startDateTime, endDateTime, user))
             whenever(bookableRepo.getAllBookables())
                 .doReturn(listOf(Bookable("guid", "guid", "Foo", Disposition())))
         }
 
         @Test
         fun `valid booking is created`() {
-            val securityContext = mock<SecurityContext> {
-                on { authentication }.doReturn(mock<UsernamePasswordAuthenticationToken> {})
-            }
-            whenever(securityContextHolderWrapper.obtainContext()).doReturn(securityContext)
-            whenever(userRegistrar.register(any())).doReturn(UserRegistrar.getFakeLoggedInUser())
+            whenever(userRegistrar.register(any())).doReturn(user)
 
             val request = BookingRequest("guid", subject, startDateTime, endDateTime)
 
@@ -152,7 +148,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
                 .andExpect(jsonPath<String>("$.subject", equalToIgnoringCase(subject)))
                 .andExpect(jsonPath<String>("$.start", equalToIgnoringCase(startDateTime.toString())))
                 .andExpect(jsonPath<String>("$.end", equalToIgnoringCase(endDateTime.toString())))
-                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("Fake DB User")))
+                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("Fake User")))
         }
 
         @Test

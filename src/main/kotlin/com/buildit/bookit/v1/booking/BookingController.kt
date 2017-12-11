@@ -1,6 +1,6 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.auth.SecurityContextHolderWrapper
+import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.buildit.bookit.v1.booking.dto.interval
@@ -12,6 +12,7 @@ import com.buildit.bookit.v1.location.dto.Location
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -57,7 +58,6 @@ class BookingController(private val bookingRepository: BookingRepository,
                         private val bookableRepository: BookableRepository,
                         private val locationRepository: LocationRepository,
                         private val clock: Clock,
-                        private val securityContextHolderWrapper: SecurityContextHolderWrapper,
                         private val userRegistrar: UserRegistrar
 ) {
 
@@ -104,7 +104,7 @@ class BookingController(private val bookingRepository: BookingRepository,
 
     @Suppress("UnsafeCallOnNullableType")
     @PostMapping()
-    fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: Errors? = null): ResponseEntity<Booking> {
+    fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, @AuthenticationPrincipal userPrincipal: UserPrincipal, errors: Errors? = null): ResponseEntity<Booking> {
 
         val bookable = bookableRepository.getAllBookables().find { it.id == bookingRequest.bookableId } ?: throw InvalidBookable()
         val location = locationRepository.getLocations().single { it.id == bookable.locationId }
@@ -120,7 +120,7 @@ class BookingController(private val bookingRepository: BookingRepository,
 
         validateBooking(location, startDateTimeTruncated, endDateTimeTruncated, bookable)
 
-        val user = userRegistrar.register(securityContextHolderWrapper.obtainContext().authentication)
+        val user = userRegistrar.register(userPrincipal)
 
         val booking = bookingRepository.insertBooking(
             bookingRequest.bookableId!!,
