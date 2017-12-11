@@ -6,7 +6,6 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.GrantedAuthority
 import java.util.Base64
 import javax.crypto.spec.SecretKeySpec
 import javax.servlet.http.HttpServletRequest
@@ -49,7 +48,7 @@ class OpenIdAuthenticator : JwtAuthenticator {
 
         if (user != null) {
             log.info("Request token verification success: $user")
-            return UsernamePasswordAuthenticationToken(UserPrincipal(user["oid", String::class.java], user["given_name", String::class.java] ?: "", user["family_name", String::class.java] ?: user["name", String::class.java] ?: user.subject), null, ArrayList<GrantedAuthority>())
+            return UsernamePasswordAuthenticationToken(UserPrincipal(user["oid", String::class.java] ?: user["sub", String::class.java], user["given_name", String::class.java] ?: "", user["family_name", String::class.java] ?: user["name", String::class.java] ?: user.subject), null, emptyList())
         }
 
         log.info("Request token verification failure.")
