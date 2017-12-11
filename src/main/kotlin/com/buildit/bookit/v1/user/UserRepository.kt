@@ -9,6 +9,7 @@ import java.util.UUID
 
 interface UserRepository {
     fun getUser(id: String): User?
+    fun getUserByExternalId(externalId: String): User?
     fun getAllUsers(): Collection<User>
     fun insertUser(externalUserId: String, givenName: String, familyName: String): User
 }
@@ -16,15 +17,22 @@ interface UserRepository {
 @Repository
 class UserDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : UserRepository {
     private val tableName = "USER"
+    private val userSelect = "SELECT USER_ID, GIVEN_NAME, FAMILY_NAME FROM $tableName"
 
     override fun getUser(id: String): User? =
         jdbcTemplate.queryForObject<User>(
-            "SELECT USER_ID, GIVEN_NAME, FAMILY_NAME FROM $tableName WHERE USER_ID = ?", arrayOf(id)) { rs, _ ->
+            "$userSelect WHERE USER_ID = ?", arrayOf(id)) { rs, _ ->
+            makeUser(rs)
+        }
+
+    override fun getUserByExternalId(externalId: String): User? =
+        jdbcTemplate.queryForObject<User>(
+            "$userSelect WHERE EXTERNAL_USER_ID = ?", arrayOf(externalId)) { rs, _ ->
             makeUser(rs)
         }
 
     override fun getAllUsers(): Collection<User> = jdbcTemplate.query(
-        "SELECT USER_ID, GIVEN_NAME, FAMILY_NAME FROM $tableName") { rs, _ ->
+        "$userSelect") { rs, _ ->
         makeUser(rs)
     }
 

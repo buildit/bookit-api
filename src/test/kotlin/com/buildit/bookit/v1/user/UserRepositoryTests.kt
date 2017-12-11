@@ -17,13 +17,13 @@ class UserRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTemplate)
     val userRepo = UserDatabaseRepository(jdbcTemplate)
 
     @Test
-    fun getAllUsers() {
+    fun `all users`() {
         val users = userRepo.getAllUsers()
         expect(users.size).to.be.equal(1) // User defined in data.sql
     }
 
     @Test
-    fun getAllUsersWithUsers() {
+    fun `all users with added users`() {
         val user1 = userRepo.insertUser("guid1", "Test1", "User1")
         val user2 = userRepo.insertUser("guid2", "Test2", "User2")
 
@@ -33,12 +33,24 @@ class UserRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTemplate)
     }
 
     @Test
-    fun getSingleUser() {
+    fun `single user`() {
         val createdUser = userRepo.insertUser("guid", "Test", "User")
         expect(createdUser.id).not.to.be.`null`
         expect(createdUser.name).to.be.equal("Test User")
 
         val readUser = userRepo.getUser(createdUser.id)
+        expect(readUser).not.to.be.`null`
+        expect(readUser?.id).not.to.be.`null`
+        expect(readUser?.name).to.be.equal("Test User")
+    }
+
+    @Test
+    fun `single user by external id`() {
+        val createdUser = userRepo.insertUser("guid", "Test", "User")
+        expect(createdUser.id).not.to.be.`null`
+        expect(createdUser.name).to.be.equal("Test User")
+
+        val readUser = userRepo.getUserByExternalId("guid")
         expect(readUser).not.to.be.`null`
         expect(readUser?.id).not.to.be.`null`
         expect(readUser?.name).to.be.equal("Test User")
