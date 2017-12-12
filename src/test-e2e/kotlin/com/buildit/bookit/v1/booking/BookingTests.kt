@@ -12,7 +12,9 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.skyscreamer.jsonassert.JSONAssert
 import org.skyscreamer.jsonassert.JSONCompareMode
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.ResponseEntity
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -208,9 +210,9 @@ class `Booking E2E Tests` {
     inner class `DELETE a booking` {
         @Test
         fun `should delete a created meeting`() {
-            response = post(bookingForTomorrow, "/v1/booking")
+            val result = post(bookingForTomorrow, "/v1/booking")
 
-            assertThat({ response?.headers?.location?.let { Global.REST_TEMPLATE.delete(it) } }, !throws<Exception>())
+            assertThat({ result.headers.location.let { Global.REST_TEMPLATE.delete(it) } }, !throws<Exception>())
         }
 
         @Test
@@ -218,6 +220,26 @@ class `Booking E2E Tests` {
             assertThat({ Global.REST_TEMPLATE.delete("/v1/booking/12345") }, !throws<Exception>())
         }
 
+        @Nested
+        inner class `DELETE another users booking` {
+            @BeforeEach
+            fun createBooking() {
+                response = Global.ANOTHER_USER_REST_TEMPLATE.postForEntity("/v1/booking", bookingForTomorrow.toEntity(), String::class.java)
+                expect(response?.statusCode?.is2xxSuccessful).to.be.`true`
+            }
+
+            @AfterEach
+            fun `clean up`() {
+                response?.headers?.location?.let { Global.ANOTHER_USER_REST_TEMPLATE.delete(it) }
+            }
+
+            @Test
+            fun `should not be able to delete another users bookings`() {
+                val result = Global.REST_TEMPLATE.exchange(response?.headers?.location, HttpMethod.DELETE, null, Any::class.java)
+
+                expect(result.statusCode).to.be.equal(FORBIDDEN)
+            }
+        }
     }
 }
 
