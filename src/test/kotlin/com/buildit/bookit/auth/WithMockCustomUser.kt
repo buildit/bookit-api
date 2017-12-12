@@ -18,11 +18,11 @@ annotation class WithMockCustomUser(
 )
 
 @Suppress("UnsafeCast")
-fun Any.makeUser(): User =
-    this::class.annotations.find { it.annotationClass == WithMockCustomUser::class }.let {
-        val ann = it as WithMockCustomUser
-        return User(ann.subject, "${ann.givenName} ${ann.familyName}")
-    }
+fun Any.makeUser(): User {
+    val annotation = this::class.annotations.single { it is WithMockCustomUser } as WithMockCustomUser
+
+    return User(annotation.subject, "${annotation.givenName} ${annotation.familyName}")
+}
 
 class WithMockCustomUserSecurityContextFactory : WithSecurityContextFactory<WithMockCustomUser> {
     override fun createSecurityContext(customUser: WithMockCustomUser): SecurityContext {
