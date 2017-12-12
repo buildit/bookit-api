@@ -99,7 +99,6 @@ class WebSecurityConfiguration {
             security.authorizeRequests().antMatchers("/v1/ping").permitAll()
             security.authorizeRequests().anyRequest().authenticated()
 
-
             security.addFilterBefore(
                 JwtAuthenticationFilter(authenticationManager(),
                     OpenIdAuthenticator(),
