@@ -6,9 +6,11 @@ import com.buildit.bookit.auth.OpenIdAuthenticator
 import com.buildit.bookit.auth.SecurityContextHolderWrapper
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.security.SecurityProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
@@ -72,10 +74,14 @@ class WebMvcConfiguration {
 @EnableWebSecurity
 class WebSecurityConfiguration {
     @Bean
-    fun securityConfigurer() = object : WebSecurityConfigurerAdapter() {
+    fun securityConfigurer() = @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER) object : WebSecurityConfigurerAdapter() {
         override fun configure(security: HttpSecurity) {
             security.cors()
             security.httpBasic()
+            // we are using token based authentication. csrf is not required.
+            security.csrf().disable()
+            security.sessionManagement().sessionCreationPolicy(STATELESS)
+
             security.authorizeRequests().antMatchers(
                 "/",
                 "/index.html",
@@ -93,15 +99,12 @@ class WebSecurityConfiguration {
             security.authorizeRequests().antMatchers("/v1/ping").permitAll()
             security.authorizeRequests().anyRequest().authenticated()
 
-            // we are using token based authentication. csrf is not required.
-            security.csrf().disable()
 
             security.addFilterBefore(
                 JwtAuthenticationFilter(authenticationManager(),
                     OpenIdAuthenticator(),
                     SecurityContextHolderWrapper()),
                 BasicAuthenticationFilter::class.java)
-            security.sessionManagement().sessionCreationPolicy(STATELESS)
         }
     }
 }
