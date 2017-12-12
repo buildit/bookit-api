@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.OK
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.client.ClientHttpRequestInterceptor
@@ -172,7 +171,7 @@ class `Security E2E Tests` {
     fun `bearer auth against Actuator fails`() {
         val response = Global.BEARER_AUTH_REST_TEMPLATE.getForEntity("/management/env", String::class.java)
 
-        expect(response.statusCode).to.equal(FORBIDDEN)
+        expect(response.statusCode).to.equal(UNAUTHORIZED)
     }
 
     @Test
