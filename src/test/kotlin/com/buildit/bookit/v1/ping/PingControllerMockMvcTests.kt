@@ -1,6 +1,6 @@
 package com.buildit.bookit.v1.ping
 
-import com.buildit.bookit.auth.UserPrincipal
+import com.buildit.bookit.auth.WithMockCustomUser
 import org.hamcrest.Matchers.equalToIgnoringCase
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.BeforeEach
@@ -9,13 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.core.context.SecurityContext
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.test.context.support.WithAnonymousUser
-import org.springframework.security.test.context.support.WithSecurityContext
-import org.springframework.security.test.context.support.WithSecurityContextFactory
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -31,7 +26,7 @@ import org.springframework.web.context.WebApplicationContext
  */
 @ExtendWith(SpringExtension::class)
 @WebMvcTest(PingController::class, includeFilters = [ComponentScan.Filter(EnableWebSecurity::class)])
-@WithMockCustomUser()
+@WithMockCustomUser
 class PingControllerMockMvcTests @Autowired constructor(
     private val context: WebApplicationContext
 ) {
@@ -68,25 +63,6 @@ class PingControllerMockMvcTests @Autowired constructor(
         mvc.perform(get("/"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.user").doesNotExist())
-    }
-}
-
-@WithSecurityContext(factory = WithMockCustomUserSecurityContextFactory::class)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class WithMockCustomUser(
-    val subject: String = "123abc",
-    val givenName: String = "Fake",
-    val familyName: String = "User"
-)
-
-class WithMockCustomUserSecurityContextFactory : WithSecurityContextFactory<WithMockCustomUser> {
-    override fun createSecurityContext(customUser: WithMockCustomUser): SecurityContext {
-        val context = SecurityContextHolder.createEmptyContext()
-
-        val principal = UserPrincipal(customUser.subject, customUser.familyName, customUser.givenName)
-        val auth = UsernamePasswordAuthenticationToken(principal, null, emptyList())
-        context.authentication = auth
-        return context
     }
 }
 

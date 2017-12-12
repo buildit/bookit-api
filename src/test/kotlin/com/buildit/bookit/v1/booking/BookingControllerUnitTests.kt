@@ -1,15 +1,19 @@
 package com.buildit.bookit.v1.booking
 
+import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
+import com.buildit.bookit.v1.booking.dto.User
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
+import com.buildit.bookit.v1.user.UserService
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -65,7 +69,7 @@ class BookingControllerUnitTests {
                         )
                     )
                 }
-                bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, clock)
+                bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, clock, mock {})
             }
 
             @Nested
@@ -125,13 +129,13 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `getBooking() for existing booking returns that booking`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking("guid1")
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock, mock {}).getBooking("guid1")
                     expect(booking.id).to.be.equal("guid1")
                 }
 
                 @Test
                 fun `getBooking() for nonexistent booking throws exception`() {
-                    fun action() = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking("guid-not-there")
+                    fun action() = BookingController(bookingRepo, mock {}, mock {}, clock, mock {}).getBooking("guid-not-there")
                     assertThat({ action() }, throws<BookingNotFound>())
                 }
             }
@@ -141,44 +145,53 @@ class BookingControllerUnitTests {
         inner class `POST` {
             private val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
-            private val createdBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end, BookingController.getLoggedInUser())
+
+            private val expectedBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end, User())
+            private val userPrincipal = UserPrincipal("foo", "bar", "baz")
+
+            private lateinit var userService: UserService
 
             @BeforeEach
             fun setup() {
                 val bookingRepository = mock<BookingRepository> {
-                    on { insertBooking(nycBookable1.id, "MyRequest", start, end, BookingController.getLoggedInUser()) }.doReturn(createdBooking)
+                    on { insertBooking(nycBookable1.id, "MyRequest", start, end, User()) }.doReturn(expectedBooking)
                     on { getAllBookings() }.doReturn(listOf(
                         Booking("guid1", nycBookable1.id, "Before", start.minusHours(1), end.minusHours(1)),
                         Booking("guid2", nycBookable1.id, "After", start.plusHours(1), end.plusHours(1))
                     ))
                 }
-                bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, clock)
+
+                userService = mock {
+                    on { register(any()) }.doReturn(User())
+                }
+
+                bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, clock, userService)
             }
 
             @Test
             fun `should create a booking`() {
                 val request = BookingRequest(nycBookable1.id, "MyRequest", start, end)
 
-                val response = bookingController.createBooking(request)
+                val response = bookingController.createBooking(request, userPrincipal)
                 val booking = response.body
 
-                expect(booking).to.equal(createdBooking)
+                expect(booking).to.equal(expectedBooking)
             }
 
             @Test
             fun `should chop seconds`() {
                 val request = BookingRequest(nycBookable1.id, "MyRequest", start.plusSeconds(59), end.plusSeconds(59))
 
-                val response = bookingController.createBooking(request)
+                val response = bookingController.createBooking(request, userPrincipal)
                 val booking = response.body
 
-                expect(booking).to.equal(createdBooking)
+                expect(booking).to.equal(expectedBooking)
             }
 
             @Test
             fun `should validate bookable exists`() {
                 val request = BookingRequest("guid-not-there", "MyRequest", start, end)
-                fun action() = bookingController.createBooking(request)
+                fun action() = bookingController.createBooking(request, userPrincipal)
                 assertThat({ action() }, throws<InvalidBookable>())
             }
 
@@ -190,7 +203,7 @@ class BookingControllerUnitTests {
                     start.minusMinutes(30),
                     end.minusMinutes(30))
 
-                fun action() = bookingController.createBooking(request)
+                fun action() = bookingController.createBooking(request, userPrincipal)
                 assertThat({ action() }, throws<BookableNotAvailable>())
             }
 
@@ -202,7 +215,7 @@ class BookingControllerUnitTests {
                     start.plusMinutes(30),
                     end.plusMinutes(30))
 
-                fun action() = bookingController.createBooking(request)
+                fun action() = bookingController.createBooking(request, userPrincipal)
                 assertThat({ action() }, throws<BookableNotAvailable>())
             }
         }
