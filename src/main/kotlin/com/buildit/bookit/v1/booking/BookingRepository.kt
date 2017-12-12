@@ -19,7 +19,8 @@ interface BookingRepository {
      * @param creatingUser A pre-existing, fully-formed <code>User</code> object representing the person creating the booking.
      */
     fun insertBooking(bookableId: String, subject: String, startDateTime: LocalDateTime, endDateTime: LocalDateTime, creatingUser: User): Booking
-    fun delete(id: String)
+
+    fun delete(id: String): Boolean
 }
 
 @Repository
@@ -50,7 +51,7 @@ class BookingDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : Bookin
                 rs.getObject("START_DATE", LocalDateTime::class.java),
                 rs.getObject("END_DATE", LocalDateTime::class.java),
                 makeUser(rs)
-                )
+            )
         }
     }
 
@@ -72,16 +73,7 @@ class BookingDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : Bookin
         return Booking(bookingId, bookableId, subject, startDateTime, endDateTime, creatingUser)
     }
 
-//    override fun insertBooking(bookableId: String,
-//                               subject: String,
-//                               startDateTime: LocalDateTime,
-//                               endDateTime: LocalDateTime): Booking {
-//        return insertBooking(bookableId, subject, startDateTime, endDateTime, null)
-//    }
-
-    override fun delete(id: String) {
-        jdbcTemplate.update("DELETE FROM $tableName WHERE BOOKING_ID = ?", id)
-    }
+    override fun delete(id: String): Boolean = jdbcTemplate.update("DELETE FROM $tableName WHERE BOOKING_ID = ?", id) == 1
 
     private fun makeUser(rs: ResultSet): User =
         User(

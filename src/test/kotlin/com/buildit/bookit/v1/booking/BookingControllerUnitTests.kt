@@ -21,6 +21,7 @@ import com.winterbe.expekt.expect
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpStatus
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -35,6 +36,8 @@ class BookingControllerUnitTests {
     private val today: LocalDate = LocalDate.now(ZoneId.of("America/New_York"))
     private val nycBookable1 = Bookable("guid", "guid-nyc", "NYC Bookable 1", Disposition())
     private val nycBookable2 = Bookable("guid", "guid-nyc", "NYC Bookable 2", Disposition())
+    private val userPrincipal = UserPrincipal("foo", "bar", "baz")
+    private val bookingToday = Booking("guid1", nycBookable1.id, "Booking today", today.atTime(9, 15), today.atTime(10, 15))
 
     @BeforeEach
     fun setup() {
@@ -177,7 +180,6 @@ class BookingControllerUnitTests {
             private val end = start.plusHours(1)
 
             private val expectedBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end, bookingUser)
-            private val userPrincipal = UserPrincipal("foo", "bar", "baz")
 
             private lateinit var userService: UserService
 
@@ -254,19 +256,40 @@ class BookingControllerUnitTests {
         inner class `DELETE` {
             private lateinit var bookingRepo: BookingRepository
             private lateinit var userService: UserService
+            private val anotherUserPrincipal = UserPrincipal("yet", "another", "user")
 
             @BeforeEach
             fun setup() {
-                bookingRepo = mock {}
-                userService = mock {}
+                bookingRepo = mock {
+                    on { getAllBookings() }.doReturn(listOf(bookingToday))
+                }
+                userService = mock {
+                    on { register(userPrincipal) }.doReturn(User())
+                    on { register(anotherUserPrincipal) }.doReturn(User("5678", "another user"))
+                }
                 bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, userService, clock)
             }
 
             @Test
             fun `should delete a booking`() {
-                bookingController.deleteBooking("12345")
+                val result = bookingController.deleteBooking(bookingToday.id, userPrincipal)
 
-                verify(bookingRepo).delete("12345")
+                expect(result.statusCode).to.equal(HttpStatus.NO_CONTENT)
+                verify(bookingRepo).delete(bookingToday.id)
+            }
+
+            @Test
+            fun `should delete non existent booking`() {
+                val result = bookingController.deleteBooking("12345", userPrincipal)
+
+                expect(result.statusCode).to.equal(HttpStatus.NO_CONTENT)
+            }
+
+            @Test
+            fun `should not delete other booking`() {
+                val result = bookingController.deleteBooking(bookingToday.id, anotherUserPrincipal)
+
+                expect(result.statusCode).to.equal(HttpStatus.FORBIDDEN)
             }
         }
     }
