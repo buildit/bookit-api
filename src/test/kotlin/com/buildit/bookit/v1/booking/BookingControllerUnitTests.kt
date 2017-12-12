@@ -146,7 +146,7 @@ class BookingControllerUnitTests {
             private val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
 
-            private val expectedBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end, User())
+            private val expectedBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end, User(externalId = "666"))
             private val userPrincipal = UserPrincipal("foo", "bar", "baz")
 
             private lateinit var userService: UserService
@@ -154,7 +154,7 @@ class BookingControllerUnitTests {
             @BeforeEach
             fun setup() {
                 val bookingRepository = mock<BookingRepository> {
-                    on { insertBooking(nycBookable1.id, "MyRequest", start, end, User()) }.doReturn(expectedBooking)
+                    on { insertBooking(nycBookable1.id, "MyRequest", start, end, User(externalId = "666")) }.doReturn(expectedBooking)
                     on { getAllBookings() }.doReturn(listOf(
                         Booking("guid1", nycBookable1.id, "Before", start.minusHours(1), end.minusHours(1)),
                         Booking("guid2", nycBookable1.id, "After", start.plusHours(1), end.plusHours(1))
@@ -162,7 +162,7 @@ class BookingControllerUnitTests {
                 }
 
                 userService = mock {
-                    on { register(any()) }.doReturn(User())
+                    on { register(any()) }.doReturn(User(externalId = "666"))
                 }
 
                 bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, userService, clock)

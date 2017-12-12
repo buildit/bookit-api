@@ -37,7 +37,8 @@ class BookingDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : Bookin
             |       b.END_DATE,
             |       u.USER_ID,
             |       u.GIVEN_NAME,
-            |       u.FAMILY_NAME
+            |       u.FAMILY_NAME,
+            |       u.EXTERNAL_USER_ID
             |FROM $tableName b
             |LEFT JOIN USER u on b.USER_ID = u.USER_ID""".trimMargin()
 
@@ -85,6 +86,7 @@ class BookingDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : Bookin
     private fun makeUser(rs: ResultSet): User =
         User(
             rs.getString("USER_ID"),
-            "${rs.getString("GIVEN_NAME")} ${rs.getString("FAMILY_NAME")}"
+            "${rs.getString("GIVEN_NAME")} ${rs.getString("FAMILY_NAME")}",
+            rs.getString("EXTERNAL_USER_ID")
         )
 }

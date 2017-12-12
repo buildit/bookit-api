@@ -106,7 +106,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
                     "The Booking",
                     startDateTime,
                     endDateTime,
-                    User())))
+                    User(externalId = "666"))))
         }
 
         @Test

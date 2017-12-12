@@ -15,7 +15,7 @@ class UserServiceTest {
 
         @Test
         fun `user already known`() {
-            val knownUser = User("sub", "given family")
+            val knownUser = User("sub", "given family", "ext")
 
             val userRepository: UserRepository = mock {
                 on { getUserByExternalId("sub") }.thenReturn(knownUser)
@@ -28,7 +28,7 @@ class UserServiceTest {
 
         @Test
         fun `user unknown`() {
-            val newlyCreatedUser = User("sub", "given family")
+            val newlyCreatedUser = User("sub", "given family", "ext")
 
             val userRepository: UserRepository = mock {
                 on { getUserByExternalId("sub") }.thenThrow(EmptyResultDataAccessException(1))

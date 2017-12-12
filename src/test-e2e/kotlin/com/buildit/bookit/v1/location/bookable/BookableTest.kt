@@ -151,7 +151,8 @@ class `Bookable E2E Tests` {
                                         "start": "${inOneMinute.truncatedTo(ChronoUnit.MINUTES)}",
                                         "end": "${inTwoMinutes.truncatedTo(ChronoUnit.MINUTES)}",
                                         "user": {
-                                            "name": "Fake Auth User"
+                                            "name": "Fake Auth User",
+                                            "externalId": "${Global.FAKE_OID}"
                                         }
                                     }
                                 ]

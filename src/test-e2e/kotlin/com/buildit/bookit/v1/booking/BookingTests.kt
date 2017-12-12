@@ -49,7 +49,8 @@ class `Booking E2E Tests` {
                             "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
                             "subject": "My new meeting",
                             "user": {
-                              "name": "Fake Auth User"
+                              "name": "Fake Auth User",
+                              "externalId": "${Global.FAKE_OID}"
                             }
                           }
                         ]
