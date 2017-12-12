@@ -51,14 +51,44 @@ class BookingControllerUnitTests {
 
     @Nested
     inner class `|v1|booking` {
+        val bookingUser = User("123", "user name", "456")
+
         @Nested
         inner class `GET` {
             private lateinit var bookingRepo: BookingRepository
 
-            private val bookingToday = Booking("guid1", nycBookable1.id, "Booking today", today.atTime(9, 15), today.atTime(10, 15))
-            private val bookingTomorrow = Booking("guid2", nycBookable1.id, "Booking tomorrow", today.plusDays(1).atTime(9, 15), today.plusDays(1).atTime(10, 15))
-            private val bookingTodayDifferentBookable = Booking("guid3", nycBookable2.id, "Booking today, different bookable", today.atTime(11, 0), today.atTime(11, 30))
-            private val bookingYesterday = Booking("guid4", nycBookable1.id, "Booking yesterday", today.minusDays(1).atTime(9, 15), today.minusDays(1).atTime(10, 15))
+            private val bookingToday =
+                Booking("guid1",
+                    nycBookable1.id,
+                    "Booking today",
+                    today.atTime(9, 15),
+                    today.atTime(10, 15),
+                    bookingUser
+                )
+            private val bookingTomorrow =
+                Booking("guid2",
+                    nycBookable1.id,
+                    "Booking tomorrow",
+                    today.plusDays(1).atTime(9, 15),
+                    today.plusDays(1).atTime(10, 15),
+                    bookingUser
+                )
+            private val bookingTodayDifferentBookable =
+                Booking("guid3",
+                    nycBookable2.id,
+                    "Booking today, different bookable",
+                    today.atTime(11, 0),
+                    today.atTime(11, 30),
+                    bookingUser
+                )
+            private val bookingYesterday =
+                Booking("guid4",
+                    nycBookable1.id,
+                    "Booking yesterday",
+                    today.minusDays(1).atTime(9, 15),
+                    today.minusDays(1).atTime(10, 15),
+                    bookingUser
+                )
 
             @BeforeEach
             fun setup() {
@@ -146,7 +176,7 @@ class BookingControllerUnitTests {
             private val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
 
-            private val expectedBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end, User(externalId = "666"))
+            private val expectedBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end, bookingUser)
             private val userPrincipal = UserPrincipal("foo", "bar", "baz")
 
             private lateinit var userService: UserService
@@ -154,15 +184,15 @@ class BookingControllerUnitTests {
             @BeforeEach
             fun setup() {
                 val bookingRepository = mock<BookingRepository> {
-                    on { insertBooking(nycBookable1.id, "MyRequest", start, end, User(externalId = "666")) }.doReturn(expectedBooking)
+                    on { insertBooking(nycBookable1.id, "MyRequest", start, end, bookingUser) }.doReturn(expectedBooking)
                     on { getAllBookings() }.doReturn(listOf(
-                        Booking("guid1", nycBookable1.id, "Before", start.minusHours(1), end.minusHours(1)),
-                        Booking("guid2", nycBookable1.id, "After", start.plusHours(1), end.plusHours(1))
+                        Booking("guid1", nycBookable1.id, "Before", start.minusHours(1), end.minusHours(1), bookingUser),
+                        Booking("guid2", nycBookable1.id, "After", start.plusHours(1), end.plusHours(1), bookingUser)
                     ))
                 }
 
                 userService = mock {
-                    on { register(any()) }.doReturn(User(externalId = "666"))
+                    on { register(any()) }.doReturn(bookingUser)
                 }
 
                 bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, userService, clock)

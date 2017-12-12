@@ -32,12 +32,12 @@ data class Booking(
     val start: LocalDateTime,
     @field:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     val end: LocalDateTime,
-    val user: User = User(externalId = "666")
+    val user: User
 )
 
 data class User(
-    val id: String = "12345",
-    val name: String = "Fake User",
+    val id: String,
+    val name: String,
     val externalId: String
 )
 
