@@ -6,6 +6,7 @@ import com.nhaarman.mockito_kotlin.mock
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.dao.EmptyResultDataAccessException
 
 class UserServiceTest {
 
@@ -30,7 +31,7 @@ class UserServiceTest {
             val newlyCreatedUser = User("sub", "given family")
 
             val userRepository: UserRepository = mock {
-                on { getUserByExternalId("sub") }.thenReturn(null)
+                on { getUserByExternalId("sub") }.thenThrow(EmptyResultDataAccessException(1))
                 on { insertUser("sub", "given", "family") }.thenReturn(newlyCreatedUser)
             }
 

@@ -40,8 +40,8 @@ class UserRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTemplate)
 
         val readUser = userRepo.getUser(createdUser.id)
         expect(readUser).not.to.be.`null`
-        expect(readUser?.id).not.to.be.`null`
-        expect(readUser?.name).to.be.equal("Test User")
+        expect(readUser.id).not.to.be.`null`
+        expect(readUser.name).to.be.equal("Test User")
     }
 
     @Test
@@ -52,7 +52,7 @@ class UserRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTemplate)
 
         val readUser = userRepo.getUserByExternalId("guid")
         expect(readUser).not.to.be.`null`
-        expect(readUser?.id).not.to.be.`null`
-        expect(readUser?.name).to.be.equal("Test User")
+        expect(readUser.id).not.to.be.`null`
+        expect(readUser.name).to.be.equal("Test User")
     }
 }

@@ -8,8 +8,8 @@ import java.sql.ResultSet
 import java.util.UUID
 
 interface UserRepository {
-    fun getUser(id: String): User?
-    fun getUserByExternalId(externalId: String): User?
+    fun getUser(id: String): User
+    fun getUserByExternalId(externalId: String): User
     fun getAllUsers(): Collection<User>
     fun insertUser(externalUserId: String, givenName: String, familyName: String): User
 }
@@ -19,13 +19,13 @@ class UserDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : UserRepos
     private val tableName = "USER"
     private val userSelect = "SELECT USER_ID, GIVEN_NAME, FAMILY_NAME FROM $tableName"
 
-    override fun getUser(id: String): User? =
+    override fun getUser(id: String): User =
         jdbcTemplate.queryForObject<User>(
             "$userSelect WHERE USER_ID = ?", arrayOf(id)) { rs, _ ->
             makeUser(rs)
         }
 
-    override fun getUserByExternalId(externalId: String): User? =
+    override fun getUserByExternalId(externalId: String): User =
         jdbcTemplate.queryForObject<User>(
             "$userSelect WHERE EXTERNAL_USER_ID = ?", arrayOf(externalId)) { rs, _ ->
             makeUser(rs)
