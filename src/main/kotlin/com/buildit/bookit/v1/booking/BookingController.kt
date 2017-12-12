@@ -101,8 +101,15 @@ class BookingController(private val bookingRepository: BookingRepository,
         bookingRepository.getAllBookings().find { it.id == bookingId } ?: throw BookingNotFound()
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    fun deleteBooking(@PathVariable("id") id: String) = bookingRepository.delete(id)
+    fun deleteBooking(@PathVariable("id") id: String, @AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<Unit> {
+        val user = userService.register(userPrincipal)
+        val booking = bookingRepository.getAllBookings().find { it.id == id }
+        if (booking != null && booking.user != user) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
+        bookingRepository.delete(id)
+        return ResponseEntity.noContent().build()
+    }
 
     @Suppress("UnsafeCallOnNullableType")
     @PostMapping()
