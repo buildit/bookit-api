@@ -58,8 +58,8 @@ class BookableNotAvailable : RuntimeException("Bookable is not available.  Pleas
 class BookingController(private val bookingRepository: BookingRepository,
                         private val bookableRepository: BookableRepository,
                         private val locationRepository: LocationRepository,
-                        private val clock: Clock,
-                        private val userService: UserService
+                        private val userService: UserService,
+                        private val clock: Clock
 ) {
 
     @GetMapping

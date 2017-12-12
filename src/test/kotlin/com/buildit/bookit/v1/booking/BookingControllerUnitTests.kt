@@ -69,7 +69,7 @@ class BookingControllerUnitTests {
                         )
                     )
                 }
-                bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, clock, mock {})
+                bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, mock {}, clock)
             }
 
             @Nested
@@ -129,13 +129,13 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `getBooking() for existing booking returns that booking`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock, mock {}).getBooking("guid1")
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking("guid1")
                     expect(booking.id).to.be.equal("guid1")
                 }
 
                 @Test
                 fun `getBooking() for nonexistent booking throws exception`() {
-                    fun action() = BookingController(bookingRepo, mock {}, mock {}, clock, mock {}).getBooking("guid-not-there")
+                    fun action() = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking("guid-not-there")
                     assertThat({ action() }, throws<BookingNotFound>())
                 }
             }
@@ -165,7 +165,7 @@ class BookingControllerUnitTests {
                     on { register(any()) }.doReturn(User())
                 }
 
-                bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, clock, userService)
+                bookingController = BookingController(bookingRepository, bookableRepo, locationRepo, userService, clock)
             }
 
             @Test
@@ -223,11 +223,13 @@ class BookingControllerUnitTests {
         @Nested
         inner class `DELETE` {
             private lateinit var bookingRepo: BookingRepository
+            private lateinit var userService: UserService
 
             @BeforeEach
             fun setup() {
                 bookingRepo = mock {}
-                bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, clock)
+                userService = mock {}
+                bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, userService, clock)
             }
 
             @Test
