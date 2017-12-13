@@ -191,5 +191,77 @@ class `Bookable E2E Tests` {
                 createResponse?.headers?.location?.let { Global.REST_TEMPLATE.delete(it) }
             }
         }
+
+        @Nested
+        inner class `another users booking` {
+            var createResponse: ResponseEntity<String>? = null
+
+            @BeforeEach
+            fun `create booking`() {
+                val goodRequest =
+                    """
+                            {
+                                "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                                "subject": "My new meeting",
+                                "start": "$inOneMinute",
+                                "end": "$inTwoMinutes"
+                            }
+                            """
+                createResponse = Global.ANOTHER_USER_REST_TEMPLATE.postForEntity("/v1/booking", goodRequest.toEntity(), String::class.java)
+            }
+
+            @Test
+            fun `should hide booking details`() {
+                // act
+                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?expand=bookings", String::class.java)
+
+                // assert
+                val expectedResponse = """
+                        [
+                            {
+                                "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                                "locationId": "b1177996-75e2-41da-a3e9-fcdd75d1ab31",
+                                "name": "Red Room",
+                                "disposition": {
+                                    "closed": false,
+                                    "reason": ""
+                                },
+                                bookings: [
+                                    {
+                                        "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                                        "subject": "**********",
+                                        "user": {
+                                            "name": "Another Fake User",
+                                            "externalId": "${Global.ANOTHER_FAKE_OID}"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "1c824c61-7539-41d7-b723-d4447826ba50"
+                            },
+                            {
+                                "id": "23787564-e99d-4741-b285-4d17cc29bf8d"
+                            },
+                            {
+                                "id": "a7b68976-8dda-44f2-8e39-4e2b6c3514cd"
+                            },
+                            {
+                                "id": "25708e84-cf1b-45aa-b062-0af903328a52"
+                            },
+                            {
+                                "id": "cc4bd7e5-00f6-4903-86a2-abf5423edb84"
+                            }
+                        ]
+                    """.trimIndent()
+                JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.LENIENT)
+            }
+
+            @AfterEach
+            fun `delete booking`() {
+                createResponse?.headers?.location?.let { Global.ANOTHER_USER_REST_TEMPLATE.delete(it) }
+            }
+        }
+
     }
 }
