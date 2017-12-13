@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.location.bookable
 
+import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.booking.dto.interval
@@ -8,6 +9,7 @@ import com.buildit.bookit.v1.location.bookable.dto.BookableResource
 import com.buildit.bookit.v1.location.dto.LocationNotFound
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -24,6 +26,8 @@ class BookableNotFound : RuntimeException("Bookable not found")
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 class InvalidBookable : RuntimeException("Bookable does not exist")
+
+const val MASKED_STRING = "**********"
 
 @RestController
 @RequestMapping("/v1/location/{locationId}/bookable")
@@ -44,6 +48,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
     @GetMapping
     fun getAllBookables(
         @PathVariable("locationId") locationId: String,
+        @AuthenticationPrincipal user: UserPrincipal,
         @RequestParam("start", required = false)
         @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
         startDateInclusive: LocalDate? = null,
@@ -67,14 +72,21 @@ class BookableController(private val bookableRepository: BookableRepository, pri
             end.atStartOfDay(timeZone).toInstant()
         )
 
+        val allBookings = bookingRepository.getAllBookings()
         return bookableRepository.getAllBookables()
             .filter { it.locationId == locationId }
             .map { bookable ->
                 val bookings = when {
                     "bookings" in expand ?: emptyList() ->
-                        bookingRepository.getAllBookings()
+                        allBookings
                             .filter { booking -> booking.bookableId == bookable.id }
                             .filter { desiredInterval.overlaps(it.interval(timeZone)) }
+                            .map { booking ->
+                                if (booking.user.externalId == user.subject)
+                                    booking
+                                else
+                                    booking.copy(subject = MASKED_STRING)
+                            }
                     else -> emptyList()
                 }
 

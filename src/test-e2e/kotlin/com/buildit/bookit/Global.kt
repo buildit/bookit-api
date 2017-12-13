@@ -36,7 +36,7 @@ object Global {
         request.headers["Authorization"] = "Bearer $jwt"
         execution.execute(request, body)
     }).build())
-    private val ANOTHER_FAKE_OID = "b6263c2f-7e05-47cd-a75d-3181a9edd450"
+    val ANOTHER_FAKE_OID = "b6263c2f-7e05-47cd-a75d-3181a9edd450"
     val ANOTHER_USER_REST_TEMPLATE = TestRestTemplate(RestTemplateBuilder().rootUri(URI).additionalInterceptors(ClientHttpRequestInterceptor { request, body, execution ->
         val apiKeySecretBytes = DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secret".toByteArray()))
         val jwt = Jwts.builder()
