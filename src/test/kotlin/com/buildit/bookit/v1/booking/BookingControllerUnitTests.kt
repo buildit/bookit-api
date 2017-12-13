@@ -264,7 +264,6 @@ class BookingControllerUnitTests {
                 }
                 userService = mock {
                     on { register(userPrincipal) }.doReturn(bookingUser)
-                    on { register(anotherUserPrincipal) }.doReturn(User("5678", "another user", "yet"))
                 }
                 bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, userService, clock)
             }

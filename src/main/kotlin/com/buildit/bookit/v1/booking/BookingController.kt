@@ -102,9 +102,8 @@ class BookingController(private val bookingRepository: BookingRepository,
 
     @DeleteMapping("/{id}")
     fun deleteBooking(@PathVariable("id") id: String, @AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<Unit> {
-        val user = userService.register(userPrincipal)
         val booking = bookingRepository.getAllBookings().find { it.id == id }
-        if (booking != null && booking.user != user) {
+        if (booking != null && booking.user.externalId != userPrincipal.subject) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
         }
         bookingRepository.delete(id)
