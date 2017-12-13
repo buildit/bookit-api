@@ -106,7 +106,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
                     "The Booking",
                     startDateTime,
                     endDateTime,
-                    User())))
+                    User("123", "test user name", "666"))))
         }
 
         @Test
@@ -114,7 +114,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
             mvc.perform(get("/v1/booking/guid"))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath<String>("$.subject", equalToIgnoringCase("The Booking")))
-                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("Fake User")))
+                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("test user name")))
+                .andExpect(jsonPath<String>("$.user.externalId", equalToIgnoringCase("666")))
         }
     }
 
@@ -150,7 +151,9 @@ class BookingControllerMockMvcTests @Autowired constructor(
                 .andExpect(jsonPath<String>("$.subject", equalToIgnoringCase(subject)))
                 .andExpect(jsonPath<String>("$.start", equalToIgnoringCase(startDateTime.toString())))
                 .andExpect(jsonPath<String>("$.end", equalToIgnoringCase(endDateTime.toString())))
+                .andExpect(jsonPath<String>("$.user.id", equalToIgnoringCase("123abc")))
                 .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("Fake User")))
+                .andExpect(jsonPath<String>("$.user.externalId", equalToIgnoringCase("456xyz")))
         }
 
         @Test

@@ -3,6 +3,7 @@ package com.buildit.bookit.v1.location.bookable
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.booking.dto.Booking
+import com.buildit.bookit.v1.booking.dto.User
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.BookableResource
@@ -101,13 +102,50 @@ class BookableControllerUnitTests {
                         .to.contain(BookableResource(nycBookable1, emptyList()))
                 }
 
+                val bookingUser = User("111", "test user", "222")
+
                 @Nested
                 inner class `with bookings` {
-                    private val bookingToday = Booking("guid1", nycBookable1.id, "Booking 1", today.atTime(9, 15), today.atTime(10, 15))
-                    private val bookingToday2 = Booking("guid2", nycBookable1.id, "Booking 2", today.atTime(11, 0), today.atTime(11, 30))
-                    private val bookingTodayDifferentBookable = Booking("guid3", nycBookable2.id, "Booking 3, different bookable", today.atTime(11, 0), today.atTime(11, 30))
-                    private val bookingYesterday = Booking("guid4", nycBookable1.id, "Booking 4, yesterday", today.minusDays(1).atTime(11, 0), today.minusDays(1).atTime(11, 30))
-                    private val bookingTomorrow = Booking("guid5", nycBookable1.id, "Booking 5, tomorrow", today.plusDays(1).atTime(11, 0), today.plusDays(1).atTime(11, 30))
+                    private val bookingToday =
+                        Booking("guid1",
+                            nycBookable1.id,
+                            "Booking 1",
+                            today.atTime(9, 15),
+                            today.atTime(10, 15),
+                            bookingUser
+                        )
+                    private val bookingToday2 =
+                        Booking("guid2",
+                            nycBookable1.id,
+                            "Booking 2",
+                            today.atTime(11, 0),
+                            today.atTime(11, 30),
+                            bookingUser
+                        )
+                    private val bookingTodayDifferentBookable =
+                        Booking("guid3",
+                            nycBookable2.id,
+                            "Booking 3, different bookable",
+                            today.atTime(11, 0),
+                            today.atTime(11, 30),
+                            bookingUser
+                        )
+                    private val bookingYesterday =
+                        Booking("guid4",
+                            nycBookable1.id,
+                            "Booking 4, yesterday",
+                            today.minusDays(1).atTime(11, 0),
+                            today.minusDays(1).atTime(11, 30),
+                            bookingUser
+                        )
+                    private val bookingTomorrow =
+                        Booking("guid5",
+                            nycBookable1.id,
+                            "Booking 5, tomorrow",
+                            today.plusDays(1).atTime(11, 0),
+                            today.plusDays(1).atTime(11, 30),
+                            bookingUser
+                        )
 
                     private val bookingRepo = mock<BookingRepository> {
                         on { getAllBookings() }.doReturn(listOf(bookingToday, bookingToday2, bookingTodayDifferentBookable, bookingYesterday, bookingTomorrow))
@@ -148,7 +186,7 @@ class BookableControllerUnitTests {
                         val bookingRepo = mock<BookingRepository> {
                             on { getAllBookings() }.doReturn(
                                 listOf(
-                                    Booking("guid1", "guid2", "Booking", today.atTime(9, 15), today.atTime(10, 15))
+                                    Booking("guid1", "guid2", "Booking", today.atTime(9, 15), today.atTime(10, 15), bookingUser)
                                 )
                             )
                         }

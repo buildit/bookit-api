@@ -14,14 +14,15 @@ import java.lang.annotation.Inherited
 annotation class WithMockCustomUser(
     val subject: String = "123abc",
     val givenName: String = "Fake",
-    val familyName: String = "User"
+    val familyName: String = "User",
+    val externalId: String = "456xyz"
 )
 
 @Suppress("UnsafeCast")
 fun Any.makeUser(): User {
     val annotation = this::class.annotations.single { it is WithMockCustomUser } as WithMockCustomUser
 
-    return User(annotation.subject, "${annotation.givenName} ${annotation.familyName}")
+    return User(annotation.subject, "${annotation.givenName} ${annotation.familyName}", annotation.externalId)
 }
 
 class WithMockCustomUserSecurityContextFactory : WithSecurityContextFactory<WithMockCustomUser> {
