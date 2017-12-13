@@ -23,7 +23,7 @@ object Global {
     val URI = System.getenv("ENDPOINT_URI") ?: "http://localhost:8080"
     val BASIC_AUTH_REST_TEMPLATE = TestRestTemplate(RestTemplateBuilder().rootUri(URI).basicAuthorization("admin", "password").build())
     val ANONYMOUS_REST_TEMPLATE = TestRestTemplate(RestTemplateBuilder().rootUri(URI).build())
-    private val FAKE_OID = "9e14c6ff-764e-4bd7-96f6-1d4bc2593a3e"
+    val FAKE_OID = "9e14c6ff-764e-4bd7-96f6-1d4bc2593a3e"
     val BEARER_AUTH_REST_TEMPLATE = TestRestTemplate(RestTemplateBuilder().rootUri(URI).additionalInterceptors(ClientHttpRequestInterceptor { request, body, execution ->
         val apiKeySecretBytes = DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secret".toByteArray()))
         val jwt = Jwts.builder()

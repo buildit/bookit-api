@@ -37,7 +37,8 @@ class BookingControllerUnitTests {
     private val nycBookable1 = Bookable("guid", "guid-nyc", "NYC Bookable 1", Disposition())
     private val nycBookable2 = Bookable("guid", "guid-nyc", "NYC Bookable 2", Disposition())
     private val userPrincipal = UserPrincipal("foo", "bar", "baz")
-    private val bookingToday = Booking("guid1", nycBookable1.id, "Booking today", today.atTime(9, 15), today.atTime(10, 15))
+    private val bookingUser = User("123", "user name", "foo")
+    private val bookingToday = Booking("guid1", nycBookable1.id, "Booking today", today.atTime(9, 15), today.atTime(10, 15), bookingUser)
 
     @BeforeEach
     fun setup() {
@@ -54,8 +55,6 @@ class BookingControllerUnitTests {
 
     @Nested
     inner class `|v1|booking` {
-        val bookingUser = User("123", "user name", "456")
-
         @Nested
         inner class `GET` {
             private lateinit var bookingRepo: BookingRepository
@@ -264,8 +263,8 @@ class BookingControllerUnitTests {
                     on { getAllBookings() }.doReturn(listOf(bookingToday))
                 }
                 userService = mock {
-                    on { register(userPrincipal) }.doReturn(User())
-                    on { register(anotherUserPrincipal) }.doReturn(User("5678", "another user"))
+                    on { register(userPrincipal) }.doReturn(bookingUser)
+                    on { register(anotherUserPrincipal) }.doReturn(User("5678", "another user", "yet"))
                 }
                 bookingController = BookingController(bookingRepo, bookableRepo, locationRepo, userService, clock)
             }
@@ -280,7 +279,7 @@ class BookingControllerUnitTests {
 
             @Test
             fun `should delete non existent booking`() {
-                val result = bookingController.deleteBooking("12345", userPrincipal)
+                val result = bookingController.deleteBooking(bookingUser.id, userPrincipal)
 
                 expect(result.statusCode).to.equal(HttpStatus.NO_CONTENT)
             }
