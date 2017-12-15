@@ -4,7 +4,6 @@ import com.buildit.bookit.auth.WithMockCustomUser
 import com.buildit.bookit.auth.makeUser
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
-import com.buildit.bookit.v1.booking.dto.User
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
@@ -26,8 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -48,7 +47,7 @@ import java.time.temporal.ChronoUnit
  * Booking controller spring mvc integration tests
  */
 @ExtendWith(SpringExtension::class)
-@WebMvcTest(BookingController::class, includeFilters = [ComponentScan.Filter(EnableWebSecurity::class)])
+@WebMvcTest(BookingController::class, includeFilters = [ComponentScan.Filter(Configuration::class)])
 @WithMockCustomUser
 class BookingControllerMockMvcTests @Autowired constructor(
     private val context: WebApplicationContext,
@@ -92,21 +91,23 @@ class BookingControllerMockMvcTests @Autowired constructor(
         reset(bookingRepo)
         reset(bookableRepo)
         reset(locationRepo)
+        reset(userService)
     }
 
     @Nested
     @WithMockCustomUser
     inner class GetBooking {
+        private val user = makeUser()
+
         @BeforeEach
         fun setupMock() {
-
             whenever(bookingRepo.getAllBookings())
                 .doReturn(listOf(Booking("guid",
                     "guid",
                     "The Booking",
                     startDateTime,
                     endDateTime,
-                    User("123", "test user name", "666"))))
+                    user)))
         }
 
         @Test
@@ -114,12 +115,13 @@ class BookingControllerMockMvcTests @Autowired constructor(
             mvc.perform(get("/v1/booking/guid"))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath<String>("$.subject", equalToIgnoringCase("The Booking")))
-                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("test user name")))
-                .andExpect(jsonPath<String>("$.user.externalId", equalToIgnoringCase("666")))
+                .andExpect(jsonPath<String>("$.user.name", equalToIgnoringCase("Fake User")))
+                .andExpect(jsonPath<String>("$.user.externalId", equalToIgnoringCase("456xyz")))
         }
     }
 
     @Test
+    @WithMockCustomUser
     fun `nonexistent booking is not found`() {
         mvc.perform(get("/v1/booking/999"))
             .andExpect(status().isNotFound)

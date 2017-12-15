@@ -3,6 +3,7 @@ package com.buildit.bookit.v1.booking
 import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
+import com.buildit.bookit.v1.booking.dto.MASKED_STRING
 import com.buildit.bookit.v1.booking.dto.User
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
@@ -37,6 +38,7 @@ class BookingControllerUnitTests {
     private val nycBookable1 = Bookable("guid", "guid-nyc", "NYC Bookable 1", Disposition())
     private val nycBookable2 = Bookable("guid", "guid-nyc", "NYC Bookable 2", Disposition())
     private val userPrincipal = UserPrincipal("foo", "bar", "baz")
+    private val anotherUserPrincipal = UserPrincipal("yet", "another", "user")
     private val bookingUser = User("123", "user name", "foo")
     private val bookingToday = Booking("guid1", nycBookable1.id, "Booking today", today.atTime(9, 15), today.atTime(10, 15), bookingUser)
 
@@ -108,13 +110,21 @@ class BookingControllerUnitTests {
             inner class `invoking getAllBookings()` {
                 @Test
                 fun `returns all existing bookings`() {
-                    val bookings = bookingController.getAllBookings()
+                    val bookings = bookingController.getAllBookings(userPrincipal)
                     expect(bookings.size).to.be.equal(4)
+                    expect(bookings).to.satisfy { it.none { booking -> booking.subject == MASKED_STRING } }
+                }
+
+                @Test
+                fun `returns all existing bookings - different user masks`() {
+                    val bookings = bookingController.getAllBookings(anotherUserPrincipal)
+                    expect(bookings.size).to.be.equal(4)
+                    expect(bookings).to.satisfy { it.all { booking -> booking.subject == MASKED_STRING } }
                 }
 
                 @Test
                 fun `returns all existing bookings filtered by start (inclusive) and end (exclusive)`() {
-                    val bookings = bookingController.getAllBookings(today, today.plusDays(1))
+                    val bookings = bookingController.getAllBookings(userPrincipal, today, today.plusDays(1))
                     expect(bookings).to.have.size(2)
                     expect(bookings).to.have.all.elements(bookingToday, bookingTodayDifferentBookable)
                 }
@@ -122,7 +132,7 @@ class BookingControllerUnitTests {
                 @Test
                 fun `fails when end before start`() {
                     assertThat({
-                        bookingController.getAllBookings(today, today.minusDays(1))
+                        bookingController.getAllBookings(userPrincipal, today, today.minusDays(1))
                     },
                         throws<EndBeforeStartException>())
                 }
@@ -130,28 +140,28 @@ class BookingControllerUnitTests {
                 @Test
                 fun `fails when start == end`() {
                     assertThat({
-                        bookingController.getAllBookings(today, today)
+                        bookingController.getAllBookings(userPrincipal, today, today)
                     },
                         throws<EndBeforeStartException>())
                 }
 
                 @Test
                 fun `start defaults to start of time`() {
-                    val bookings = bookingController.getAllBookings(endDateExclusive = today.plusDays(1))
+                    val bookings = bookingController.getAllBookings(userPrincipal, endDateExclusive = today.plusDays(1))
                     expect(bookings).to.have.size(3)
                     expect(bookings).to.have.all.elements(bookingToday, bookingTodayDifferentBookable, bookingYesterday)
                 }
 
                 @Test
                 fun `end defaults to end of time`() {
-                    val bookings = bookingController.getAllBookings(today)
+                    val bookings = bookingController.getAllBookings(userPrincipal, today)
                     expect(bookings).to.have.size(3)
                     expect(bookings).to.have.all.elements(bookingToday, bookingTodayDifferentBookable, bookingTomorrow)
                 }
 
                 @Test
                 fun `no bookings on date`() {
-                    val bookings = bookingController.getAllBookings(today.plusYears(1))
+                    val bookings = bookingController.getAllBookings(userPrincipal, today.plusYears(1))
                     expect(bookings).to.have.size(0)
                 }
             }
@@ -161,13 +171,21 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `getBooking() for existing booking returns that booking`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking("guid1")
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking("guid1", userPrincipal)
                     expect(booking.id).to.be.equal("guid1")
+                    expect(booking.subject).to.be.equal(bookingToday.subject)
+                }
+
+                @Test
+                fun `getBooking() for existing booking returns that booking - different user masks`() {
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking("guid1", anotherUserPrincipal)
+                    expect(booking.id).to.be.equal("guid1")
+                    expect(booking.subject).to.be.equal(MASKED_STRING)
                 }
 
                 @Test
                 fun `getBooking() for nonexistent booking throws exception`() {
-                    fun action() = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking("guid-not-there")
+                    fun action() = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking("guid-not-there", userPrincipal)
                     assertThat({ action() }, throws<BookingNotFound>())
                 }
             }
@@ -255,7 +273,6 @@ class BookingControllerUnitTests {
         inner class `DELETE` {
             private lateinit var bookingRepo: BookingRepository
             private lateinit var userService: UserService
-            private val anotherUserPrincipal = UserPrincipal("yet", "another", "user")
 
             @BeforeEach
             fun setup() {

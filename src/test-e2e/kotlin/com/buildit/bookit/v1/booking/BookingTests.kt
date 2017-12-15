@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.skyscreamer.jsonassert.JSONAssert
 import org.skyscreamer.jsonassert.JSONCompareMode
+import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.FORBIDDEN
@@ -46,17 +47,28 @@ class `Booking E2E Tests` {
         @Nested
         inner class `valid` {
             private val expectedBooking = """
-                        [
-                          {
+                        {
                             "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
                             "subject": "My new meeting",
                             "user": {
                               "name": "Fake Auth User",
                               "externalId": "${Global.FAKE_OID}"
                             }
-                          }
-                        ]
+                        }
                     """.trimIndent()
+            private val expectedBookings = "[$expectedBooking]"
+
+            private val otherUserExpectedBooking = """
+                        {
+                            "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                            "subject": "**********",
+                            "user": {
+                              "name": "Fake Auth User",
+                              "externalId": "${Global.FAKE_OID}"
+                            }
+                        }
+                    """.trimIndent()
+            private val otherUserExpectedBookings = "[$otherUserExpectedBooking]"
 
             private val noBooking = """
                         [ ]
@@ -71,21 +83,21 @@ class `Booking E2E Tests` {
             @Test
             fun `get with no params returns bookings`() {
                 val response = get("/v1/booking")
-                JSONAssert.assertEquals(expectedBooking, response.body, JSONCompareMode.LENIENT)
+                JSONAssert.assertEquals(expectedBookings, response.body, JSONCompareMode.LENIENT)
             }
 
             @Test
             fun `overlapping start date returns bookings`() {
                 val start = DateTimeFormatter.ISO_LOCAL_DATE.format(now)
                 val response = get("/v1/booking?start=$start")
-                JSONAssert.assertEquals(expectedBooking, response.body, JSONCompareMode.LENIENT)
+                JSONAssert.assertEquals(expectedBookings, response.body, JSONCompareMode.LENIENT)
             }
 
             @Test
             fun `overlapping end date returns bookings`() {
                 val end = DateTimeFormatter.ISO_LOCAL_DATE.format(dayAfterTomorrow)
                 val response = get("/v1/booking?end=$end")
-                JSONAssert.assertEquals(expectedBooking, response.body, JSONCompareMode.LENIENT)
+                JSONAssert.assertEquals(expectedBookings, response.body, JSONCompareMode.LENIENT)
             }
 
             @Test
@@ -93,7 +105,7 @@ class `Booking E2E Tests` {
                 val start = DateTimeFormatter.ISO_LOCAL_DATE.format(now)
                 val end = DateTimeFormatter.ISO_LOCAL_DATE.format(dayAfterTomorrow)
                 val response = get("/v1/booking?start=$start&end=$end")
-                JSONAssert.assertEquals(expectedBooking, response.body, JSONCompareMode.LENIENT)
+                JSONAssert.assertEquals(expectedBookings, response.body, JSONCompareMode.LENIENT)
             }
 
             @Test
@@ -110,13 +122,31 @@ class `Booking E2E Tests` {
                 JSONAssert.assertEquals(noBooking, response.body, JSONCompareMode.LENIENT)
             }
 
+            @Test
+            fun `get with no params returns bookings - another user masks`() {
+                val response = get("/v1/booking", Global.ANOTHER_USER_REST_TEMPLATE)
+                JSONAssert.assertEquals(otherUserExpectedBookings, response.body, JSONCompareMode.LENIENT)
+            }
+
+            @Test
+            fun `get single booking`() {
+                val response = response?.headers?.location?.let { get(it.toString()) }
+                JSONAssert.assertEquals(expectedBooking, response?.body, JSONCompareMode.LENIENT)
+            }
+
+            @Test
+            fun `get single booking - another users booking masks`() {
+                val response = response?.headers?.location?.let { get(it.toString(), Global.ANOTHER_USER_REST_TEMPLATE) }
+                JSONAssert.assertEquals(otherUserExpectedBooking, response?.body, JSONCompareMode.LENIENT)
+            }
+
             @AfterEach
             fun `clean up`() {
                 response?.headers?.location?.let { Global.REST_TEMPLATE.delete(it) }
             }
         }
 
-        private fun get(url: String) = Global.REST_TEMPLATE.getForEntity(url, String::class.java)
+        private fun get(url: String, template: TestRestTemplate = Global.REST_TEMPLATE) = template.getForEntity(url, String::class.java)
     }
 
     @Nested
@@ -204,8 +234,8 @@ class `Booking E2E Tests` {
         }
     }
 
-    private fun post(request: String, url: String) =
-        Global.REST_TEMPLATE.postForEntity(url, request.toEntity(), String::class.java)
+    private fun post(request: String, url: String, template: TestRestTemplate = Global.REST_TEMPLATE) =
+        template.postForEntity(url, request.toEntity(), String::class.java)
 
     @Nested
     inner class `DELETE a booking` {
@@ -225,7 +255,7 @@ class `Booking E2E Tests` {
         inner class `DELETE another users booking` {
             @BeforeEach
             fun createBooking() {
-                response = Global.ANOTHER_USER_REST_TEMPLATE.postForEntity("/v1/booking", bookingForTomorrow.toEntity(), String::class.java)
+                response = post(bookingForTomorrow, "/v1/booking", Global.ANOTHER_USER_REST_TEMPLATE)
                 expect(response?.statusCode?.is2xxSuccessful).to.be.`true`
             }
 

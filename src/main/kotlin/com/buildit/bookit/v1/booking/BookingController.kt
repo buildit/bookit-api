@@ -4,6 +4,7 @@ import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.buildit.bookit.v1.booking.dto.interval
+import com.buildit.bookit.v1.booking.dto.maskSubjectIfOtherUser
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
@@ -61,9 +62,9 @@ class BookingController(private val bookingRepository: BookingRepository,
                         private val userService: UserService,
                         private val clock: Clock
 ) {
-
     @GetMapping
     fun getAllBookings(
+        @AuthenticationPrincipal user: UserPrincipal,
         @RequestParam("start", required = false)
         @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
         startDateInclusive: LocalDate? = null,
@@ -80,7 +81,7 @@ class BookingController(private val bookingRepository: BookingRepository,
 
         val allBookings = bookingRepository.getAllBookings()
         if (start == LocalDate.MIN && end == LocalDate.MAX)
-            return allBookings
+            return allBookings.map { maskSubjectIfOtherUser(it, user) }
 
         val locationTimezones = locationRepository.getLocations().associate { Pair(it.id, ZoneId.of(it.timeZone)) }
         val bookableTimezones = bookableRepository.getAllBookables().associate { Pair(it.id, locationTimezones[it.locationId]) }
@@ -94,11 +95,12 @@ class BookingController(private val bookingRepository: BookingRepository,
                 )
                 desiredInterval.overlaps(booking.interval(timezone))
             }
+            .map { maskSubjectIfOtherUser(it, user) }
     }
 
     @GetMapping("/{id}")
-    fun getBooking(@PathVariable("id") bookingId: String): Booking =
-        bookingRepository.getAllBookings().find { it.id == bookingId } ?: throw BookingNotFound()
+    fun getBooking(@PathVariable("id") bookingId: String, @AuthenticationPrincipal user: UserPrincipal): Booking =
+        bookingRepository.getAllBookings().find { it.id == bookingId }.let { maskSubjectIfOtherUser(it ?: throw BookingNotFound(), user) }
 
     @DeleteMapping("/{id}")
     fun deleteBooking(@PathVariable("id") id: String, @AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<Unit> {
