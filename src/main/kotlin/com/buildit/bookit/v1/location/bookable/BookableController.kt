@@ -4,6 +4,7 @@ import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.booking.dto.interval
+import com.buildit.bookit.v1.booking.dto.maskIfOther
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.BookableResource
 import com.buildit.bookit.v1.location.dto.LocationNotFound
@@ -26,8 +27,6 @@ class BookableNotFound : RuntimeException("Bookable not found")
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 class InvalidBookable : RuntimeException("Bookable does not exist")
-
-const val MASKED_STRING = "**********"
 
 @RestController
 @RequestMapping("/v1/location/{locationId}/bookable")
@@ -81,12 +80,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
                         allBookings
                             .filter { booking -> booking.bookableId == bookable.id }
                             .filter { desiredInterval.overlaps(it.interval(timeZone)) }
-                            .map { booking ->
-                                if (booking.user.externalId == user.subject)
-                                    booking
-                                else
-                                    booking.copy(subject = MASKED_STRING)
-                            }
+                            .map { maskIfOther(it, user) }
                     else -> emptyList()
                 }
 

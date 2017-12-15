@@ -1,5 +1,6 @@
 package com.buildit.bookit.v1.booking.dto
 
+import com.buildit.bookit.auth.UserPrincipal
 import com.fasterxml.jackson.annotation.JsonFormat
 import org.hibernate.validator.constraints.NotBlank
 import org.threeten.extra.Interval
@@ -20,6 +21,13 @@ data class BookingRequest(
     @field:NotNull(message = "end is required")
     val end: LocalDateTime?
 )
+
+const val MASKED_STRING = "**********"
+fun maskIfOther(booking: Booking, otherUser: UserPrincipal): Booking =
+    when {
+        booking.user.externalId != otherUser.subject -> booking.copy(subject = MASKED_STRING)
+        else -> booking
+    }
 
 /**
  * Booking response
