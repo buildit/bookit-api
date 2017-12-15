@@ -4,7 +4,7 @@ import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.booking.dto.interval
-import com.buildit.bookit.v1.booking.dto.maskIfOther
+import com.buildit.bookit.v1.booking.dto.maskSubjectIfOtherUser
 import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.dto.BookableResource
 import com.buildit.bookit.v1.location.dto.LocationNotFound
@@ -80,7 +80,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
                         allBookings
                             .filter { booking -> booking.bookableId == bookable.id }
                             .filter { desiredInterval.overlaps(it.interval(timeZone)) }
-                            .map { maskIfOther(it, user) }
+                            .map { maskSubjectIfOtherUser(it, user) }
                     else -> emptyList()
                 }
 
