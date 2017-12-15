@@ -47,7 +47,7 @@ import java.time.temporal.ChronoUnit
  * Booking controller spring mvc integration tests
  */
 @ExtendWith(SpringExtension::class)
-@WebMvcTest(BookingController::class, includeFilters = [ComponentScan.Filter(EnableWebSecurity::class)])
+@WebMvcTest(BookingController::class, includeFilters = [ComponentScan.Filter(Configuration::class)])
 @WithMockCustomUser
 class BookingControllerMockMvcTests @Autowired constructor(
     private val context: WebApplicationContext,

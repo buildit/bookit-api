@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.context.annotation.Configuration
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -27,7 +27,7 @@ import org.springframework.web.context.WebApplicationContext
  * Tests the /location endpoint
  */
 @ExtendWith(SpringExtension::class)
-@WebMvcTest(LocationController::class, includeFilters = [ComponentScan.Filter(EnableWebSecurity::class)])
+@WebMvcTest(LocationController::class, includeFilters = [ComponentScan.Filter(Configuration::class)])
 @WithMockCustomUser
 class LocationControllerMockMvcTests @Autowired constructor(
     private val context: WebApplicationContext
