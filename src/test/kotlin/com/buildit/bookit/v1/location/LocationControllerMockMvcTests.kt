@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import java.time.ZoneId
 
 /**
  * Tests the /location endpoint
@@ -48,8 +49,9 @@ class LocationControllerMockMvcTests @Autowired constructor(
 
     @BeforeEach
     fun setupMocks() {
-        whenever(locationRepo.getLocations())
-            .doReturn(listOf(Location("guid", "The best location ever", "America/New_York")))
+        val location = Location("The best location ever", ZoneId.of("America/New_York"), "guid")
+        whenever(locationRepo.findOne(location.id))
+            .doReturn(location)
     }
 
     @Test

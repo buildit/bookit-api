@@ -31,7 +31,6 @@ import java.net.URI
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.temporal.ChronoUnit.MINUTES
 import javax.validation.Valid
 
@@ -83,7 +82,7 @@ class BookingController(private val bookingRepository: BookingRepository,
         if (start == LocalDate.MIN && end == LocalDate.MAX)
             return allBookings.map { maskSubjectIfOtherUser(it, user) }
 
-        val locationTimezones = locationRepository.getLocations().associate { Pair(it.id, ZoneId.of(it.timeZone)) }
+        val locationTimezones = locationRepository.findAll().associate { Pair(it.id, it.timeZone) }
         val bookableTimezones = bookableRepository.getAllBookables().associate { Pair(it.id, locationTimezones[it.locationId]) }
 
         return allBookings
@@ -117,7 +116,7 @@ class BookingController(private val bookingRepository: BookingRepository,
     fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, @AuthenticationPrincipal userPrincipal: UserPrincipal, errors: Errors? = null): ResponseEntity<Booking> {
 
         val bookable = bookableRepository.getAllBookables().find { it.id == bookingRequest.bookableId } ?: throw InvalidBookable()
-        val location = locationRepository.getLocations().single { it.id == bookable.locationId }
+        val location = locationRepository.findOne(bookable.locationId)
 
         if (errors?.hasErrors() == true) {
             val errorMessage = errors.allErrors.joinToString(",", transform = { it.defaultMessage })
@@ -146,7 +145,7 @@ class BookingController(private val bookingRepository: BookingRepository,
     }
 
     private fun validateBooking(location: Location, startDateTimeTruncated: LocalDateTime, endDateTimeTruncated: LocalDateTime, bookable: Bookable) {
-        val now = LocalDateTime.now(clock.withZone(ZoneId.of(location.timeZone)))
+        val now = LocalDateTime.now(clock.withZone(location.timeZone))
         if (!startDateTimeTruncated.isAfter(now)) {
             throw StartInPastException()
         }
@@ -156,8 +155,8 @@ class BookingController(private val bookingRepository: BookingRepository,
         }
 
         val interval = Interval.of(
-            startDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant(),
-            endDateTimeTruncated.atZone(ZoneId.of(location.timeZone)).toInstant()
+            startDateTimeTruncated.atZone(location.timeZone).toInstant(),
+            endDateTimeTruncated.atZone(location.timeZone).toInstant()
         )
 
         val unavailable = bookingRepository.getAllBookings()
@@ -165,8 +164,8 @@ class BookingController(private val bookingRepository: BookingRepository,
             .any {
                 interval.overlaps(
                     Interval.of(
-                        it.start.atZone(ZoneId.of(location.timeZone)).toInstant(),
-                        it.end.atZone(ZoneId.of(location.timeZone)).toInstant()))
+                        it.start.atZone(location.timeZone).toInstant(),
+                        it.end.atZone(location.timeZone).toInstant()))
             }
 
         if (unavailable) {

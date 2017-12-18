@@ -53,8 +53,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
     private val context: WebApplicationContext,
     private val mapper: ObjectMapper
 ) {
-    private val NYC = "America/New_York"
-    private val NYC_TZ = ZoneId.of(NYC)
+    private val NYC_TZ = ZoneId.of("America/New_York")
     private val startDateTime = now(NYC_TZ).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
     private val endDateTime = now(NYC_TZ).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
 
@@ -83,7 +82,9 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
     @BeforeEach
     fun setupMocks() {
-        whenever(locationRepo.getLocations()).doReturn(listOf(Location("guid", "NYC", NYC)))
+        val location = Location("NYC", NYC_TZ, "guid")
+        whenever(locationRepo.findAll()).doReturn(listOf(location))
+        whenever(locationRepo.findOne(location.id)).doReturn(location)
     }
 
     @AfterEach

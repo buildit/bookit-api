@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import java.time.ZoneId
 
 @ExtendWith(SpringExtension::class)
 @WebMvcTest(BookableController::class, includeFilters = [ComponentScan.Filter(Configuration::class)])
@@ -56,8 +57,9 @@ class BookableControllerMockMvcTests @Autowired constructor(
 
     @BeforeEach
     fun setupMocks() {
-        whenever(locationRepo.getLocations())
-            .doReturn(listOf(Location("location-guid", "NYC", "America/New_York")))
+        val location = Location("NYC", ZoneId.of("America/New_York"), "location-guid")
+        whenever(locationRepo.findOne(location.id))
+            .doReturn(location)
         whenever(bookableRepo.getAllBookables())
             .doReturn(listOf(Bookable("bookable-guid", "guid", "The best bookable ever", Disposition())))
     }

@@ -34,7 +34,8 @@ class BookingControllerUnitTests {
     private lateinit var locationRepo: LocationRepository
     private lateinit var bookableRepo: BookableRepository
     private val clock: Clock = Clock.systemUTC()
-    private val today: LocalDate = LocalDate.now(ZoneId.of("America/New_York"))
+    private val nycTz = ZoneId.of("America/New_York")
+    private val today: LocalDate = LocalDate.now(nycTz)
     private val nycBookable1 = Bookable("guid", "guid-nyc", "NYC Bookable 1", Disposition())
     private val nycBookable2 = Bookable("guid", "guid-nyc", "NYC Bookable 2", Disposition())
     private val userPrincipal = UserPrincipal("foo", "bar", "baz")
@@ -44,11 +45,15 @@ class BookingControllerUnitTests {
 
     @BeforeEach
     fun setup() {
+        val nyc = Location("NYC", nycTz, "guid-nyc")
+        val london = Location("LON", ZoneId.of("Europe/London"), "guid-euro")
         locationRepo = mock {
-            on { getLocations() }.doReturn(listOf(
-                Location("guid-nyc", "NYC", "America/New_York"),
-                Location("guid-euro", "LON", "Europe/London")
+            on { findAll() }.doReturn(listOf(
+                nyc,
+                london
             ))
+            on { findOne(nyc.id) }.doReturn(nyc)
+            on { findOne(london.id) }.doReturn(london)
         }
         bookableRepo = mock {
             on { getAllBookables() }.doReturn(listOf(nycBookable1, nycBookable2))
@@ -193,7 +198,7 @@ class BookingControllerUnitTests {
 
         @Nested
         inner class `POST` {
-            private val start = LocalDateTime.now(ZoneId.of("America/New_York")).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
+            private val start = LocalDateTime.now(nycTz).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
 
             private val expectedBooking = Booking("guid", nycBookable1.id, "MyRequest", start, end, bookingUser)

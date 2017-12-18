@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.threeten.extra.Interval
 import java.time.LocalDate
-import java.time.ZoneId
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 class BookableNotFound : RuntimeException("Bookable not found")
@@ -37,7 +36,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
      */
     @GetMapping("/{bookableId}")
     fun getBookable(@PathVariable("locationId") location: String, @PathVariable("bookableId") bookable: String): BookableResource {
-        locationRepository.getLocations().find { it.id == location } ?: throw LocationNotFound()
+        locationRepository.findOne(location) ?: throw LocationNotFound()
         return BookableResource(bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound())
     }
 
@@ -57,8 +56,8 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         @RequestParam("expand", required = false)
         expand: List<String>? = emptyList()
     ): Collection<BookableResource> {
-        val location = locationRepository.getLocations().find { it.id == locationId } ?: throw LocationNotFound()
-        val timeZone = ZoneId.of(location.timeZone)
+        val location = locationRepository.findOne(locationId) ?: throw LocationNotFound()
+        val timeZone = location.timeZone
         val start = startDateInclusive ?: LocalDate.MIN
         val end = endDateExclusive ?: LocalDate.MAX
 
