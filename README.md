@@ -18,8 +18,7 @@ dependencies.
 ## Quick Start
 
 1. [Install Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) version 8 if you haven't already
-  1. If you need to change to version 8, install it. Then 
-    [swap your version](https://stackoverflow.com/questions/46513639/how-to-downgrade-java-from-9-to-8-on-a-macos-eclipse-is-not-running-with-java-9) via command line
+    * If you need to change to version 8, install it. Then [swap your version](https://stackoverflow.com/questions/46513639/how-to-downgrade-java-from-9-to-8-on-a-macos-eclipse-is-not-running-with-java-9) via command line
 1. Run `./gradlew bootRun` and wait until the app reads *85% EXECUTING*
 1. Visit [http://localhost:8080/](http://localhost:8080/) in your web browser
 
