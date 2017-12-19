@@ -20,10 +20,10 @@ import java.time.temporal.ChronoUnit
  * Test /v1/location/<location>/bookable like a black box
  */
 class `Bookable E2E Tests` {
-    val now = LocalDateTime.now(ZoneId.of("America/New_York"))
-    val today = LocalDate.now(ZoneId.of("America/New_York"))
-    val inOneMinute = now.plusMinutes(1)
-    val inTwoMinutes = now.plusMinutes(2)
+    private val now = LocalDateTime.now(ZoneId.of("America/New_York"))
+    private val today = LocalDate.now(ZoneId.of("America/New_York"))
+    private val inOneMinute = now.plusMinutes(1)
+    private val inTwoMinutes = now.plusMinutes(2)
 
     @Test
     fun `get 1 bookable`() {
@@ -118,7 +118,7 @@ class `Bookable E2E Tests` {
 
         @Nested
         inner class `room unavailable` {
-            var createResponse: ResponseEntity<String>? = null
+            private var createResponse: ResponseEntity<String>? = null
 
             @BeforeEach
             fun `create booking`() {
@@ -202,7 +202,7 @@ class `Bookable E2E Tests` {
 
         @Nested
         inner class `another users booking` {
-            var createResponse: ResponseEntity<String>? = null
+            private var createResponse: ResponseEntity<String>? = null
 
             @BeforeEach
             fun `create booking`() {

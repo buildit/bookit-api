@@ -17,9 +17,9 @@ import java.time.LocalDateTime
  */
 @ExtendWith(SpringExtension::class)
 @JdbcTest
-class BookingRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTemplate) {
-    val start = LocalDateTime.parse("2017-04-21T10:00")
-    val end = LocalDateTime.parse("2017-04-21T11:00")
+class BookingRepositoryTests @Autowired constructor(jdbcTemplate: JdbcTemplate) {
+    private val start = LocalDateTime.parse("2017-04-21T10:00")
+    private val end = LocalDateTime.parse("2017-04-21T11:00")
     val bookingRepo = BookingDatabaseRepository(jdbcTemplate)
     val userRepo = UserDatabaseRepository(jdbcTemplate)
 

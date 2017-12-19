@@ -8,17 +8,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.ZoneId
 
 @ExtendWith(SpringExtension::class)
 @DataJpaTest
 class BookableRepositoryTests @Autowired constructor(
-    val bookableRepo: BookableRepository,
-    val entityManager: TestEntityManager
+    val bookableRepo: BookableRepository
 ) {
-    val nyc = Location("NYC", ZoneId.of("America/New_York"), "b1177996-75e2-41da-a3e9-fcdd75d1ab31")
+    private final val nyc = Location("NYC", ZoneId.of("America/New_York"), "b1177996-75e2-41da-a3e9-fcdd75d1ab31")
     val red = Bookable(nyc, "Red Room", Disposition(), "aab6d676-d3cb-4b9b-b285-6e63058aeda8")
 
     @Test

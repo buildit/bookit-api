@@ -16,7 +16,7 @@ interface UserRepository {
 
 @Repository
 class UserDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : UserRepository {
-    private val tableName = "USER"
+    private final val tableName = "USER"
     private val userSelect = "SELECT USER_ID, GIVEN_NAME, FAMILY_NAME, EXTERNAL_USER_ID FROM $tableName"
 
     override fun getUser(id: String): User =
@@ -31,8 +31,7 @@ class UserDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : UserRepos
             makeUser(rs)
         }
 
-    override fun getAllUsers(): Collection<User> = jdbcTemplate.query(
-        "$userSelect") { rs, _ ->
+    override fun getAllUsers(): Collection<User> = jdbcTemplate.query(userSelect) { rs, _ ->
         makeUser(rs)
     }
 

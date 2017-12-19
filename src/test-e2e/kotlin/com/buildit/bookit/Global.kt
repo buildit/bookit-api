@@ -15,8 +15,7 @@ fun String.toEntity(): HttpEntity<String> {
     val headers = HttpHeaders()
     headers.contentType = MediaType.APPLICATION_JSON
 
-    val entity = HttpEntity<String>(this.trimIndent(), headers)
-    return entity
+    return HttpEntity(trimIndent(), headers)
 }
 
 object Global {

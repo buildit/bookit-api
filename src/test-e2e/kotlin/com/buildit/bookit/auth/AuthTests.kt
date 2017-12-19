@@ -17,8 +17,6 @@ import java.util.Base64
 import java.util.Date
 import javax.xml.bind.DatatypeConverter
 
-private val s = Base64.getEncoder().encodeToString("secret".toByteArray())
-
 /**
  * Test security
  */

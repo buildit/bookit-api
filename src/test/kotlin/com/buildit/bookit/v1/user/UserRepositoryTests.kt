@@ -13,7 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
  */
 @ExtendWith(SpringExtension::class)
 @JdbcTest
-class UserRepositoryTests @Autowired constructor(val jdbcTemplate: JdbcTemplate) {
+class UserRepositoryTests @Autowired constructor(jdbcTemplate: JdbcTemplate) {
     val userRepo = UserDatabaseRepository(jdbcTemplate)
 
     @Test
