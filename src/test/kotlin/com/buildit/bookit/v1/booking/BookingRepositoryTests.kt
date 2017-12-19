@@ -1,7 +1,6 @@
 package com.buildit.bookit.v1.booking
 
-import com.buildit.bookit.v1.booking.dto.User
-import com.buildit.bookit.v1.user.UserDatabaseRepository
+import com.buildit.bookit.v1.user.dto.User
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,7 +20,6 @@ class BookingRepositoryTests @Autowired constructor(jdbcTemplate: JdbcTemplate) 
     private val start = LocalDateTime.parse("2017-04-21T10:00")
     private val end = LocalDateTime.parse("2017-04-21T11:00")
     val bookingRepo = BookingDatabaseRepository(jdbcTemplate)
-    val userRepo = UserDatabaseRepository(jdbcTemplate)
 
     lateinit var creatingUser: User
 

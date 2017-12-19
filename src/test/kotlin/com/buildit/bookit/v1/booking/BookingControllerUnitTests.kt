@@ -3,14 +3,14 @@ package com.buildit.bookit.v1.booking
 import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
-import com.buildit.bookit.v1.booking.dto.MASKED_STRING
-import com.buildit.bookit.v1.booking.dto.User
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
 import com.buildit.bookit.v1.user.UserService
+import com.buildit.bookit.v1.user.dto.MASKED_STRING
+import com.buildit.bookit.v1.user.dto.User
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import com.nhaarman.mockito_kotlin.any
@@ -39,7 +39,7 @@ class BookingControllerUnitTests {
     private val nycBookable2 = Bookable(nyc, "NYC Bookable 2", Disposition(), "guid")
     private val userPrincipal = UserPrincipal("foo", "bar", "baz")
     private val anotherUserPrincipal = UserPrincipal("yet", "another", "user")
-    private val bookingUser = User("123", "user name", "foo")
+    private val bookingUser = User("user name", "foo", "123")
     private val bookingToday = Booking("guid1", nycBookable1.id!!, "Booking today", today.atTime(9, 15), today.atTime(10, 15), bookingUser)
 
     @BeforeEach
@@ -290,7 +290,7 @@ class BookingControllerUnitTests {
 
             @Test
             fun `should delete non existent booking`() {
-                val result = bookingController.deleteBooking(bookingUser.id, userPrincipal)
+                val result = bookingController.deleteBooking(bookingUser.id!!, userPrincipal)
 
                 expect(result.statusCode).to.equal(HttpStatus.NO_CONTENT)
             }

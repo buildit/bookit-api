@@ -4,12 +4,12 @@ import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.booking.dto.Booking
-import com.buildit.bookit.v1.booking.dto.User
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.BookableResource
 import com.buildit.bookit.v1.location.bookable.dto.Disposition
 import com.buildit.bookit.v1.location.dto.Location
 import com.buildit.bookit.v1.location.dto.LocationNotFound
+import com.buildit.bookit.v1.user.dto.User
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
 import com.nhaarman.mockito_kotlin.doReturn
@@ -29,8 +29,8 @@ class BookableControllerUnitTests {
         on { findByLocation(nyc) }.doReturn(listOf(nycBookable1, nycBookable2))
     }
     private val userPrincipal = UserPrincipal("foo", "bar", "baz")
-    private val bookingUser = User("111", "bar baz", "foo")
-    private val anotherBookingUser = User("222", "user principal", "another")
+    private val bookingUser = User("bar baz", "foo", "111")
+    private val anotherBookingUser = User("user principal", "another", "222")
 
     private val bookingRepo = mock<BookingRepository> {}
 

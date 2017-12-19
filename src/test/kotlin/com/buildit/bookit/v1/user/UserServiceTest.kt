@@ -1,7 +1,7 @@
 package com.buildit.bookit.v1.user
 
 import com.buildit.bookit.auth.UserPrincipal
-import com.buildit.bookit.v1.booking.dto.User
+import com.buildit.bookit.v1.user.dto.User
 import com.nhaarman.mockito_kotlin.mock
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.Nested
@@ -15,10 +15,10 @@ class UserServiceTest {
 
         @Test
         fun `user already known`() {
-            val knownUser = User("sub", "given family", "ext")
+            val knownUser = User("given family", "ext", "sub")
 
             val userRepository: UserRepository = mock {
-                on { getUserByExternalId("sub") }.thenReturn(knownUser)
+                on { findByExternalId("sub") }.thenReturn(knownUser)
             }
             val userService = UserService(userRepository)
 
@@ -28,11 +28,11 @@ class UserServiceTest {
 
         @Test
         fun `user unknown`() {
-            val newlyCreatedUser = User("sub", "given family", "ext")
+            val newlyCreatedUser = User("given family", "ext", "sub")
 
             val userRepository: UserRepository = mock {
-                on { getUserByExternalId("sub") }.thenThrow(EmptyResultDataAccessException(1))
-                on { insertUser("sub", "given", "family") }.thenReturn(newlyCreatedUser)
+                on { findByExternalId("sub") }.thenThrow(EmptyResultDataAccessException(1))
+                on { save(User("given", "family", "sub")) }.thenReturn(newlyCreatedUser)
             }
 
             val userService = UserService(userRepository)

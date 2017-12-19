@@ -1,6 +1,6 @@
 package com.buildit.bookit.v1.booking.dto
 
-import com.buildit.bookit.auth.UserPrincipal
+import com.buildit.bookit.v1.user.dto.User
 import com.fasterxml.jackson.annotation.JsonFormat
 import org.hibernate.validator.constraints.NotBlank
 import org.threeten.extra.Interval
@@ -12,22 +12,15 @@ import javax.validation.constraints.NotNull
  * Booking request
  */
 data class BookingRequest(
-    @field:NotNull(message = "bookableId is required")
+    @NotNull(message = "bookableId is required")
     val bookableId: String?,
-    @field:NotBlank(message = "subject is required and cannot be blank")
+    @NotBlank(message = "subject is required and cannot be blank")
     val subject: String?,
-    @field:NotNull(message = "start is required")
+    @NotNull(message = "start is required")
     val start: LocalDateTime?,
-    @field:NotNull(message = "end is required")
+    @NotNull(message = "end is required")
     val end: LocalDateTime?
 )
-
-const val MASKED_STRING = "**********"
-fun maskSubjectIfOtherUser(booking: Booking, otherUser: UserPrincipal): Booking =
-    when {
-        booking.user.externalId != otherUser.subject -> booking.copy(subject = MASKED_STRING)
-        else -> booking
-    }
 
 /**
  * Booking response
@@ -36,17 +29,11 @@ data class Booking(
     val id: String,
     val bookableId: String,
     val subject: String,
-    @field:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     val start: LocalDateTime,
-    @field:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     val end: LocalDateTime,
     val user: User
-)
-
-data class User(
-    val id: String,
-    val name: String,
-    val externalId: String
 )
 
 fun Booking.interval(timeZone: ZoneId): Interval =

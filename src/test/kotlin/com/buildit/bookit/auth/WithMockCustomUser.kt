@@ -1,6 +1,6 @@
 package com.buildit.bookit.auth
 
-import com.buildit.bookit.v1.booking.dto.User
+import com.buildit.bookit.v1.user.dto.User
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
@@ -22,7 +22,7 @@ annotation class WithMockCustomUser(
 fun Any.makeUser(): User {
     val annotation = this::class.annotations.single { it is WithMockCustomUser } as WithMockCustomUser
 
-    return User(annotation.subject, "${annotation.givenName} ${annotation.familyName}", annotation.externalId)
+    return User("${annotation.givenName} ${annotation.familyName}", annotation.externalId, annotation.subject)
 }
 
 class WithMockCustomUserSecurityContextFactory : WithSecurityContextFactory<WithMockCustomUser> {

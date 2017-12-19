@@ -1,44 +1,44 @@
 package com.buildit.bookit.v1.user
 
+import com.buildit.bookit.v1.user.dto.User
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest
-import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 /**
  * User controller unit tests
  */
 @ExtendWith(SpringExtension::class)
-@JdbcTest
-class UserRepositoryTests @Autowired constructor(jdbcTemplate: JdbcTemplate) {
-    val userRepo = UserDatabaseRepository(jdbcTemplate)
+@DataJpaTest
+class UserRepositoryTests @Autowired constructor(val userRepo: UserRepository
+) {
 
     @Test
     fun `all users`() {
-        val users = userRepo.getAllUsers()
-        expect(users.size).to.be.equal(1) // User defined in data.sql
+        val users = userRepo.findAll()?.toList()
+        expect(users).has.size(1) // User defined in data.sql
     }
 
     @Test
     fun `all users with added users`() {
-        val user1 = userRepo.insertUser("guid1", "Test1", "User1")
-        val user2 = userRepo.insertUser("guid2", "Test2", "User2")
+        val user1 = userRepo.save(User("Test1", "User1", "guid1"))
+        val user2 = userRepo.save(User("Test2", "User2", "guid2"))
 
-        val allUsers = userRepo.getAllUsers()
+        val allUsers = userRepo.findAll()?.toList()
         expect(allUsers).to.contain(user1)
         expect(allUsers).to.contain(user2)
     }
 
     @Test
     fun `single user`() {
-        val createdUser = userRepo.insertUser("guid", "Test", "User")
+        val createdUser = userRepo.save(User("Test", "User", "guid"))
         expect(createdUser.id).not.to.be.`null`
         expect(createdUser.name).to.be.equal("Test User")
 
-        val readUser = userRepo.getUser(createdUser.id)
+        val readUser = userRepo.findOne(createdUser.id!!)
         expect(readUser).not.to.be.`null`
         expect(readUser.id).not.to.be.`null`
         expect(readUser.name).to.be.equal("Test User")
@@ -46,13 +46,13 @@ class UserRepositoryTests @Autowired constructor(jdbcTemplate: JdbcTemplate) {
 
     @Test
     fun `single user by external id`() {
-        val createdUser = userRepo.insertUser("guid", "Test", "User")
+        val createdUser = userRepo.save(User("Test", "User", "guid"))
         expect(createdUser.id).not.to.be.`null`
         expect(createdUser.name).to.be.equal("Test User")
 
-        val readUser = userRepo.getUserByExternalId("guid")
+        val readUser = userRepo.findByExternalId("guid")
         expect(readUser).not.to.be.`null`
-        expect(readUser.id).not.to.be.`null`
+        expect(readUser!!.id).not.to.be.`null`
         expect(readUser.name).to.be.equal("Test User")
     }
 }

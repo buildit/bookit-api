@@ -1,7 +1,7 @@
 package com.buildit.bookit.v1.booking
 
 import com.buildit.bookit.v1.booking.dto.Booking
-import com.buildit.bookit.v1.booking.dto.User
+import com.buildit.bookit.v1.user.dto.User
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert
 import org.springframework.stereotype.Repository
@@ -36,12 +36,12 @@ class BookingDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : Bookin
             |       b.SUBJECT,
             |       b.START_DATE,
             |       b.END_DATE,
-            |       u.USER_ID,
+            |       u.ID,
             |       u.GIVEN_NAME,
             |       u.FAMILY_NAME,
-            |       u.EXTERNAL_USER_ID
+            |       u.EXTERNAL_ID
             |FROM $tableName b
-            |LEFT JOIN USER u on b.USER_ID = u.USER_ID""".trimMargin()
+            |LEFT JOIN USER u on b.USER_ID = u.ID""".trimMargin()
 
         return jdbcTemplate.query(sql) { rs, _ ->
             Booking(
@@ -77,8 +77,8 @@ class BookingDatabaseRepository(private val jdbcTemplate: JdbcTemplate) : Bookin
 
     private fun makeUser(rs: ResultSet): User =
         User(
-            rs.getString("USER_ID"),
             "${rs.getString("GIVEN_NAME")} ${rs.getString("FAMILY_NAME")}",
-            rs.getString("EXTERNAL_USER_ID")
+            rs.getString("EXTERNAL_ID"),
+            rs.getString("ID")
         )
 }
