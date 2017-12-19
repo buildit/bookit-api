@@ -32,7 +32,7 @@ data class Disposition(
 )
 
 data class BookableResource(
-    @field:JsonUnwrapped
+    @JsonUnwrapped
     val bookable: Bookable,
     val bookings: Collection<Booking> = emptyList()
 )
