@@ -47,7 +47,7 @@ In addition to the [common Spring Boot properties](https://docs.spring.io/spring
 
 The example values specified above are the values used in integration, staging, and production.  BOOKIT_DATABASE_PASSWORD is acquired via the appropriate AWS SSM Parameter Store value.
 
-> _Note that when running via `./gradlew bootRun`, the database is magically configured to use an in-memory (Derby) database.  See Quick Start, above._
+> _Note that when running via `./gradlew bootRun`, the database is magically configured to use an in-memory (H2) database.  See Quick Start, above._
 
 
 ## Build information
