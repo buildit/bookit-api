@@ -5,7 +5,6 @@ import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
 import com.buildit.bookit.v1.booking.dto.interval
 import com.buildit.bookit.v1.booking.dto.maskSubjectIfOtherUser
-import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
@@ -57,7 +56,6 @@ class BookableNotAvailable : RuntimeException("Bookable is not available.  Pleas
 @Transactional
 class BookingController(private val bookingRepository: BookingRepository,
                         private val bookableRepository: BookableRepository,
-                        private val locationRepository: LocationRepository,
                         private val userService: UserService,
                         private val clock: Clock
 ) {
@@ -82,8 +80,7 @@ class BookingController(private val bookingRepository: BookingRepository,
         if (start == LocalDate.MIN && end == LocalDate.MAX)
             return allBookings.map { maskSubjectIfOtherUser(it, user) }
 
-        val locationTimezones = locationRepository.findAll().associate { Pair(it.id, it.timeZone) }
-        val bookableTimezones = bookableRepository.getAllBookables().associate { Pair(it.id, locationTimezones[it.locationId]) }
+        val bookableTimezones = bookableRepository.findAll().associate { Pair(it.id, it.location.timeZone) }
 
         return allBookings
             .filter { booking ->
@@ -115,8 +112,7 @@ class BookingController(private val bookingRepository: BookingRepository,
     @PostMapping()
     fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, @AuthenticationPrincipal userPrincipal: UserPrincipal, errors: Errors? = null): ResponseEntity<Booking> {
 
-        val bookable = bookableRepository.getAllBookables().find { it.id == bookingRequest.bookableId } ?: throw InvalidBookable()
-        val location = locationRepository.findOne(bookable.locationId)
+        val bookable = bookableRepository.findOne(bookingRequest.bookableId) ?: throw InvalidBookable()
 
         if (errors?.hasErrors() == true) {
             val errorMessage = errors.allErrors.joinToString(",", transform = { it.defaultMessage })
@@ -127,7 +123,7 @@ class BookingController(private val bookingRepository: BookingRepository,
         val startDateTimeTruncated = bookingRequest.start!!.truncatedTo(MINUTES)
         val endDateTimeTruncated = bookingRequest.end!!.truncatedTo(MINUTES)
 
-        validateBooking(location, startDateTimeTruncated, endDateTimeTruncated, bookable)
+        validateBooking(bookable.location, startDateTimeTruncated, endDateTimeTruncated, bookable)
 
         val user = userService.register(userPrincipal)
 

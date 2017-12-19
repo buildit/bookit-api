@@ -4,7 +4,6 @@ import com.buildit.bookit.auth.WithMockCustomUser
 import com.buildit.bookit.auth.makeUser
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
-import com.buildit.bookit.v1.location.LocationRepository
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.Disposition
@@ -54,6 +53,8 @@ class BookingControllerMockMvcTests @Autowired constructor(
     private val mapper: ObjectMapper
 ) {
     private val NYC_TZ = ZoneId.of("America/New_York")
+    private val location = Location("NYC", NYC_TZ, "guid")
+    private val bookable = Bookable(location, "Foo", Disposition(), "guid")
     private val startDateTime = now(NYC_TZ).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
     private val endDateTime = now(NYC_TZ).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
 
@@ -67,9 +68,6 @@ class BookingControllerMockMvcTests @Autowired constructor(
     lateinit var bookableRepo: BookableRepository
 
     @MockBean
-    lateinit var locationRepo: LocationRepository
-
-    @MockBean
     lateinit var userService: UserService
 
     @BeforeEach
@@ -80,18 +78,10 @@ class BookingControllerMockMvcTests @Autowired constructor(
             .build()
     }
 
-    @BeforeEach
-    fun setupMocks() {
-        val location = Location("NYC", NYC_TZ, "guid")
-        whenever(locationRepo.findAll()).doReturn(listOf(location))
-        whenever(locationRepo.findOne(location.id)).doReturn(location)
-    }
-
     @AfterEach
     fun resetMocks() {
         reset(bookingRepo)
         reset(bookableRepo)
-        reset(locationRepo)
         reset(userService)
     }
 
@@ -137,17 +127,17 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @BeforeEach
         fun createMock() {
-            whenever(bookingRepo.insertBooking("guid", subject, startDateTime, endDateTime, user))
-                .doReturn(Booking("guid", "guid", subject, startDateTime, endDateTime, user))
-            whenever(bookableRepo.getAllBookables())
-                .doReturn(listOf(Bookable("guid", "guid", "Foo", Disposition())))
+            whenever(bookingRepo.insertBooking(bookable.id!!, subject, startDateTime, endDateTime, user))
+                .doReturn(Booking("guid", bookable.id!!, subject, startDateTime, endDateTime, user))
+            whenever(bookableRepo.findOne(bookable.id))
+                .doReturn(listOf(bookable))
         }
 
         @Test
         fun `valid booking is created`() {
             whenever(userService.register(any())).doReturn(user)
 
-            val request = BookingRequest("guid", subject, startDateTime, endDateTime)
+            val request = BookingRequest(bookable.id, subject, startDateTime, endDateTime)
 
             mvc.perform(post(request))
                 .andExpect(status().isCreated)
@@ -163,7 +153,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
         fun `booking must be in future`() {
             val startDateTime = now(NYC_TZ).minusHours(1)
             val endDateTime = startDateTime.plusHours(1)
-            val request = BookingRequest("guid", subject, startDateTime, endDateTime)
+            val request = BookingRequest(bookable.id, subject, startDateTime, endDateTime)
 
             mvc.perform(post(request))
                 .andExpect(status().isBadRequest)
@@ -173,7 +163,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
         fun `booking start must precede end`() {
             val startDateTime = now(NYC_TZ).plusHours(1)
             val endDateTime = startDateTime.minusHours(1)
-            val request = BookingRequest("guid", subject, startDateTime, endDateTime)
+            val request = BookingRequest(bookable.id, subject, startDateTime, endDateTime)
 
             mvc.perform(post(request))
                 .andExpect(status().isBadRequest)
@@ -189,7 +179,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @Test
         fun `booking must have non-null subject`() {
-            val request = BookingRequest("guid", null, startDateTime, endDateTime)
+            val request = BookingRequest(bookable.id, null, startDateTime, endDateTime)
 
             mvc.perform(post(request))
                 .andExpect(status().isBadRequest)
@@ -197,7 +187,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @Test
         fun `booking must have non-blank subject`() {
-            val request = BookingRequest("guid", "  ", startDateTime, endDateTime)
+            val request = BookingRequest(bookable.id, "  ", startDateTime, endDateTime)
 
             mvc.perform(post(request))
                 .andExpect(status().isBadRequest)
@@ -205,7 +195,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @Test
         fun `booking must have non-empty subject`() {
-            val request = BookingRequest("guid", "", startDateTime, endDateTime)
+            val request = BookingRequest(bookable.id, "", startDateTime, endDateTime)
 
             mvc.perform(post(request))
                 .andExpect(status().isBadRequest)
@@ -213,7 +203,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @Test
         fun `booking must have start`() {
-            val request = BookingRequest("guid", subject, null, endDateTime)
+            val request = BookingRequest(bookable.id, subject, null, endDateTime)
 
             mvc.perform(post(request))
                 .andExpect(status().isBadRequest)
@@ -221,7 +211,7 @@ class BookingControllerMockMvcTests @Autowired constructor(
 
         @Test
         fun `booking must have end`() {
-            val request = BookingRequest("guid", subject, startDateTime, null)
+            val request = BookingRequest(bookable.id, subject, startDateTime, null)
 
             mvc.perform(post(request))
                 .andExpect(status().isBadRequest)

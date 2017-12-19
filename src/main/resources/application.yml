@@ -25,5 +25,5 @@ spring:
       ddl-auto: validate
 logging:
   level:
-    org.springframework.security: DEBUG
+#    org.springframework.security: DEBUG
 #    org.springframework.web.client.RestTemplate: DEBUG

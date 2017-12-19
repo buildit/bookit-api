@@ -20,7 +20,7 @@ class LocationRepositoryTests @Autowired constructor(
     val entityManager: TestEntityManager
 ) {
     @Test
-    fun getLocations() {
+    fun findAll() {
         // arrange
         // act
         val locations = locationRepo.findAll()?.toList()
@@ -28,5 +28,25 @@ class LocationRepositoryTests @Autowired constructor(
         // assert
         expect(locations).has.size(2)
         expect(locations).to.contain(Location("NYC", ZoneId.of("America/New_York"), "b1177996-75e2-41da-a3e9-fcdd75d1ab31"))
+    }
+
+    @Test
+    fun findOne() {
+        // arrange
+        // act
+        val location = locationRepo.findOne("b1177996-75e2-41da-a3e9-fcdd75d1ab31")
+
+        // assert
+        expect(location).to.equal(Location("NYC", ZoneId.of("America/New_York"), "b1177996-75e2-41da-a3e9-fcdd75d1ab31"))
+    }
+
+    @Test
+    fun findOneNotExist() {
+        // arrange
+        // act
+        val location = locationRepo.findOne("foo")
+
+        // assert
+        expect(location).to.be.`null`
     }
 }

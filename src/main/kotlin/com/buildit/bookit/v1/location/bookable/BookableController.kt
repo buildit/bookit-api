@@ -5,8 +5,9 @@ import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
 import com.buildit.bookit.v1.booking.dto.interval
 import com.buildit.bookit.v1.booking.dto.maskSubjectIfOtherUser
-import com.buildit.bookit.v1.location.LocationRepository
+import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.BookableResource
+import com.buildit.bookit.v1.location.dto.Location
 import com.buildit.bookit.v1.location.dto.LocationNotFound
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
@@ -30,14 +31,18 @@ class InvalidBookable : RuntimeException("Bookable does not exist")
 @RestController
 @RequestMapping("/v1/location/{locationId}/bookable")
 @Transactional
-class BookableController(private val bookableRepository: BookableRepository, private val locationRepository: LocationRepository, val bookingRepository: BookingRepository) {
+class BookableController(private val bookableRepository: BookableRepository, val bookingRepository: BookingRepository) {
     /**
      * Get a bookable
      */
     @GetMapping("/{bookableId}")
-    fun getBookable(@PathVariable("locationId") location: String, @PathVariable("bookableId") bookable: String): BookableResource {
-        locationRepository.findOne(location) ?: throw LocationNotFound()
-        return BookableResource(bookableRepository.getAllBookables().find { it.id == bookable } ?: throw BookableNotFound())
+    fun getBookable(@PathVariable("locationId") location: Location?, @PathVariable("bookableId") bookable: Bookable?): BookableResource {
+        location ?: throw LocationNotFound()
+        bookable ?: throw BookableNotFound()
+        if (bookable.location != location) {
+            throw BookableNotFound()
+        }
+        return BookableResource(bookable)
     }
 
     /**
@@ -45,7 +50,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
      */
     @GetMapping
     fun getAllBookables(
-        @PathVariable("locationId") locationId: String,
+        @PathVariable("locationId") locationId: Location?,
         @AuthenticationPrincipal user: UserPrincipal,
         @RequestParam("start", required = false)
         @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
@@ -56,7 +61,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         @RequestParam("expand", required = false)
         expand: List<String>? = emptyList()
     ): Collection<BookableResource> {
-        val location = locationRepository.findOne(locationId) ?: throw LocationNotFound()
+        val location = locationId ?: throw LocationNotFound()
         val timeZone = location.timeZone
         val start = startDateInclusive ?: LocalDate.MIN
         val end = endDateExclusive ?: LocalDate.MAX
@@ -71,8 +76,7 @@ class BookableController(private val bookableRepository: BookableRepository, pri
         )
 
         val allBookings = bookingRepository.getAllBookings()
-        return bookableRepository.getAllBookables()
-            .filter { it.locationId == locationId }
+        return bookableRepository.findByLocation(location)
             .map { bookable ->
                 val bookings = when {
                     "bookings" in expand ?: emptyList() ->
