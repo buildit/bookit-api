@@ -26,8 +26,9 @@ We have bundled a gradle wrapper so you can run the below commands.  Alternative
 | `./gradlew check`                                 | Runs linting, unit tests, static analysis, etc   | Good for pre-push checking                         
 | `./gradlew test`                                  | Runs unit/integration tests                      |                          
 | `./gradlew test-e2e`                              | Runs end-to-end tests                            | Requires running server  
-| `./gradlew bootRun`                               | Runs server                                      | Magically runs `schema.sql` and loads basic test data from `data.sql`.
-| `SPRING_DATASOURCE_PLATFORM=dev ./gradlew bootRun`| Runs server                                      | Magically runs `schema.sql` and loads more voluminous `dev-data.sql` file into the Derby database.                         
+| `./gradlew bootRun`                               | Runs server                                      | Magically runs `schema.sql` and loads basic test data from `data.sql` using an in-memory H2 database.
+| `BOOKIT_DATABASE_URL=jdbc:mariadb://localhost/bookit BOOKIT_DATABASE_USER=root ./gradlew bootRun`| Runs server                                      | Magically runs `schema.sql` and loads basic test data from `data.sql` using an (already running) MySql/MariaDB instance.                         
+| `SPRING_DATASOURCE_PLATFORM=dev ./gradlew bootRun`| Runs server                                      | Magically runs `schema.sql` and loads more voluminous `dev-data.sql` file into the H2 database.                         
 
 
 
