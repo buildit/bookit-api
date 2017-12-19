@@ -32,12 +32,12 @@ CREATE TABLE location (
 );
 
 CREATE TABLE booking (
-    BOOKING_ID         VARCHAR(36)  NOT NULL,
-    PRIMARY KEY        (BOOKING_ID),
+    ID                 VARCHAR(36)  NOT NULL,
+    PRIMARY KEY        (ID),
     BOOKABLE_ID        VARCHAR(36)  NOT NULL,
     SUBJECT            VARCHAR(255) NOT NULL,
-    START_DATE         DATETIME     NOT NULL,
-    END_DATE           DATETIME     NOT NULL,
+    START              DATETIME     NOT NULL,
+    END                DATETIME     NOT NULL,
     USER_ID            VARCHAR(36)  NOT NULL,
     FOREIGN KEY (USER_ID) REFERENCES USER(ID)
 );

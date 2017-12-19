@@ -154,7 +154,9 @@ class `Bookable E2E Tests` {
                                 },
                                 bookings: [
                                     {
-                                        "bookableId":"aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                                        "bookable": {
+                                            "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8"
+                                        },
                                         "subject": "My new meeting",
                                         "start": "${inOneMinute.truncatedTo(ChronoUnit.MINUTES)}",
                                         "end": "${inTwoMinutes.truncatedTo(ChronoUnit.MINUTES)}",
@@ -238,7 +240,9 @@ class `Bookable E2E Tests` {
                                 },
                                 bookings: [
                                     {
-                                        "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                                        "bookable": {
+                                            "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8"
+                                        },
                                         "subject": "**********",
                                         "user": {
                                             "name": "Another Fake User",

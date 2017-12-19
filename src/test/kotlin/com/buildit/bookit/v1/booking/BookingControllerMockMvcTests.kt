@@ -22,9 +22,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
+import org.springframework.format.FormatterRegistry
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -38,6 +41,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import java.time.LocalDateTime.now
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -52,11 +57,22 @@ class BookingControllerMockMvcTests @Autowired constructor(
     private val context: WebApplicationContext,
     private val mapper: ObjectMapper
 ) {
-    private val NYC_TZ = ZoneId.of("America/New_York")
-    private val location = Location("NYC", NYC_TZ, "guid")
-    private val bookable = Bookable(location, "Foo", Disposition(), "guid")
-    private val startDateTime = now(NYC_TZ).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
-    private val endDateTime = now(NYC_TZ).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
+    @WithMockCustomUser
+    companion object {
+        private val user = makeUser()
+        private val NYC_TZ = ZoneId.of("America/New_York")
+        private val startDateTime = now(NYC_TZ).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
+        private val endDateTime = now(NYC_TZ).plusHours(2).truncatedTo(ChronoUnit.MINUTES)
+        private val location = Location("NYC", NYC_TZ, "guid")
+        private val bookable = Bookable(location, "Foo", Disposition(), "guid")
+
+        private val booking = Booking(bookable,
+            "The Booking",
+            startDateTime,
+            endDateTime,
+            user,
+            "guid")
+    }
 
     @Autowired
     private lateinit var mvc: MockMvc
@@ -88,17 +104,11 @@ class BookingControllerMockMvcTests @Autowired constructor(
     @Nested
     @WithMockCustomUser
     inner class GetBooking {
-        private val user = makeUser()
 
         @BeforeEach
         fun setupMock() {
-            whenever(bookingRepo.getAllBookings())
-                .doReturn(listOf(Booking("guid",
-                    "guid",
-                    "The Booking",
-                    startDateTime,
-                    endDateTime,
-                    user)))
+            whenever(bookingRepo.findOne(booking.id))
+                .doReturn(listOf(booking))
         }
 
         @Test
@@ -123,12 +133,11 @@ class BookingControllerMockMvcTests @Autowired constructor(
     inner class CreateBooking {
         private val subject = "New Meeting"
 
-        private val user = makeUser()
-
         @BeforeEach
         fun createMock() {
-            whenever(bookingRepo.insertBooking(bookable.id!!, subject, startDateTime, endDateTime, user))
-                .doReturn(Booking("guid", bookable.id!!, subject, startDateTime, endDateTime, user))
+            val booking = Booking(bookable, subject, startDateTime, endDateTime, user)
+            whenever(bookingRepo.save(booking))
+                .doReturn(booking)
             whenever(bookableRepo.findOne(bookable.id))
                 .doReturn(listOf(bookable))
         }
@@ -227,5 +236,20 @@ class BookingControllerMockMvcTests @Autowired constructor(
     fun `nonexistent booking is deleted`() {
         mvc.perform(delete("/v1/booking/999"))
             .andExpect(status().isNoContent)
+    }
+
+    @TestConfiguration
+    class InternalConfig {
+        @Bean
+        fun configurer(): WebMvcConfigurer = object : WebMvcConfigurerAdapter() {
+            override fun addFormatters(registry: FormatterRegistry) {
+                registry.addConverter(String::class.java, Booking::class.java) { id ->
+                    when (id) {
+                        BookingControllerMockMvcTests.booking.id -> BookingControllerMockMvcTests.booking
+                        else -> null
+                    }
+                }
+            }
+        }
     }
 }

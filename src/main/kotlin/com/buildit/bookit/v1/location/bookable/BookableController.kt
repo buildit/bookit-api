@@ -75,13 +75,11 @@ class BookableController(private val bookableRepository: BookableRepository, val
             end.atStartOfDay(timeZone).toInstant()
         )
 
-        val allBookings = bookingRepository.getAllBookings()
         return bookableRepository.findByLocation(location)
             .map { bookable ->
                 val bookings = when {
                     "bookings" in expand ?: emptyList() ->
-                        allBookings
-                            .filter { booking -> booking.bookableId == bookable.id }
+                        bookingRepository.findByBookable(bookable)
                             .filter { desiredInterval.overlaps(it.interval(timeZone)) }
                             .map { maskSubjectIfOtherUser(it, user) }
                     else -> emptyList()

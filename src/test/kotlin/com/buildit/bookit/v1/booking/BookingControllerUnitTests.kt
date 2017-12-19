@@ -39,8 +39,8 @@ class BookingControllerUnitTests {
     private val nycBookable2 = Bookable(nyc, "NYC Bookable 2", Disposition(), "guid")
     private val userPrincipal = UserPrincipal("foo", "bar", "baz")
     private val anotherUserPrincipal = UserPrincipal("yet", "another", "user")
-    private val bookingUser = User("user name", "foo", "123")
-    private val bookingToday = Booking("guid1", nycBookable1.id!!, "Booking today", today.atTime(9, 15), today.atTime(10, 15), bookingUser)
+    private val bookingUser = User("foo", "bar", "baz", "user-guid")
+    private val bookingToday = Booking(nycBookable1, "Booking today", today.atTime(9, 15), today.atTime(10, 15), bookingUser, "guid1")
 
     @BeforeEach
     fun setup() {
@@ -57,42 +57,42 @@ class BookingControllerUnitTests {
             private lateinit var bookingRepo: BookingRepository
 
             private val bookingToday =
-                Booking("guid1",
-                    nycBookable1.id!!,
+                Booking(nycBookable1,
                     "Booking today",
                     today.atTime(9, 15),
                     today.atTime(10, 15),
-                    bookingUser
+                    bookingUser,
+                    "guid1"
                 )
             private val bookingTomorrow =
-                Booking("guid2",
-                    nycBookable1.id!!,
+                Booking(nycBookable1,
                     "Booking tomorrow",
                     today.plusDays(1).atTime(9, 15),
                     today.plusDays(1).atTime(10, 15),
-                    bookingUser
+                    bookingUser,
+                    "guid2"
                 )
             private val bookingTodayDifferentBookable =
-                Booking("guid3",
-                    nycBookable2.id!!,
+                Booking(nycBookable2,
                     "Booking today, different bookable",
                     today.atTime(11, 0),
                     today.atTime(11, 30),
-                    bookingUser
+                    bookingUser,
+                    "guid3"
                 )
             private val bookingYesterday =
-                Booking("guid4",
-                    nycBookable1.id!!,
+                Booking(nycBookable1,
                     "Booking yesterday",
                     today.minusDays(1).atTime(9, 15),
                     today.minusDays(1).atTime(10, 15),
-                    bookingUser
+                    bookingUser,
+                    "guid4"
                 )
 
             @BeforeEach
             fun setup() {
                 bookingRepo = mock {
-                    on { getAllBookings() }.doReturn(
+                    on { findAll() }.doReturn(
                         listOf(
                             bookingToday, bookingTomorrow, bookingTodayDifferentBookable, bookingYesterday
                         )
@@ -166,21 +166,21 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `getBooking() for existing booking returns that booking`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking("guid1", userPrincipal)
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking(bookingToday, userPrincipal)
                     expect(booking.id).to.be.equal("guid1")
                     expect(booking.subject).to.be.equal(bookingToday.subject)
                 }
 
                 @Test
                 fun `getBooking() for existing booking returns that booking - different user masks`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking("guid1", anotherUserPrincipal)
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking(bookingToday, anotherUserPrincipal)
                     expect(booking.id).to.be.equal("guid1")
                     expect(booking.subject).to.be.equal(MASKED_STRING)
                 }
 
                 @Test
                 fun `getBooking() for nonexistent booking throws exception`() {
-                    fun action() = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking("guid-not-there", userPrincipal)
+                    fun action() = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking(null, userPrincipal)
                     assertThat({ action() }, throws<BookingNotFound>())
                 }
             }
@@ -191,17 +191,17 @@ class BookingControllerUnitTests {
             private val start = LocalDateTime.now(nycTz).plusHours(1).truncatedTo(ChronoUnit.MINUTES)
             private val end = start.plusHours(1)
 
-            private val expectedBooking = Booking("guid", nycBookable1.id!!, "MyRequest", start, end, bookingUser)
+            private val expectedBooking = Booking(nycBookable1, "MyRequest", start, end, bookingUser)
 
             private lateinit var userService: UserService
 
             @BeforeEach
             fun setup() {
                 val bookingRepository = mock<BookingRepository> {
-                    on { insertBooking(nycBookable1.id!!, "MyRequest", start, end, bookingUser) }.doReturn(expectedBooking)
-                    on { getAllBookings() }.doReturn(listOf(
-                        Booking("guid1", nycBookable1.id!!, "Before", start.minusHours(1), end.minusHours(1), bookingUser),
-                        Booking("guid2", nycBookable1.id!!, "After", start.plusHours(1), end.plusHours(1), bookingUser)
+                    on { save(expectedBooking) }.doReturn(expectedBooking)
+                    on { findByBookable(nycBookable1) }.doReturn(listOf(
+                        Booking(nycBookable1, "Before", start.minusHours(1), end.minusHours(1), bookingUser, "guid1"),
+                        Booking(nycBookable1, "After", start.plusHours(1), end.plusHours(1), bookingUser, "guid2")
                     ))
                 }
 
@@ -271,33 +271,31 @@ class BookingControllerUnitTests {
 
             @BeforeEach
             fun setup() {
-                bookingRepo = mock {
-                    on { getAllBookings() }.doReturn(listOf(bookingToday))
-                }
                 userService = mock {
                     on { register(userPrincipal) }.doReturn(bookingUser)
                 }
+                bookingRepo = mock {}
                 bookingController = BookingController(bookingRepo, bookableRepo, userService, clock)
             }
 
             @Test
             fun `should delete a booking`() {
-                val result = bookingController.deleteBooking(bookingToday.id, userPrincipal)
+                val result = bookingController.deleteBooking(bookingToday, userPrincipal)
 
                 expect(result.statusCode).to.equal(HttpStatus.NO_CONTENT)
-                verify(bookingRepo).delete(bookingToday.id)
+                verify(bookingRepo).delete(bookingToday)
             }
 
             @Test
             fun `should delete non existent booking`() {
-                val result = bookingController.deleteBooking(bookingUser.id!!, userPrincipal)
+                val result = bookingController.deleteBooking(null, userPrincipal)
 
                 expect(result.statusCode).to.equal(HttpStatus.NO_CONTENT)
             }
 
             @Test
             fun `should not delete other booking`() {
-                val result = bookingController.deleteBooking(bookingToday.id, anotherUserPrincipal)
+                val result = bookingController.deleteBooking(bookingToday, anotherUserPrincipal)
 
                 expect(result.statusCode).to.equal(HttpStatus.FORBIDDEN)
             }

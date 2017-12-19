@@ -12,7 +12,7 @@ import java.lang.annotation.Inherited
 @Retention(AnnotationRetention.RUNTIME)
 @Inherited
 annotation class WithMockCustomUser(
-    val subject: String = "123abc",
+    val id: String = "123abc",
     val givenName: String = "Fake",
     val familyName: String = "User",
     val externalId: String = "456xyz"
@@ -22,7 +22,7 @@ annotation class WithMockCustomUser(
 fun Any.makeUser(): User {
     val annotation = this::class.annotations.single { it is WithMockCustomUser } as WithMockCustomUser
 
-    return User("${annotation.givenName} ${annotation.familyName}", annotation.externalId, annotation.subject)
+    return User(annotation.externalId, annotation.givenName, annotation.familyName, annotation.id)
 }
 
 class WithMockCustomUserSecurityContextFactory : WithSecurityContextFactory<WithMockCustomUser> {

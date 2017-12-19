@@ -38,8 +38,8 @@ class BookableControllerMockMvcTests @Autowired constructor(
     private val context: WebApplicationContext
 ) {
     companion object {
-        val location = Location("NYC", ZoneId.of("America/New_York"), "location-guid")
-        val bookable = Bookable(location, "The best bookable ever", Disposition(), "bookable-guid")
+        private val location = Location("NYC", ZoneId.of("America/New_York"), "location-guid")
+        private val bookable = Bookable(location, "The best bookable ever", Disposition(), "bookable-guid")
     }
 
     @Autowired

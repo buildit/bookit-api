@@ -37,7 +37,7 @@ class LocationControllerMockMvcTests @Autowired constructor(
     private val context: WebApplicationContext
 ) {
     companion object {
-        val location = Location("The best location ever", ZoneId.of("America/New_York"), "guid")
+        private val location = Location("The best location ever", ZoneId.of("America/New_York"), "guid")
     }
 
     @Autowired

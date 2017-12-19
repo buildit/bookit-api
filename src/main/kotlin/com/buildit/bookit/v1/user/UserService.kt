@@ -11,5 +11,5 @@ class UserService(val userRepository: UserRepository) {
      */
     fun register(principal: UserPrincipal): User =
         userRepository.findByExternalId(principal.subject) ?:
-            userRepository.save(User(principal.givenName, principal.familyName, principal.subject))
+            userRepository.save(User(principal.subject, principal.givenName, principal.familyName))
 }

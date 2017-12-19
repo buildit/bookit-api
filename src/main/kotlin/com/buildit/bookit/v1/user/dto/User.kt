@@ -11,12 +11,12 @@ import javax.persistence.Id
 
 @Entity
 data class User(
+    @Column(unique = true, nullable = false)
+    val externalId: String,
     @Column(nullable = false) @JsonIgnore
     val givenName: String,
     @Column(nullable = false) @JsonIgnore
     val familyName: String,
-    @Column(unique = true, nullable = false)
-    val externalId: String,
     @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2")
     val id: String? = null
 ) {
