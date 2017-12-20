@@ -17,6 +17,20 @@ dependencies.
 
 ## Quick Start
 
+### Docker
+
+If you need to simply run the project locally, you can with 1 line via Docker.
+
+1. [Install Docker](https://www.docker.com/) and run it if you haven't already
+1. Clone this repo
+1. Run `docker-compose up` in the root
+1. Visit [http://localhost:8080/](http://localhost:8080/) in your web browser
+1. When you're finished run `docker-compose down` to cleanup
+
+### Development
+
+To setup a proper local development environment follow these steps.
+
 1. [Install Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) version 8 if you haven't already
     * If you need to change to version 8, install it. Then [swap your version](https://stackoverflow.com/questions/46513639/how-to-downgrade-java-from-9-to-8-on-a-macos-eclipse-is-not-running-with-java-9) via command line
 1. Run `./gradlew bootRun` and wait until the app reads *85% EXECUTING*
