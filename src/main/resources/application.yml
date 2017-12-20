@@ -20,5 +20,5 @@ spring:
     driver-class-name: ${bookit.database.driver:}
 logging:
   level:
-    org.springframework.security: DEBUG
+#    org.springframework.security: DEBUG
 #    org.springframework.web.client.RestTemplate: DEBUG
