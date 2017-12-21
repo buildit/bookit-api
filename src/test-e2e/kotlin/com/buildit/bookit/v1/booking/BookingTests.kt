@@ -184,7 +184,7 @@ class `Booking E2E Tests` {
 
                 val jsonResponse = JSONObject(response?.body)
                 expect(jsonResponse.getString("id")).not.to.be.`null`
-                expect(jsonResponse.get("bookableId")).not.to.be.`null`
+                expect(jsonResponse.get("bookable")).not.to.be.`null`
                 expect(jsonResponse.get("subject")).to.be.equal("My new meeting")
             }
 
