@@ -4,41 +4,41 @@ DROP TABLE IF EXISTS bookable;
 DROP TABLE IF EXISTS location;
 
 CREATE TABLE user (
-    ID                 VARCHAR(36) NOT NULL,
-    PRIMARY KEY        (id),
-    EXTERNAL_ID        VARCHAR(128) NOT NULL,
-    GIVEN_NAME         VARCHAR(128),
-    FAMILY_NAME        VARCHAR(128)
+    id          VARCHAR(36)  NOT NULL,
+    PRIMARY KEY (id),
+    external_id VARCHAR(128) NOT NULL,
+    given_name  VARCHAR(128),
+    family_name VARCHAR(128)
 );
-CREATE INDEX IDX_EXTERNAL_ID
-    ON USER (EXTERNAL_ID);
+CREATE INDEX idx_external_id
+    ON user (external_id);
 
 CREATE TABLE bookable (
-    ID                 VARCHAR(36) NOT NULL,
-    PRIMARY KEY        (ID),
-    LOCATION_ID        VARCHAR(36) NOT NULL,
-    NAME               VARCHAR(50) NOT NULL,
-    CLOSED             BOOLEAN     NOT NULL,
-    REASON             VARCHAR(50) NOT NULL
+    id          VARCHAR(36) NOT NULL,
+    PRIMARY KEY (id),
+    location_id VARCHAR(36) NOT NULL,
+    name        VARCHAR(50) NOT NULL,
+    closed      BOOLEAN     NOT NULL,
+    reason      VARCHAR(50) NOT NULL
 );
 CREATE INDEX IDX_LOCATION_ID
-    ON BOOKABLE (LOCATION_ID);
+    ON bookable (location_id);
 
 CREATE TABLE location (
-    ID                 VARCHAR(36) NOT NULL,
-    PRIMARY KEY        (ID),
-    NAME               VARCHAR(50) NOT NULL,
-    TIME_ZONE          VARCHAR(50) NOT NULL
+    id        VARCHAR(36) NOT NULL,
+    PRIMARY KEY (id),
+    name      VARCHAR(50) NOT NULL,
+    time_zone VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE booking (
-    ID                 VARCHAR(36)  NOT NULL,
-    PRIMARY KEY        (ID),
-    BOOKABLE_ID        VARCHAR(36)  NOT NULL,
-    SUBJECT            VARCHAR(255) NOT NULL,
-    START              DATETIME     NOT NULL,
-    END                DATETIME     NOT NULL,
-    USER_ID            VARCHAR(36)  NOT NULL,
-    FOREIGN KEY (USER_ID) REFERENCES USER(ID)
+    id          VARCHAR(36)  NOT NULL,
+    PRIMARY KEY (id),
+    bookable_id VARCHAR(36)  NOT NULL,
+    subject     VARCHAR(255) NOT NULL,
+    start       DATETIME     NOT NULL,
+    end         DATETIME     NOT NULL,
+    user_id     VARCHAR(36)  NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user (id)
 );
 
