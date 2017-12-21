@@ -5,11 +5,13 @@ import com.buildit.bookit.auth.JwtAuthenticationFilter
 import com.buildit.bookit.auth.OpenIdAuthenticator
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.autoconfigure.security.SecurityProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
@@ -28,6 +30,9 @@ import java.time.Clock
  */
 @SpringBootApplication
 @EnableConfigurationProperties(BookitProperties::class)
+@EntityScan(
+    basePackageClasses = [BookitApplication::class, Jsr310JpaConverters.ZoneIdConverter::class]
+)
 class BookitApplication {
     @Bean
     fun defaultClock(): Clock = Clock.systemUTC()

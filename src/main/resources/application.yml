@@ -18,6 +18,11 @@ spring:
     password: ${bookit.database.password:}
     url: ${bookit.database.url:}
     driver-class-name: ${bookit.database.driver:}
+  jpa:
+#    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
 logging:
   level:
 #    org.springframework.security: DEBUG

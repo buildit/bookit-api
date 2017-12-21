@@ -1,11 +1,18 @@
 package com.buildit.bookit.v1.booking.dto
 
-import com.buildit.bookit.auth.UserPrincipal
+import com.buildit.bookit.v1.location.bookable.dto.Bookable
+import com.buildit.bookit.v1.user.dto.User
 import com.fasterxml.jackson.annotation.JsonFormat
+import org.hibernate.annotations.GenericGenerator
 import org.hibernate.validator.constraints.NotBlank
 import org.threeten.extra.Interval
 import java.time.LocalDateTime
 import java.time.ZoneId
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.Id
+import javax.persistence.ManyToOne
 import javax.validation.constraints.NotNull
 
 /**
@@ -22,31 +29,23 @@ data class BookingRequest(
     val end: LocalDateTime?
 )
 
-const val MASKED_STRING = "**********"
-fun maskSubjectIfOtherUser(booking: Booking, otherUser: UserPrincipal): Booking =
-    when {
-        booking.user.externalId != otherUser.subject -> booking.copy(subject = MASKED_STRING)
-        else -> booking
-    }
-
 /**
  * Booking response
  */
+@Entity
 data class Booking(
-    val id: String,
-    val bookableId: String,
+    @ManyToOne(optional = false)
+    val bookable: Bookable,
+    @Column(nullable = false)
     val subject: String,
-    @field:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @Column(nullable = false) @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     val start: LocalDateTime,
-    @field:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @Column(nullable = false) @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     val end: LocalDateTime,
-    val user: User
-)
-
-data class User(
-    val id: String,
-    val name: String,
-    val externalId: String
+    @ManyToOne(optional = false)
+    val user: User,
+    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    val id: String? = null
 )
 
 fun Booking.interval(timeZone: ZoneId): Interval =

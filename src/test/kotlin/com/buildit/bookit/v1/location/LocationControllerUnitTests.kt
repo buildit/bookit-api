@@ -9,15 +9,19 @@ import com.nhaarman.mockito_kotlin.mock
 import com.winterbe.expekt.expect
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.ZoneId
 
 class LocationControllerUnitTests {
+    val nyc = Location("NYC", ZoneId.of("America/New_York"), "guid1")
     val mockRepository = mock<LocationRepository> {
-        on { getLocations() }.doReturn(
+        val denver = Location("DEN", ZoneId.of("America/Denver"), "guid2")
+        on { findAll() }.doReturn(
             listOf(
-                Location("guid1", "NYC", "Americas/New_York"),
-                Location("guid2", "DEN", "Americas/Denver")
+                nyc,
+                denver
             )
         )
+        on { findOne(nyc.id) }.doReturn(nyc)
     }
 
     @Nested
@@ -38,7 +42,7 @@ class LocationControllerUnitTests {
                 @Test
                 fun `should return the location`() {
                     val locationController = LocationController(mockRepository)
-                    expect(locationController.getLocation("guid1").name).to.be.equal("NYC")
+                    expect(locationController.getLocation(nyc).name).to.be.equal("NYC")
                 }
             }
 
@@ -47,7 +51,7 @@ class LocationControllerUnitTests {
                 @Test
                 fun `should throw an exception`() {
                     val locationController = LocationController(mockRepository)
-                    assertThat({ locationController.getLocation("guid99") }, throws<LocationNotFound>())
+                    assertThat({ locationController.getLocation(null) }, throws<LocationNotFound>())
                 }
             }
         }

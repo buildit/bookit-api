@@ -48,7 +48,9 @@ class `Booking E2E Tests` {
         inner class `valid` {
             private val expectedBooking = """
                         {
-                            "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                            "bookable": {
+                                "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8"
+                            },
                             "subject": "My new meeting",
                             "user": {
                               "name": "Fake Auth User",
@@ -60,7 +62,9 @@ class `Booking E2E Tests` {
 
             private val otherUserExpectedBooking = """
                         {
-                            "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                            "bookable": {
+                                "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8"
+                            },
                             "subject": "**********",
                             "user": {
                               "name": "Fake Auth User",
@@ -160,7 +164,7 @@ class `Booking E2E Tests` {
 
                 val jsonResponse = JSONObject(response?.body)
                 expect(jsonResponse.getString("id")).not.to.be.`null`
-                expect(jsonResponse.get("bookableId")).not.to.be.`null`
+                expect(jsonResponse.get("bookable")).not.to.be.`null`
                 expect(jsonResponse.get("subject")).to.be.equal("My new meeting")
             }
 
@@ -180,7 +184,7 @@ class `Booking E2E Tests` {
 
                 val jsonResponse = JSONObject(response?.body)
                 expect(jsonResponse.getString("id")).not.to.be.`null`
-                expect(jsonResponse.get("bookableId")).not.to.be.`null`
+                expect(jsonResponse.get("bookable")).not.to.be.`null`
                 expect(jsonResponse.get("subject")).to.be.equal("My new meeting")
             }
 

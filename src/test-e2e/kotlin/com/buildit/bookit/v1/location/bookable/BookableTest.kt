@@ -20,10 +20,10 @@ import java.time.temporal.ChronoUnit
  * Test /v1/location/<location>/bookable like a black box
  */
 class `Bookable E2E Tests` {
-    val now = LocalDateTime.now(ZoneId.of("America/New_York"))
-    val today = LocalDate.now(ZoneId.of("America/New_York"))
-    val inOneMinute = now.plusMinutes(1)
-    val inTwoMinutes = now.plusMinutes(2)
+    private val now = LocalDateTime.now(ZoneId.of("America/New_York"))
+    private val today = LocalDate.now(ZoneId.of("America/New_York"))
+    private val inOneMinute = now.plusMinutes(1)
+    private val inTwoMinutes = now.plusMinutes(2)
 
     @Test
     fun `get 1 bookable`() {
@@ -34,7 +34,9 @@ class `Bookable E2E Tests` {
         val expectedResponse = """
                         {
                             "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
-                            "locationId": "b1177996-75e2-41da-a3e9-fcdd75d1ab31",
+                            "location": {
+                                "id": "b1177996-75e2-41da-a3e9-fcdd75d1ab31"
+                            },
                             "name": "Red Room",
                             "disposition": {
                                 "closed": false,
@@ -43,14 +45,16 @@ class `Bookable E2E Tests` {
                             bookings: []
                         }
                     """.trimIndent()
-        JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.STRICT)
+        JSONAssert.assertEquals(expectedResponse, response.body, JSONCompareMode.LENIENT)
     }
 
     private val allBookables = """
                             [
                                 {
                                     "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
-                                    "locationId": "b1177996-75e2-41da-a3e9-fcdd75d1ab31",
+                                    "location": {
+                                        "id": "b1177996-75e2-41da-a3e9-fcdd75d1ab31"
+                                    },
                                     "name": "Red Room",
                                     "disposition": {
                                         "closed": false,
@@ -72,7 +76,9 @@ class `Bookable E2E Tests` {
                                 },
                                 {
                                     "id": "cc4bd7e5-00f6-4903-86a2-abf5423edb84",
-                                    "locationId": "b1177996-75e2-41da-a3e9-fcdd75d1ab31",
+                                    "location": {
+                                        "id": "b1177996-75e2-41da-a3e9-fcdd75d1ab31"
+                                    },
                                     "name": "Yellow Room",
                                     "disposition": {
                                         "closed": true,
@@ -112,7 +118,7 @@ class `Bookable E2E Tests` {
 
         @Nested
         inner class `room unavailable` {
-            var createResponse: ResponseEntity<String>? = null
+            private var createResponse: ResponseEntity<String>? = null
 
             @BeforeEach
             fun `create booking`() {
@@ -138,7 +144,9 @@ class `Bookable E2E Tests` {
                         [
                             {
                                 "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
-                                "locationId": "b1177996-75e2-41da-a3e9-fcdd75d1ab31",
+                                "location": {
+                                    "id": "b1177996-75e2-41da-a3e9-fcdd75d1ab31"
+                                },
                                 "name": "Red Room",
                                 "disposition": {
                                     "closed": false,
@@ -146,7 +154,9 @@ class `Bookable E2E Tests` {
                                 },
                                 bookings: [
                                     {
-                                        "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                                        "bookable": {
+                                            "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8"
+                                        },
                                         "subject": "My new meeting",
                                         "start": "${inOneMinute.truncatedTo(ChronoUnit.MINUTES)}",
                                         "end": "${inTwoMinutes.truncatedTo(ChronoUnit.MINUTES)}",
@@ -194,7 +204,7 @@ class `Bookable E2E Tests` {
 
         @Nested
         inner class `another users booking` {
-            var createResponse: ResponseEntity<String>? = null
+            private var createResponse: ResponseEntity<String>? = null
 
             @BeforeEach
             fun `create booking`() {
@@ -220,7 +230,9 @@ class `Bookable E2E Tests` {
                         [
                             {
                                 "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
-                                "locationId": "b1177996-75e2-41da-a3e9-fcdd75d1ab31",
+                                "location": {
+                                    id: "b1177996-75e2-41da-a3e9-fcdd75d1ab31"
+                                },
                                 "name": "Red Room",
                                 "disposition": {
                                     "closed": false,
@@ -228,7 +240,9 @@ class `Bookable E2E Tests` {
                                 },
                                 bookings: [
                                     {
-                                        "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                                        "bookable": {
+                                            "id": "aab6d676-d3cb-4b9b-b285-6e63058aeda8"
+                                        },
                                         "subject": "**********",
                                         "user": {
                                             "name": "Another Fake User",
