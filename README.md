@@ -17,6 +17,27 @@ dependencies.
 
 ## Quick Start
 
+### Docker
+
+If you need to simply run the project locally, you can with 1 line via Docker.
+
+1. [Install Docker](https://www.docker.com/) and run it if you haven't already
+1. Clone this repo
+1. Run `docker-compose up` in the root
+1. Visit [http://localhost:8080/](http://localhost:8080/) in your web browser
+1. When you're finished run `docker-compose down` to cleanup
+
+### Development
+
+To setup a proper local development environment follow these steps.
+
+1. [Install Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) version 8 if you haven't already
+    * If you need to change to version 8, install it. Then [swap your version](https://stackoverflow.com/questions/46513639/how-to-downgrade-java-from-9-to-8-on-a-macos-eclipse-is-not-running-with-java-9) via command line
+1. Run `./gradlew bootRun` and wait until the app reads *85% EXECUTING*
+1. Visit [http://localhost:8080/](http://localhost:8080/) in your web browser
+
+## Commands
+
 We have bundled a gradle wrapper so you can run the below commands.  Alternatively, you can use gradle if you have it installed.
     
 | Command                                           |     Description                                  | Notes                    
@@ -26,8 +47,9 @@ We have bundled a gradle wrapper so you can run the below commands.  Alternative
 | `./gradlew check`                                 | Runs linting, unit tests, static analysis, etc   | Good for pre-push checking                         
 | `./gradlew test`                                  | Runs unit/integration tests                      |                          
 | `./gradlew test-e2e`                              | Runs end-to-end tests                            | Requires running server  
-| `./gradlew bootRun`                               | Runs server                                      | Magically runs `schema.sql` and loads basic test data from `data.sql`.
-| `SPRING_DATASOURCE_PLATFORM=dev ./gradlew bootRun`| Runs server                                      | Magically runs `schema.sql` and loads more voluminous `dev-data.sql` file into the Derby database.                         
+| `./gradlew bootRun`                               | Runs server                                      | Magically runs `schema.sql` and loads basic test data from `data.sql` using an in-memory H2 database.
+| `BOOKIT_DATABASE_URL=jdbc:mariadb://localhost/bookit BOOKIT_DATABASE_USER=root ./gradlew bootRun`| Runs server                                      | Magically runs `schema.sql` and loads basic test data from `data.sql` using an (already running) MySql/MariaDB instance.                         
+| `SPRING_DATASOURCE_PLATFORM=dev ./gradlew bootRun`| Runs server                                      | Magically runs `schema.sql` and loads more voluminous `dev-data.sql` file into the H2 database.                         
 
 
 
@@ -46,7 +68,7 @@ In addition to the [common Spring Boot properties](https://docs.spring.io/spring
 
 The example values specified above are the values used in integration, staging, and production.  BOOKIT_DATABASE_PASSWORD is acquired via the appropriate AWS SSM Parameter Store value.
 
-> _Note that when running via `./gradlew bootRun`, the database is magically configured to use an in-memory (Derby) database.  See Quick Start, above._
+> _Note that when running via `./gradlew bootRun`, the database is magically configured to use an in-memory (H2) database.  See Quick Start, above._
 
 
 ## Build information
