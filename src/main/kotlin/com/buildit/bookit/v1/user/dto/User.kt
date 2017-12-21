@@ -20,7 +20,7 @@ data class User(
     @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2")
     val id: String? = null
 ) {
-    val name get() = "$givenName $familyName"
+    val name get() = "$givenName $familyName".trim()
 }
 
 const val MASKED_STRING = "**********"
