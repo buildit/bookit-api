@@ -164,6 +164,26 @@ class `Booking E2E Tests` {
                 expect(jsonResponse.get("subject")).to.be.equal("My new meeting")
             }
 
+            @Test
+            fun `should return a created meeting in london`() {
+                val bookingForTomorrowLondon =
+                    """
+                {
+                    "bookableId": "dddc584f-6723-43ed-a8c9-3a39ab366d56",
+                    "subject": "My new meeting",
+                    "start": "$tomorrow",
+                    "end": "$tomorrowPlusAnHour"
+                }
+                """
+
+                response = post(bookingForTomorrowLondon, "/v1/booking")
+
+                val jsonResponse = JSONObject(response?.body)
+                expect(jsonResponse.getString("id")).not.to.be.`null`
+                expect(jsonResponse.get("bookableId")).not.to.be.`null`
+                expect(jsonResponse.get("subject")).to.be.equal("My new meeting")
+            }
+
             @AfterEach
             fun cleanup() {
                 response?.headers?.location?.let { Global.REST_TEMPLATE.delete(it) }
@@ -179,6 +199,27 @@ class `Booking E2E Tests` {
                     "subject": "My meeting in the past",
                     "start": "$yesterday",
                     "end": "${yesterday.plusHours(1)}"
+                }
+                """
+
+            response = post(requestWithPastDate, "/v1/booking")
+
+            val jsonResponse = JSONObject(response?.body)
+
+            expect(response?.statusCode).to.be.equal(BAD_REQUEST)
+            expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.StartInPastException")
+            expect(jsonResponse.get("message")).to.be.equal("Start must be in the future")
+        }
+
+        @Test
+        fun `date in past of london location should fail with 400`() {
+            val requestWithPastDate =
+                """
+                {
+                    "bookableId": "dddc584f-6723-43ed-a8c9-3a39ab366d56",
+                    "subject": "My meeting in the past for London",
+                    "start": "${now.plusHours(1)}",
+                    "end": "${now.plusHours(2)}"
                 }
                 """
 
