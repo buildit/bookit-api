@@ -159,7 +159,7 @@ afterEvaluate {
         violationRules {
             rule {
                 limit {
-                    minimum = 0.60
+                    minimum = 0.50
                 }
             }
         }
@@ -180,7 +180,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-actuator-docs')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    
+
     // security
     compile('org.springframework.boot:spring-boot-starter-security')
     compile("io.jsonwebtoken:jjwt:${property('jjwt.version')}")
