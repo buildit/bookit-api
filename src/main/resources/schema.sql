@@ -38,7 +38,6 @@ CREATE TABLE booking (
     subject     VARCHAR(255) NOT NULL,
     start       DATETIME     NOT NULL,
     end         DATETIME     NOT NULL,
-    user_id     VARCHAR(36)  NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES user (id)
+    user_id     VARCHAR(36)  NOT NULL
 );
 
