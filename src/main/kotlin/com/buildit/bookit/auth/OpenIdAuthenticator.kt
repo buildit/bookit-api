@@ -1,5 +1,6 @@
 package com.buildit.bookit.auth
 
+import com.buildit.bookit.BookitProperties
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
@@ -15,7 +16,7 @@ interface JwtAuthenticator {
     fun getAuthentication(jwtToken: String, request: HttpServletRequest): UsernamePasswordAuthenticationToken?
 }
 
-class OpenIdAuthenticator : JwtAuthenticator {
+class OpenIdAuthenticator(private val props: BookitProperties) : JwtAuthenticator {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     @Suppress("ReturnCount", "TooGenericExceptionCaught")
@@ -26,7 +27,7 @@ class OpenIdAuthenticator : JwtAuthenticator {
                 .parseClaimsJws(jwtToken)
                 .body
         } catch (e: RuntimeException) {
-            if (listOf("localhost", "integration").any { request.serverName.startsWith(it) }) {
+            if (this.props.allowTestTokens ?: listOf("localhost", "integration").any { request.serverName.startsWith(it) }) {
                 log.info("Attempt FAKE token validation.")
                 try {
                     //We will sign our JWT with our ApiKey secret

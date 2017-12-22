@@ -4,5 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties("bookit")
 data class BookitProperties(
-    var databaseUrl: String? = ""
+    var allowTestTokens: Boolean? = null,
+    var databaseUrl: String? = null,
+    var databaseDriver: String? = null,
+    var databaseDialect: String? = null
 )

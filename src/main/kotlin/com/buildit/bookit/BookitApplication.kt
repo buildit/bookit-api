@@ -74,7 +74,7 @@ class WebMvcConfiguration {
 }
 
 @Configuration
-class WebSecurityConfiguration {
+class WebSecurityConfiguration(private val props: BookitProperties) {
     @Bean
     fun securityConfigurer() = @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER) object : WebSecurityConfigurerAdapter() {
         override fun configure(security: HttpSecurity) {
@@ -103,7 +103,7 @@ class WebSecurityConfiguration {
 
             security.addFilterBefore(
                 JwtAuthenticationFilter(authenticationManager(),
-                    OpenIdAuthenticator()),
+                    OpenIdAuthenticator(props)),
                 BasicAuthenticationFilter::class.java)
         }
     }

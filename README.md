@@ -64,6 +64,7 @@ In addition to the [common Spring Boot properties](https://docs.spring.io/spring
 | BOOKIT_DATABASE_USER     | The username to use when logging into database                                             | admin
 | BOOKIT_DATABASE_PASSWORD | The password to use when logging into the database                                         | _password_
 | BOOKIT_DATABASE_DIALECT | The hibernate dialect to use                                         | org.hibernate.dialect.MySQL55Dialect
+| BOOKIT_ALLOW_TEST_TOKENS | Allow and verify test JWTs.  Default: allow only for localhost & integration      | true/false
 
 The example values specified above are the values used in integration, staging, and production.  BOOKIT_DATABASE_PASSWORD is acquired via the appropriate AWS SSM Parameter Store value.
 
