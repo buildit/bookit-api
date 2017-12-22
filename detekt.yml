@@ -27,6 +27,8 @@ style:
     active: false
   ForbiddenComment:
     active: false
+  MagicNumber:
+    ignoreAnnotation: true
 
 complexity:
   LongParameterList:
