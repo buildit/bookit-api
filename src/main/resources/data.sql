@@ -15,7 +15,7 @@ VALUES ('a7b68976-8dda-44f2-8e39-4e2b6c3514cd', 'b1177996-75e2-41da-a3e9-fcdd75d
 INSERT INTO bookable (id, location_id, name, closed, reason)
 VALUES ('25708e84-cf1b-45aa-b062-0af903328a52', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'White Room', '0', '');
 INSERT INTO bookable (id, location_id, name, closed, reason)
-VALUES ('cc4bd7e5-00f6-4903-86a2-abf5423edb84', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Yellow Room', '0', '');
+VALUES ('cc4bd7e5-00f6-4903-86a2-abf5423edb84', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Yellow Room', '1', 'Not bookable (ad-hoc)');
 INSERT INTO bookable (id, location_id, name, closed, reason)
 VALUES ('86d0eb7c-cce0-400a-b413-72f19ba11230', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Randolph Room', '1', 'Out of beer!');
 
