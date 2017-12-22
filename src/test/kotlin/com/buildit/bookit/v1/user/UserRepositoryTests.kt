@@ -19,7 +19,7 @@ class UserRepositoryTests @Autowired constructor(val userRepo: UserRepository
     @Test
     fun `all users`() {
         val users = userRepo.findAll()?.toList()
-        expect(users).has.size(1) // User defined in data.sql
+        expect(users).has.size(1) // User defined in import.sql
     }
 
     @Test
