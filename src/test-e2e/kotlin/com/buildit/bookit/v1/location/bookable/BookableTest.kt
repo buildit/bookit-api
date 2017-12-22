@@ -75,14 +75,17 @@ class `Bookable E2E Tests` {
                                     "id": "25708e84-cf1b-45aa-b062-0af903328a52"
                                 },
                                 {
-                                    "id": "cc4bd7e5-00f6-4903-86a2-abf5423edb84",
+                                    "id": "cc4bd7e5-00f6-4903-86a2-abf5423edb84"
+                                },
+                                {
+                                    "id": "86d0eb7c-cce0-400a-b413-72f19ba11230",
                                     "location": {
                                         "id": "b1177996-75e2-41da-a3e9-fcdd75d1ab31"
                                     },
-                                    "name": "Yellow Room",
+                                    "name": "Randolph Room",
                                     "disposition": {
                                         "closed": true,
-                                        "reason": "Closed for remodeling"
+                                        "reason": "Out of beer!"
                                     },
                                     bookings: []
                                 }
@@ -181,6 +184,9 @@ class `Bookable E2E Tests` {
                             },
                             {
                                 "id": "cc4bd7e5-00f6-4903-86a2-abf5423edb84"
+                            },
+                            {
+                                "id": "86d0eb7c-cce0-400a-b413-72f19ba11230"
                             }
                         ]
                     """.trimIndent()
@@ -265,6 +271,9 @@ class `Bookable E2E Tests` {
                             },
                             {
                                 "id": "cc4bd7e5-00f6-4903-86a2-abf5423edb84"
+                            },
+                            {
+                                "id": "86d0eb7c-cce0-400a-b413-72f19ba11230"
                             }
                         ]
                     """.trimIndent()

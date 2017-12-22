@@ -22,7 +22,7 @@ class BookableRepositoryTests @Autowired constructor(
     @Test
     fun findAll() {
         val bookables = bookableRepo.findAll()?.toList()
-        expect(bookables).has.size(17)
+        expect(bookables).has.size(18)
         expect(bookables).to.contain(red)
     }
 
@@ -35,7 +35,7 @@ class BookableRepositoryTests @Autowired constructor(
     @Test
     fun findByLocation() {
         val bookables = bookableRepo.findByLocation(nyc)
-        expect(bookables.size).to.be.equal(6)
+        expect(bookables.size).to.be.equal(7)
         expect(bookables).to.contain(red)
     }
 }
