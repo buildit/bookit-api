@@ -17,7 +17,7 @@ data class Location(@Column(unique = true, nullable = false)
                     val name: String,
                     @Column(nullable = false)
                     val timeZone: ZoneId,
-                    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2")
+                    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2") @Column(length = 36)
                     val id: String? = null)
 
 /**

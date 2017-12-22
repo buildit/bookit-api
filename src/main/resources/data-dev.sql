@@ -1,20 +1,20 @@
 INSERT INTO bookable (id, location_id, name, closed, reason)
-VALUES ('cd87ee34-b393-4400-a1c9-d91278d4b8ee', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Dev Red', '0', '');
+VALUES ('cd87ee34-b393-4400-a1c9-d91278d4b8ee', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Dev Red', FALSE, '');
 INSERT INTO bookable (id, location_id, name, closed, reason)
-VALUES ('bf16f7d9-d0ee-4333-86ff-5a97c75b4424', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Dev Blue', '0', '');
+VALUES ('bf16f7d9-d0ee-4333-86ff-5a97c75b4424', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Dev Blue', FALSE, '');
 INSERT INTO bookable (id, location_id, name, closed, reason)
-VALUES ('bfa745f7-cb86-493a-98b4-984173a9ab01', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Dev White', '0', '');
+VALUES ('bfa745f7-cb86-493a-98b4-984173a9ab01', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Dev White', FALSE, '');
 INSERT INTO bookable (id, location_id, name, closed, reason)
-VALUES ('3aceeedc-5302-4b32-b653-a7ee1d8eab6c', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Dev Black', '0', '');
+VALUES ('3aceeedc-5302-4b32-b653-a7ee1d8eab6c', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Dev Black', FALSE, '');
 INSERT INTO bookable (id, location_id, name, closed, reason) VALUES
-    ('6bdb5c82-134b-4328-b590-95133f887134', '43ec3f7d-348d-427f-8c13-102ca0362a62', 'Dev Elizabeth Conference', '0',
+    ('6bdb5c82-134b-4328-b590-95133f887134', '43ec3f7d-348d-427f-8c13-102ca0362a62', 'Dev Elizabeth Conference', FALSE,
      '');
 INSERT INTO bookable (id, location_id, name, closed, reason)
-VALUES ('261b4bdc-6288-4315-bd77-92420a9f3fbd', '43ec3f7d-348d-427f-8c13-102ca0362a62', 'Dev Thames Planning', '0', '');
+VALUES ('261b4bdc-6288-4315-bd77-92420a9f3fbd', '43ec3f7d-348d-427f-8c13-102ca0362a62', 'Dev Thames Planning', FALSE, '');
 INSERT INTO bookable (id, location_id, name, closed, reason)
-VALUES ('dd947975-4dee-4404-9daa-76f5d7b76684', '43ec3f7d-348d-427f-8c13-102ca0362a62', 'Dev Very Splendid', '0', '');
+VALUES ('dd947975-4dee-4404-9daa-76f5d7b76684', '43ec3f7d-348d-427f-8c13-102ca0362a62', 'Dev Very Splendid', FALSE, '');
 INSERT INTO bookable (id, location_id, name, closed, reason) VALUES
-    ('0308b2aa-8aef-40d4-99af-d7cae8318523', '43ec3f7d-348d-427f-8c13-102ca0362a62', 'Dev Tower of London Spooky', '0',
+    ('0308b2aa-8aef-40d4-99af-d7cae8318523', '43ec3f7d-348d-427f-8c13-102ca0362a62', 'Dev Tower of London Spooky', FALSE,
      '');
 
 INSERT INTO user (id, external_id, given_name, family_name)

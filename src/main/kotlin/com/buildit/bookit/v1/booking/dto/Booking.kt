@@ -44,7 +44,7 @@ data class Booking(
     val end: LocalDateTime,
     @ManyToOne(optional = false)
     val user: User,
-    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2") @Column(length = 36)
     val id: String? = null
 )
 

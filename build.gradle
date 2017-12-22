@@ -7,7 +7,7 @@ buildscript {
     ext['hibernate.version'] = '5.2.12.Final'
     ext['jackson.version'] = '2.9.0'
     ext['mysql.version'] = '5.1.44'
-    ext['mariadb.version'] = '2.1.2'
+    ext['mariadb.version'] = '2.2.0'
     ext['h2.version'] = '1.4.196'
 
     // these are our additions (some become defaults in spring boot 2.x)

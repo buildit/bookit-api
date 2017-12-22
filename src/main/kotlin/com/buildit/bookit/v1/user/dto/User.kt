@@ -17,7 +17,7 @@ data class User(
     val givenName: String,
     @Column(nullable = false) @JsonIgnore
     val familyName: String,
-    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2") @Column(length = 36)
     val id: String? = null
 ) {
     val name get() = "$givenName $familyName".trim()

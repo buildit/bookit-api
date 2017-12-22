@@ -48,10 +48,8 @@ We have bundled a gradle wrapper so you can run the below commands.  Alternative
 | `./gradlew test`                                  | Runs unit/integration tests                      |                          
 | `./gradlew test-e2e`                              | Runs end-to-end tests                            | Requires running server  
 | `./gradlew bootRun`                               | Runs server                                      | Magically creates/updates the database and loads basic test data from `data.sql` using an in-memory H2 database.
-| `BOOKIT_DATABASE_URL=jdbc:mariadb://localhost/bookit BOOKIT_DATABASE_USER=root ./gradlew bootRun`| Runs server                                      | Magically creates the database and loads basic test data from `data.sql` using an (already running) MySql/MariaDB instance.                         
+| `BOOKIT_DATABASE_URL=jdbc:mariadb://localhost/bookit BOOKIT_DATABASE_USER=root BOOKIT_DATABASE_DIALECT=org.hibernate.dialect.MySQL55DialectBOOKIT_DATABASE_DIALECT=org.hibernate.dialect.MySQL55Dialect ./gradlew bootRun`| Runs server                                      | Magically creates the database and loads basic test data from `data.sql` using an (already running) MySql/MariaDB instance.                         
 | `SPRING_DATASOURCE_PLATFORM=dev ./gradlew bootRun`| Runs server                                      | Magically creates the database and loads more voluminous `dev-data.sql` file into the H2 database.                         
-
-
 
 ## Configuration Properties
 
@@ -61,10 +59,11 @@ In addition to the [common Spring Boot properties](https://docs.spring.io/spring
 
 | Parameter                | Description   | Example 
 | :---                     | :---          | :---          
-| BOOKIT_DATABASE_URL      | The JDBC Connection URL                                                                    | jdbc:mysql:aurora://aurora.bookit.internal/bookit
-| BOOKIT_DATABASE_DRIVER   | The JDBC Driver Class (can be inferred via BOOKIT_DATABASE_URL, required if using MariaDB) | org.mariadb.jdbc.Driver
+| BOOKIT_DATABASE_URL      | The JDBC Connection URL                                                                    | jdbc:mariadb:aurora://aurora.bookit.internal/bookit
+| BOOKIT_DATABASE_DRIVER   | The JDBC Driver Class (can be inferred via BOOKIT_DATABASE_URL) | org.mariadb.jdbc.Driver
 | BOOKIT_DATABASE_USER     | The username to use when logging into database                                             | admin
 | BOOKIT_DATABASE_PASSWORD | The password to use when logging into the database                                         | _password_
+| BOOKIT_DATABASE_DIALECT | The hibernate dialect to use                                         | org.hibernate.dialect.MySQL55Dialect
 
 The example values specified above are the values used in integration, staging, and production.  BOOKIT_DATABASE_PASSWORD is acquired via the appropriate AWS SSM Parameter Store value.
 

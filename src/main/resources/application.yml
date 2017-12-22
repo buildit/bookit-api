@@ -19,10 +19,12 @@ spring:
     url: ${bookit.database.url:}
     driver-class-name: ${bookit.database.driver:}
   jpa:
+    database-platform: ${bookit.database.dialect:}
     show-sql: true
     hibernate:
       ddl-auto: create
-logging:
-  level:
-#    org.springframework.security: DEBUG
-#    org.springframework.web.client.RestTemplate: DEBUG
+  logging:
+    level:
+#      org.hibernate.SQL: DEBUG
+#      org.springframework.security: DEBUG
+#      org.springframework.web.client.RestTemplate: DEBUG

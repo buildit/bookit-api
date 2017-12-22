@@ -20,7 +20,7 @@ data class Bookable(@ManyToOne(optional = false) @NaturalId
                     val name: String,
                     @Embedded
                     val disposition: Disposition = Disposition(),
-                    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2")
+                    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2") @Column(length = 36)
                     val id: String? = null)
 
 @Embeddable
