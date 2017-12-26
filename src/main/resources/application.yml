@@ -22,7 +22,7 @@ spring:
     database-platform: ${bookit.database.dialect:}
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: ${bookit.database.ddl-auto:create}
     properties:
       hibernate.hbm2ddl.import_files_sql_extractor: org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor
   logging:
