@@ -17,3 +17,7 @@ phases:
   post_build:
     commands:
       - aws s3 cp --recursive --acl public-read ./build/reports ${REPORTS_BUCKET}/
+
+cache:
+  paths:
+    - '/root/.gradle/caches/**'

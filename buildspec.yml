@@ -35,3 +35,6 @@ artifacts:
   files:
     - build.json
 
+cache:
+  paths:
+    - '/root/.gradle/caches/**'
