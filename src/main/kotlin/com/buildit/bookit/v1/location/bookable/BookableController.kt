@@ -35,6 +35,7 @@ class BookableController(private val bookableRepository: BookableRepository, val
     /**
      * Get a bookable
      */
+    @Transactional(readOnly = true)
     @GetMapping("/{bookableId}")
     fun getBookable(@PathVariable("locationId") location: Location?, @PathVariable("bookableId") bookable: Bookable?): BookableResource {
         location ?: throw LocationNotFound()
@@ -48,6 +49,7 @@ class BookableController(private val bookableRepository: BookableRepository, val
     /**
      * Get all bookables
      */
+    @Transactional(readOnly = true)
     @GetMapping
     fun getAllBookables(
         @PathVariable("locationId") locationId: Location?,

@@ -17,12 +17,11 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/v1/location")
 @Transactional
 class LocationController(private val locationRepository: LocationRepository) {
+    @Transactional(readOnly = true)
     @GetMapping
     fun getLocations(): Collection<Location> = locationRepository.findAll().toList()
 
-    /**
-     * Get information about a location
-     */
+    @Transactional(readOnly = true)
     @GetMapping("/{id}")
     fun getLocation(@PathVariable("id") location: Location?): Location =
         location ?: throw LocationNotFound()

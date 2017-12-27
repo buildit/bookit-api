@@ -60,6 +60,7 @@ class BookingController(private val bookingRepository: BookingRepository,
                         private val clock: Clock
 ) {
     @GetMapping
+    @Transactional(readOnly = true)
     fun getAllBookings(
         @AuthenticationPrincipal user: UserPrincipal,
         @RequestParam("start", required = false)
@@ -93,6 +94,7 @@ class BookingController(private val bookingRepository: BookingRepository,
     }
 
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     fun getBooking(@PathVariable("id") booking: Booking?, @AuthenticationPrincipal user: UserPrincipal): Booking =
         booking?.let { maskSubjectIfOtherUser(it, user) } ?: throw BookingNotFound()
 
