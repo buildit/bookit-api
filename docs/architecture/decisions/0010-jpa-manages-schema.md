@@ -25,3 +25,4 @@ Originally, we used Spring Boot's Database Initialization support to automatical
 * Hibernate won't drop columns that are no longer used.  Add only.  
 * Also won't migrate data for you.  Schema only.
 * If any of the above prove onerous, we can address by introducing a database migration tool such as Liquibase or Flyway.
+* This did cause us to hit a memory limit (previously set to 256MB).  Had to bump to 512MB.
