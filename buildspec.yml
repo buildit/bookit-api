@@ -37,4 +37,6 @@ artifacts:
 
 cache:
   paths:
+    - '.gradle/**/*'
     - '/root/.gradle/caches/**/*'
+    - '/var/cache/apt/archives/**/*'
