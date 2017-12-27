@@ -22,4 +22,6 @@ Originally, we used Spring Boot's Database Initialization support to automatical
 * Hibernate does warn against utilizing this feature "in production."
 * We can "test" the update in staging.  There is a risk that Hibernate updates a schema naively which may result in dropped data
 * This approach won't address how we can add static data (locations & bookables for now) over time.
-* If either of the two prove onerous, we can address by introducing a database migration tool such as Liquibase or Flyway.
+* Hibernate won't drop columns that are no longer used.  Add only.  
+* Also won't migrate data for you.  Schema only.
+* If any of the above prove onerous, we can address by introducing a database migration tool such as Liquibase or Flyway.
