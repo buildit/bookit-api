@@ -1,3 +1,6 @@
+![Build Status](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiZTZERVh5dUxQYjRON0xqYWQwRDd4c2U3bGZ4L2s0eHpCak9mQytjbzk2WTZsVXVTVWdmRGRYQzlaOGNmbWRGbWxicTBpQ2FvQm5lRDdqUytVMXMydFY4PSIsIml2UGFyYW1ldGVyU3BlYyI6IkxLL2g2ZjZadEtaS3NNSGciLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
+![E2E Tests](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiYURFRTl3WTRzaS8wbU55djN2akIya2JMSFJOQUtOMXNuQVl1anY3a3lyelpTWGkwQjlhZDl0YXVYYzJrZHRiQWYxZFdsUXl1OU01UC9SN2JJZnpvNXlZPSIsIml2UGFyYW1ldGVyU3BlYyI6InJVVHR1eTJqc05YaWwwMS8iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
+
 # BookIt-API
 
 A services api for booking bookable items such as rooms and/or resources
