@@ -7,11 +7,13 @@ version: 0.2
 phases:
   install:
     commands:
+      - apt-get install -y software-properties-common
+      - add-apt-repository ppa:openjdk-r/ppa
       - apt-get update -y
       - apt-get install -y openjdk-8-jdk
   pre_build:
     commands:
-      - $(aws ecr get-login --region us-east-1)
+      - $(aws ecr get-login --region us-east-1 --no-include-email)
       - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)-${CODEBUILD_BUILD_ID##*:}"
   build:
     commands:
