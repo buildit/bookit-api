@@ -7,9 +7,8 @@ version: 0.2
 phases:
   install:
     commands:
-      - add-apt-repository ppa:openjdk-r/ppa
       - apt-get update -y
-      - apt-get install -y software-properties-common openjdk-8-jdk
+      - apt-get install -y openjdk-8-jdk
   pre_build:
     commands:
       - $(aws ecr get-login --region us-east-1)
