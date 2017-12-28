@@ -30,3 +30,11 @@ spring:
 #      org.hibernate.SQL: DEBUG
 #      org.springframework.security: DEBUG
 #      org.springframework.web.client.RestTemplate: DEBUG
+
+---
+
+spring:
+  profiles: dev
+  jpa:
+    properties:
+      hibernate.hbm2ddl.import_files: '/import.sql,/import-dev.sql'
