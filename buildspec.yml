@@ -35,5 +35,5 @@ cache:
     - '/root/.gradle/**/*'
     - '/root/.gradle/wrapper/**/*'
     - '/root/.gradle/caches/**/*'
-    - '/var/cache/apt/archives/**/*'
+    - '/var/cache/apt/**/*'
     - '.gradle/**/*'
