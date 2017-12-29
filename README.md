@@ -15,6 +15,10 @@ The project uses:
 You will need to have a 1.8 JVM installed to run.  Gradle will take care of the 
 dependencies.
 
+## Architectural Decisions
+
+We are documenting our decisions [here](../master/docs/architecture/decisions)
+
 ## Quick Start
 
 ### Docker
@@ -97,4 +101,4 @@ The example values specified above are the values used in integration, staging, 
 
 ## Contributing
 
-See [Contributing](./docs/CONTRIBUTING.md)
+See [Contributing](./CONTRIBUTING.md)
