@@ -24,8 +24,8 @@ data class User(
 }
 
 const val MASKED_STRING = "**********"
-fun maskSubjectIfOtherUser(booking: Booking, otherUser: UserPrincipal): Booking =
+fun maskSubjectIfOtherUser(booking: Booking, otherUser: UserPrincipal?): Booking =
     when {
-        booking.user.externalId != otherUser.subject -> booking.copy(subject = MASKED_STRING)
+        booking.user.externalId != otherUser?.subject -> booking.copy(subject = MASKED_STRING)
         else -> booking
     }

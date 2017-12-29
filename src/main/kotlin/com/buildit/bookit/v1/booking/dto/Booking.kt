@@ -3,6 +3,7 @@ package com.buildit.bookit.v1.booking.dto
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.user.dto.User
 import com.fasterxml.jackson.annotation.JsonFormat
+import io.swagger.annotations.ApiModelProperty
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.validator.constraints.NotBlank
 import org.threeten.extra.Interval
@@ -23,8 +24,10 @@ data class BookingRequest(
     val bookableId: String?,
     @field:NotBlank(message = "subject is required and cannot be blank")
     val subject: String?,
-    @field:NotNull(message = "start is required")
+    @NotNull(message = "start is required")
+    @field:ApiModelProperty(example = "2017-12-29T14:00", required = true)
     val start: LocalDateTime?,
+    @ApiModelProperty(example = "2017-12-29T15:00", required = true)
     @field:NotNull(message = "end is required")
     val end: LocalDateTime?
 )
@@ -39,8 +42,10 @@ data class Booking(
     @Column(nullable = false)
     val subject: String,
     @Column(nullable = false) @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @ApiModelProperty(example = "2017-12-29T14:00")
     val start: LocalDateTime,
     @Column(nullable = false) @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @ApiModelProperty(example = "2017-12-29T15:00")
     val end: LocalDateTime,
     @ManyToOne(optional = false)
     val user: User,

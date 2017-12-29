@@ -9,6 +9,9 @@ import com.buildit.bookit.v1.location.bookable.dto.BookableResource
 import com.buildit.bookit.v1.location.dto.Location
 import com.buildit.bookit.v1.location.dto.LocationNotFound
 import com.buildit.bookit.v1.user.dto.maskSubjectIfOtherUser
+import io.swagger.annotations.ApiImplicitParam
+import io.swagger.annotations.ApiImplicitParams
+import io.swagger.annotations.ApiParam
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.threeten.extra.Interval
+import springfox.documentation.annotations.ApiIgnore
 import java.time.LocalDate
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
@@ -37,7 +41,17 @@ class BookableController(private val bookableRepository: BookableRepository, val
      */
     @Transactional(readOnly = true)
     @GetMapping("/{bookableId}")
-    fun getBookable(@PathVariable("locationId") location: Location?, @PathVariable("bookableId") bookable: Bookable?): BookableResource {
+    // use implicit params until springfox 2.8.0 released
+    // https://github.com/springfox/springfox/commit/1606caf4a421470ccb9b7592b465979dcb4c5ce1
+    // https://github.com/springfox/springfox/issues/2107
+    // current workaround below from https://github.com/springfox/springfox/issues/2053
+    @ApiImplicitParams(
+        ApiImplicitParam(name = "locationId", required = true, dataTypeClass = String::class, paramType = "path"),
+        ApiImplicitParam(name = "bookableId", required = true, dataTypeClass = String::class, paramType = "path"))
+    fun getBookable(
+        @PathVariable("locationId") @ApiParam(type = "java.lang.String") @ApiIgnore location: Location?,
+        @PathVariable("bookableId") @ApiParam(type = "java.lang.String") @ApiIgnore bookable: Bookable?
+    ): BookableResource {
         location ?: throw LocationNotFound()
         bookable ?: throw BookableNotFound()
         if (bookable.location != location) {
@@ -51,15 +65,17 @@ class BookableController(private val bookableRepository: BookableRepository, val
      */
     @Transactional(readOnly = true)
     @GetMapping
+    @ApiImplicitParam(name = "locationId", required = true, dataTypeClass = String::class, paramType = "path")
     fun getAllBookables(
-        @PathVariable("locationId") locationId: Location?,
-        @AuthenticationPrincipal user: UserPrincipal,
+        @PathVariable("locationId") @ApiParam(type = "java.lang.String") @ApiIgnore locationId: Location?,
+        @AuthenticationPrincipal user: UserPrincipal?,
         @RequestParam("start", required = false)
         @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
         startDateInclusive: LocalDate? = null,
         @RequestParam("end", required = false)
         @DateTimeFormat(pattern = "yyyy-MM-dd['T'HH:mm[[:ss][.SSS]]]")
         endDateExclusive: LocalDate? = null,
+        @ApiParam(allowableValues = "bookings")
         @RequestParam("expand", required = false)
         expand: List<String>? = emptyList()
     ): Collection<BookableResource> {
