@@ -47,8 +47,8 @@ We have bundled a gradle wrapper so you can run the below commands.  Alternative
 | `./gradlew check`                                 | Runs linting, unit tests, static analysis, etc   | Good for pre-push checking                         
 | `./gradlew test`                                  | Runs unit/integration tests                      |                          
 | `./gradlew test-e2e`                              | Runs end-to-end tests                            | Requires running server  
-| `./gradlew bootRun`                               | Runs server                                      | Magically creates/updates the database and loads basic test data from `data.sql` using an in-memory H2 database.
-| `BOOKIT_DATABASE_URL=jdbc:mariadb://localhost/bookit BOOKIT_DATABASE_USER=root BOOKIT_DATABASE_DIALECT=org.hibernate.dialect.MySQL55Dialect BOOKIT_DATABASE_DIALECT=org.hibernate.dialect.MySQL55Dialect ./gradlew bootRun`| Runs server                                      | Magically creates the database and loads basic test data from `data.sql` using an (already running) MySql/MariaDB instance.                         
+| `./gradlew bootRun`                               | Runs server                                      | Magically creates/updates the database and loads basic test data from `import.sql` using an in-memory H2 database.
+| `BOOKIT_DATABASE_URL=jdbc:mariadb://localhost/bookit BOOKIT_DATABASE_USER=root BOOKIT_DATABASE_DIALECT=org.hibernate.dialect.MySQL55Dialect BOOKIT_DATABASE_DIALECT=org.hibernate.dialect.MySQL55Dialect ./gradlew bootRun`| Runs server                                      | Magically creates the database and loads basic test data from `import.sql` using an (already running) MySql/MariaDB instance.                         
 | `SPRING_PROFILES_ACTIVE=dev ./gradlew bootRun`    | Runs server                                      | Magically creates the database and loads more voluminous `import-dev.sql` file into the H2 database.                         
 
 ## Configuration Properties
