@@ -77,7 +77,7 @@ class SwaggerConfiguration {
             OAuthBuilder()
                 .name("oauth")
                 .grantTypes(listOf(ImplicitGrant(LoginEndpoint("https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize"), "id_token")))
-                .scopes(listOf(AuthorizationScope("openid", "")))
+                .scopes(listOf(AuthorizationScope("openid", ""), AuthorizationScope("profile", ""), AuthorizationScope("user.read", "")))
                 .build()
         ))
         .select()
