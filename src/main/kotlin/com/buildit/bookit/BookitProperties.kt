@@ -8,5 +8,6 @@ data class BookitProperties(
     var databaseUrl: String? = null,
     var databaseDriver: String? = null,
     var databaseDialect: String? = null,
+    var databaseDdlAuto: String? = null,
     var requireSsl: Boolean = false
 )

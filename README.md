@@ -64,13 +64,14 @@ In addition to the [common Spring Boot properties](https://docs.spring.io/spring
 
 | Parameter                | Description   | Example 
 | :---                     | :---          | :---          
-| BOOKIT_REQUIRE_SSL       | Force ssl/https, redirect if insecure      | true/false (defaults to false)
-| BOOKIT_DATABASE_URL      | The JDBC Connection URL                                                                    | jdbc:mariadb:aurora://aurora.bookit.internal/bookit
+| BOOKIT_REQUIRE_SSL       | Force ssl/https, redirect if insecure          | true/false (defaults to false)
+| BOOKIT_DATABASE_URL      | The JDBC Connection URL                        | jdbc:mariadb:aurora://aurora.bookit.internal/bookit
 | BOOKIT_DATABASE_DRIVER   | The JDBC Driver Class (can be inferred via BOOKIT_DATABASE_URL) | org.mariadb.jdbc.Driver
-| BOOKIT_DATABASE_USER     | The username to use when logging into database                                             | admin
-| BOOKIT_DATABASE_PASSWORD | The password to use when logging into the database                                         | _password_
-| BOOKIT_DATABASE_DIALECT | The hibernate dialect to use                                         | org.hibernate.dialect.MySQL55Dialect
-| BOOKIT_ALLOW_TEST_TOKENS | Allow and verify test JWTs.  Default: allow only for localhost & integration      | true/false
+| BOOKIT_DATABASE_USER     | The username to use when logging into database | admin
+| BOOKIT_DATABASE_PASSWORD | The password to use when logging into the database | _password_
+| BOOKIT_DATABASE_DIALECT  | The hibernate dialect to use                   | org.hibernate.dialect.MySQL55Dialect
+| BOOKIT_DATABASE_DDL_AUTO | ddl-auto setting Spring JPA will use when initializing DataSource    | create/update/validate (defaults to create)
+| BOOKIT_ALLOW_TEST_TOKENS | Allow and verify test JWTs.  Default: allow only for localhost & integration    | true/false
 
 The example values specified above are the values used in integration, staging, and production.  BOOKIT_DATABASE_PASSWORD is acquired via the appropriate AWS SSM Parameter Store value.
 
