@@ -8,6 +8,8 @@ security:
     password: ${bookit.admin.password:password}
 springfox:
   documentation.swagger.v2.path: /api-docs
+server:
+  use-forward-headers: true
 spring:
   jackson:
     serialization.write-dates-as-timestamps: false
