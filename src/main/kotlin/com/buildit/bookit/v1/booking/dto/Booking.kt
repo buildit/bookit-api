@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.NotBlank
 import org.threeten.extra.Interval
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -51,7 +52,10 @@ data class Booking(
     val user: User,
     @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2") @Column(length = 36)
     val id: String? = null
-)
+) {
+    val startTimezoneAbbreviation get() = this.start.atZone(bookable.location.timeZone).format(DateTimeFormatter.ofPattern("zzz"))
+    val endTimezoneAbbreviation get() = this.end.atZone(bookable.location.timeZone).format(DateTimeFormatter.ofPattern("zzz"))
+}
 
 fun Booking.interval(timeZone: ZoneId): Interval =
     Interval.of(
