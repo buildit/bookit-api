@@ -64,6 +64,7 @@ In addition to the [common Spring Boot properties](https://docs.spring.io/spring
 
 | Parameter                | Description   | Example 
 | :---                     | :---          | :---          
+| BOOKIT_REQUIRE_SSL       | Force ssl/https, redirect if insecure      | true/false (defaults to false)
 | BOOKIT_DATABASE_URL      | The JDBC Connection URL                                                                    | jdbc:mariadb:aurora://aurora.bookit.internal/bookit
 | BOOKIT_DATABASE_DRIVER   | The JDBC Driver Class (can be inferred via BOOKIT_DATABASE_URL) | org.mariadb.jdbc.Driver
 | BOOKIT_DATABASE_USER     | The username to use when logging into database                                             | admin
