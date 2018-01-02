@@ -4,8 +4,6 @@ import org.hibernate.annotations.GenericGenerator
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
 import java.time.ZoneId
-import java.time.format.TextStyle
-import java.util.Locale
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -20,9 +18,7 @@ data class Location(@Column(unique = true, nullable = false)
                     @Column(nullable = false)
                     val timeZone: ZoneId,
                     @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2") @Column(length = 36)
-                    val id: String? = null) {
-    val timeZoneAbbreviation get() = this.timeZone.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
-}
+                    val id: String? = null)
 
 /**
  * 404 location not found
