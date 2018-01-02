@@ -75,6 +75,13 @@ The example values specified above are the values used in integration, staging, 
 
 > _Note that when running via `./gradlew bootRun`, the database is magically configured to use an in-memory (H2) database.  See Quick Start, above._
 
+## Maintenance
+
+Common maintenance tasks:
+
+* Add/Update locations and/or bookables - This is currently accomplished by updating the database tables.  The easiest way is to add/update to the [data.sql](./src/main/resources/data.sql)
+    * if updating make sure you also update the fields in the `ON DUPLICATE KEY UPDATE XXX` area
+    * these SQL statements are MySQL specific but work with H2 when in MySQL compatibility mode
 
 ## Build information
 

@@ -16,7 +16,7 @@ spring:
     name: bookit
     username: ${bookit.database.user:}
     password: ${bookit.database.password:}
-    url: ${bookit.database.url:}
+    url: ${bookit.database.url:jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL}
     driver-class-name: ${bookit.database.driver:}
   jpa:
     database-platform: ${bookit.database.dialect:}
@@ -35,6 +35,7 @@ spring:
 
 spring:
   profiles: dev
-  jpa:
-    properties:
-      hibernate.hbm2ddl.import_files: '/import.sql,/import-dev.sql'
+  datasource:
+    data:
+      - classpath:/data.sql
+      - classpath:/data-dev.sql
