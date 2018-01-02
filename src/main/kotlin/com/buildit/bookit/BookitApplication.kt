@@ -118,7 +118,7 @@ class WebSecurityConfiguration(private val props: BookitProperties) {
             // we are using token based authentication. csrf is not required.
             security.csrf().disable()
             security.sessionManagement().sessionCreationPolicy(STATELESS)
-            if (props.requireSsl)
+            if (props.requireSsl == true)
                 security.requiresChannel().anyRequest().requiresSecure()
 
             security.authorizeRequests().antMatchers(
