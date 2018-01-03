@@ -130,7 +130,6 @@ class BookingController(private val bookingRepository: BookingRepository,
         if (errors?.hasErrors() == true) {
             val errorMessage = errors.allErrors.joinToString(",", transform = { messageSource.getMessage(it, null) })
 
-
             throw InvalidBookingRequest(errorMessage)
         }
         val bookable = bookableRepository.findOne(bookingRequest.bookableId) ?: throw InvalidBookable()
