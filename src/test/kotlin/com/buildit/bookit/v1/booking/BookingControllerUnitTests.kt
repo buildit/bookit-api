@@ -216,7 +216,7 @@ class BookingControllerUnitTests {
             fun `should create a booking`() {
                 val request = BookingRequest(nycBookable1.id, "MyRequest", start, end)
 
-                val response = bookingController.createBooking(request, userPrincipal)
+                val response = bookingController.createBooking(request, userPrincipal = userPrincipal)
                 val booking = response.body
 
                 expect(booking).to.equal(expectedBooking)
@@ -226,7 +226,7 @@ class BookingControllerUnitTests {
             fun `should chop seconds`() {
                 val request = BookingRequest(nycBookable1.id, "MyRequest", start.plusSeconds(59), end.plusSeconds(59))
 
-                val response = bookingController.createBooking(request, userPrincipal)
+                val response = bookingController.createBooking(request, userPrincipal = userPrincipal)
                 val booking = response.body
 
                 expect(booking).to.equal(expectedBooking)
@@ -235,7 +235,7 @@ class BookingControllerUnitTests {
             @Test
             fun `should validate bookable exists`() {
                 val request = BookingRequest("guid-not-there", "MyRequest", start, end)
-                fun action() = bookingController.createBooking(request, userPrincipal)
+                fun action() = bookingController.createBooking(request, userPrincipal = userPrincipal)
                 assertThat({ action() }, throws<InvalidBookable>())
             }
 
@@ -247,7 +247,7 @@ class BookingControllerUnitTests {
                     start.minusMinutes(30),
                     end.minusMinutes(30))
 
-                fun action() = bookingController.createBooking(request, userPrincipal)
+                fun action() = bookingController.createBooking(request, userPrincipal = userPrincipal)
                 assertThat({ action() }, throws<BookableNotAvailable>())
             }
 
@@ -259,7 +259,7 @@ class BookingControllerUnitTests {
                     start.plusMinutes(30),
                     end.plusMinutes(30))
 
-                fun action() = bookingController.createBooking(request, userPrincipal)
+                fun action() = bookingController.createBooking(request, userPrincipal = userPrincipal)
                 assertThat({ action() }, throws<BookableNotAvailable>())
             }
         }

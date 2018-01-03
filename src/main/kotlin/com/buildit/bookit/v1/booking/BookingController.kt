@@ -37,13 +37,13 @@ import java.time.temporal.ChronoUnit.MINUTES
 import javax.validation.Valid
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-open class InvalidBooking(message: String) : RuntimeException(message)
+open class InvalidBookingRequest(message: String) : RuntimeException(message)
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-class StartInPastException : InvalidBooking("Start must be in the future")
+class StartInPastException : InvalidBookingRequest("Start must be in the future")
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-class EndBeforeStartException : InvalidBooking("End must be after Start")
+class EndBeforeStartException : InvalidBookingRequest("End must be after Start")
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 class BookingNotFound : RuntimeException("Booking not found")
@@ -124,11 +124,11 @@ class BookingController(private val bookingRepository: BookingRepository,
 
     @Suppress("UnsafeCallOnNullableType")
     @PostMapping()
-    fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, @AuthenticationPrincipal userPrincipal: UserPrincipal, errors: Errors? = null): ResponseEntity<Booking> {
+    fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: Errors? = null, @AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<Booking> {
         if (errors?.hasErrors() == true) {
             val errorMessage = errors.allErrors.joinToString(",", transform = { it.defaultMessage })
 
-            throw InvalidBooking(errorMessage)
+            throw InvalidBookingRequest(errorMessage)
         }
         val bookable = bookableRepository.findOne(bookingRequest.bookableId) ?: throw InvalidBookable()
 

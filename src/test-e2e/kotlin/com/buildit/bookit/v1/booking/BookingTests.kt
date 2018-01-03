@@ -263,7 +263,7 @@ class `Booking E2E Tests` {
                 """
                 {
                     "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
-                    "subject": "My meeting with bad dates",
+                    "subject": "My meeting",
                     "start": "foo",
                     "end": "bar"
                 }
@@ -277,6 +277,108 @@ class `Booking E2E Tests` {
             expect(jsonResponse.getString("exception")).to.be.equal("org.springframework.http.converter.HttpMessageNotReadableException")
             expect(jsonResponse.getString("message")).to.contain("Cannot deserialize value of type `java.time.LocalDateTime` from String \"foo\"")
         }
+
+        @Test
+        fun `no bookable id`() {
+            val requestWithNonDates =
+                """
+                {
+                    "subject": "My meeting",
+                    "start": "$tomorrow",
+                    "end": "$tomorrowPlusAnHour"
+                }
+                """
+
+            response = post(requestWithNonDates, "/v1/booking")
+
+            val jsonResponse = JSONObject(response?.body)
+
+            expect(response?.statusCode).to.be.equal(BAD_REQUEST)
+            expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.InvalidBookingRequest")
+            expect(jsonResponse.get("message")).to.be.equal("bookableId is required")
+        }
+
+        @Test
+        fun `no subject`() {
+            val requestWithNonDates =
+                """
+                {
+                    "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                    "start": "$tomorrow",
+                    "end": "$tomorrowPlusAnHour"
+                }
+                """
+
+            response = post(requestWithNonDates, "/v1/booking")
+
+            val jsonResponse = JSONObject(response?.body)
+
+            expect(response?.statusCode).to.be.equal(BAD_REQUEST)
+            expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.InvalidBookingRequest")
+            expect(jsonResponse.get("message")).to.be.equal("subject is required and cannot be blank")
+        }
+
+        @Test
+        fun `blank subject`() {
+            val requestWithNonDates =
+                """
+                {
+                    "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                    "subject": "",
+                    "start": "$tomorrow",
+                    "end": "$tomorrowPlusAnHour"
+                }
+                """
+
+            response = post(requestWithNonDates, "/v1/booking")
+
+            val jsonResponse = JSONObject(response?.body)
+
+            expect(response?.statusCode).to.be.equal(BAD_REQUEST)
+            expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.InvalidBookingRequest")
+            expect(jsonResponse.get("message")).to.be.equal("subject is required and cannot be blank")
+        }
+
+        @Test
+        fun `no start`() {
+            val requestWithNonDates =
+                """
+                {
+                    "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                    "subject": "My meeting",
+                    "end": "$tomorrowPlusAnHour"
+                }
+                """
+
+            response = post(requestWithNonDates, "/v1/booking")
+
+            val jsonResponse = JSONObject(response?.body)
+
+            expect(response?.statusCode).to.be.equal(BAD_REQUEST)
+            expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.InvalidBookingRequest")
+            expect(jsonResponse.get("message")).to.be.equal("start is required")
+        }
+
+        @Test
+        fun `no end`() {
+            val requestWithNonDates =
+                """
+                {
+                    "bookableId": "aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+                    "subject": "My meeting",
+                    "start": "$tomorrow"
+                }
+                """
+
+            response = post(requestWithNonDates, "/v1/booking")
+
+            val jsonResponse = JSONObject(response?.body)
+
+            expect(response?.statusCode).to.be.equal(BAD_REQUEST)
+            expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.InvalidBookingRequest")
+            expect(jsonResponse.get("message")).to.be.equal("end is required")
+        }
+
     }
 
     private fun post(request: String, url: String, template: TestRestTemplate = Global.REST_TEMPLATE) =
