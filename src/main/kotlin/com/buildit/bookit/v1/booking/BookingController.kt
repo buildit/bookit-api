@@ -13,6 +13,7 @@ import com.buildit.bookit.v1.user.dto.maskSubjectIfOtherUser
 import io.swagger.annotations.ApiImplicitParam
 import io.swagger.annotations.ApiParam
 import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -128,7 +129,7 @@ class BookingController(private val bookingRepository: BookingRepository,
     @PostMapping()
     fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: BindingResult? = null, @AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<Booking> {
         if (errors?.hasErrors() == true) {
-            val errorMessage = errors.allErrors.joinToString(",", transform = { messageSource.getMessage(it, null) })
+            val errorMessage = errors.allErrors.joinToString(",", transform = { messageSource.getMessage(it, LocaleContextHolder.getLocale()) })
 
             throw InvalidBookingRequest(errorMessage)
         }
