@@ -98,7 +98,7 @@ class BookingControllerUnitTests {
                         )
                     )
                 }
-                bookingController = BookingController(bookingRepo, bookableRepo, mock {}, clock)
+                bookingController = BookingController(bookingRepo, bookableRepo, mock {}, mock {}, mock {})
             }
 
             @Nested
@@ -166,21 +166,21 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `getBooking() for existing booking returns that booking`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking(bookingToday, userPrincipal)
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking(bookingToday, userPrincipal)
                     expect(booking.id).to.be.equal("guid1")
                     expect(booking.subject).to.be.equal(bookingToday.subject)
                 }
 
                 @Test
                 fun `getBooking() for existing booking returns that booking - different user masks`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking(bookingToday, anotherUserPrincipal)
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking(bookingToday, anotherUserPrincipal)
                     expect(booking.id).to.be.equal("guid1")
                     expect(booking.subject).to.be.equal(MASKED_STRING)
                 }
 
                 @Test
                 fun `getBooking() for nonexistent booking throws exception`() {
-                    fun action() = BookingController(bookingRepo, mock {}, mock {}, clock).getBooking(null, userPrincipal)
+                    fun action() = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking(null, userPrincipal)
                     assertThat({ action() }, throws<BookingNotFound>())
                 }
             }
@@ -209,7 +209,7 @@ class BookingControllerUnitTests {
                     on { register(any()) }.doReturn(bookingUser)
                 }
 
-                bookingController = BookingController(bookingRepository, bookableRepo, userService, clock)
+                bookingController = BookingController(bookingRepository, bookableRepo, userService, mock {}, clock)
             }
 
             @Test
@@ -275,7 +275,7 @@ class BookingControllerUnitTests {
                     on { register(userPrincipal) }.doReturn(bookingUser)
                 }
                 bookingRepo = mock {}
-                bookingController = BookingController(bookingRepo, bookableRepo, userService, clock)
+                bookingController = BookingController(bookingRepo, bookableRepo, userService, mock {}, clock)
             }
 
             @Test

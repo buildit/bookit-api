@@ -21,15 +21,15 @@ import javax.validation.constraints.NotNull
  * Booking request
  */
 data class BookingRequest(
-    @field:NotNull(message = "bookableId is required")
+    @field:NotNull
     val bookableId: String?,
-    @field:NotBlank(message = "subject is required and cannot be blank")
+    @field:NotBlank
     val subject: String?,
     @ApiModelProperty(example = "2017-12-29T14:00", required = true)
-    @field:NotNull(message = "start is required")
+    @field:NotNull
     val start: LocalDateTime?,
     @ApiModelProperty(example = "2017-12-29T15:00", required = true)
-    @field:NotNull(message = "end is required")
+    @field:NotNull
     val end: LocalDateTime?
 )
 

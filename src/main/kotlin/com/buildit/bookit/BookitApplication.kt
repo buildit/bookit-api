@@ -18,6 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import org.springframework.validation.Errors
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
@@ -70,7 +71,7 @@ class SwaggerConfiguration {
                 .version("1.0")
                 .build()
         )
-        .ignoredParameterTypes(AuthenticationPrincipal::class.java)
+        .ignoredParameterTypes(AuthenticationPrincipal::class.java, Errors::class.java)
         .directModelSubstitute(ZoneId::class.java, String::class.java)
         .securitySchemes(listOf(
             BasicAuth("spring"),

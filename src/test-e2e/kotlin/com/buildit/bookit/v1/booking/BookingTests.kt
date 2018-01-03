@@ -295,7 +295,7 @@ class `Booking E2E Tests` {
 
             expect(response?.statusCode).to.be.equal(BAD_REQUEST)
             expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.InvalidBookingRequest")
-            expect(jsonResponse.get("message")).to.be.equal("bookableId is required")
+            expect(jsonResponse.get("message")).to.be.equal("Bookable/Room required. Select one and resubmit.")
         }
 
         @Test
@@ -315,7 +315,7 @@ class `Booking E2E Tests` {
 
             expect(response?.statusCode).to.be.equal(BAD_REQUEST)
             expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.InvalidBookingRequest")
-            expect(jsonResponse.get("message")).to.be.equal("subject is required and cannot be blank")
+            expect(jsonResponse.get("message")).to.be.equal("Subject is required and cannot be blank.")
         }
 
         @Test
@@ -336,7 +336,7 @@ class `Booking E2E Tests` {
 
             expect(response?.statusCode).to.be.equal(BAD_REQUEST)
             expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.InvalidBookingRequest")
-            expect(jsonResponse.get("message")).to.be.equal("subject is required and cannot be blank")
+            expect(jsonResponse.get("message")).to.be.equal("Subject is required and cannot be blank.")
         }
 
         @Test
@@ -356,7 +356,7 @@ class `Booking E2E Tests` {
 
             expect(response?.statusCode).to.be.equal(BAD_REQUEST)
             expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.InvalidBookingRequest")
-            expect(jsonResponse.get("message")).to.be.equal("start is required")
+            expect(jsonResponse.get("message")).to.be.equal("Start date & time are required.")
         }
 
         @Test
@@ -376,7 +376,7 @@ class `Booking E2E Tests` {
 
             expect(response?.statusCode).to.be.equal(BAD_REQUEST)
             expect(jsonResponse.get("exception")).to.be.equal("com.buildit.bookit.v1.booking.InvalidBookingRequest")
-            expect(jsonResponse.get("message")).to.be.equal("end is required")
+            expect(jsonResponse.get("message")).to.be.equal("End date & time are required.")
         }
 
     }

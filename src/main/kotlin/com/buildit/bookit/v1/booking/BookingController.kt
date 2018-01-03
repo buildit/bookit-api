@@ -12,12 +12,13 @@ import com.buildit.bookit.v1.user.UserService
 import com.buildit.bookit.v1.user.dto.maskSubjectIfOtherUser
 import io.swagger.annotations.ApiImplicitParam
 import io.swagger.annotations.ApiParam
+import org.springframework.context.MessageSource
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.validation.Errors
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -60,6 +61,7 @@ class BookableNotAvailable : RuntimeException("Bookable is not available.  Pleas
 class BookingController(private val bookingRepository: BookingRepository,
                         private val bookableRepository: BookableRepository,
                         private val userService: UserService,
+                        private val messageSource: MessageSource,
                         private val clock: Clock
 ) {
     @GetMapping
@@ -124,9 +126,10 @@ class BookingController(private val bookingRepository: BookingRepository,
 
     @Suppress("UnsafeCallOnNullableType")
     @PostMapping()
-    fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: Errors? = null, @AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<Booking> {
+    fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: BindingResult? = null, @AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<Booking> {
         if (errors?.hasErrors() == true) {
-            val errorMessage = errors.allErrors.joinToString(",", transform = { it.defaultMessage })
+            val errorMessage = errors.allErrors.joinToString(",", transform = { messageSource.getMessage(it, null) })
+
 
             throw InvalidBookingRequest(errorMessage)
         }
