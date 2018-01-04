@@ -1,7 +1,9 @@
 package com.buildit.bookit.auth
 
+import com.buildit.bookit.BookitProperties
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwsHeader
+import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.SigningKeyResolverAdapter
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
@@ -12,12 +14,61 @@ import java.security.Key
 import java.security.PublicKey
 import java.security.cert.Certificate
 import java.security.cert.CertificateFactory
+import java.util.Base64
+import javax.crypto.spec.SecretKeySpec
+import javax.servlet.http.HttpServletRequest
+import javax.xml.bind.DatatypeConverter
 
-internal object OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
-    private val log = LoggerFactory.getLogger(this::class.java)
-    private var jwkConfig: JSONObject = fetchJwkConfig()
+internal class OpenidSigningKeyResolver(private val request: HttpServletRequest, private val props: BookitProperties) : SigningKeyResolverAdapter() {
+    companion object {
+        private val log = LoggerFactory.getLogger(this::class.java)
+        private var jwkConfig: JSONObject = fetchJwkConfig()
+        private fun fetchJwkConfig(): JSONObject {
+            val openidConfigStr = URL("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration").readText()
+            if (log.isDebugEnabled) {
+                log.debug("AAD OpenID Config: {}", openidConfigStr)
+            }
 
-    override fun resolveSigningKey(header: JwsHeader<*>, claims: Claims): Key? = loadPublicKey(header.getKeyId())
+            val openidConfig = JSONObject(openidConfigStr)
+            val jwksUri = openidConfig.getString("jwks_uri")
+            if (log.isDebugEnabled) {
+                log.debug("AAD OpenID Config jwksUri: {}", jwksUri)
+            }
+
+            val jwkConfigStr = URL(jwksUri).readText()
+            if (log.isDebugEnabled) {
+                log.debug("AAD OpenID JWK Config: {}", jwkConfigStr)
+            }
+
+            return JSONObject(jwkConfigStr)
+        }
+
+        private fun makePemCertificate(key: JSONObject): String {
+            val x5c = key.getJSONArray("x5c").getString(0)
+            val certParts = x5c.split("(?<=\\G.{64})".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+
+            var keyStr = "-----BEGIN CERTIFICATE-----\r\n"
+            keyStr += certParts.joinToString("\r\n")
+            keyStr += "-----END CERTIFICATE-----\r\n"
+
+            if (log.isDebugEnabled) {
+                log.debug("AAD OpenID Key:\n{}", keyStr)
+            }
+            return keyStr
+        }
+    }
+
+    override fun resolveSigningKey(header: JwsHeader<*>, claims: Claims): Key? = findKey(header)
+
+    private fun findKey(header: JwsHeader<*>): Key? {
+        if (header.getAlgorithm() == SignatureAlgorithm.HS256.value && this.props.allowTestTokens ?: listOf("localhost", "integration").any { request.serverName.startsWith(it) }) {
+            log.info("Allow FAKE token validation.")
+            //We will verify our JWT with our ApiKey secret
+            val apiKeySecretBytes = DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secret".toByteArray()))
+            return SecretKeySpec(apiKeySecretBytes, SignatureAlgorithm.HS256.jcaName)
+        }
+        return loadPublicKey(header.getKeyId())
+    }
 
     /**
      * 1. go to here: https://login.microsoftonline.com/common/.well-known/openid-configuration
@@ -63,39 +114,5 @@ internal object OpenidSigningKeyResolver : SigningKeyResolverAdapter() {
             log.debug("AAD OpenID X509Certificate publicKey: {}", publicKey)
         }
         return publicKey
-    }
-
-    private fun fetchJwkConfig(): JSONObject {
-        val openidConfigStr = URL("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration").readText()
-        if (log.isDebugEnabled) {
-            log.debug("AAD OpenID Config: {}", openidConfigStr)
-        }
-
-        val openidConfig = JSONObject(openidConfigStr)
-        val jwksUri = openidConfig.getString("jwks_uri")
-        if (log.isDebugEnabled) {
-            log.debug("AAD OpenID Config jwksUri: {}", jwksUri)
-        }
-
-        val jwkConfigStr = URL(jwksUri).readText()
-        if (log.isDebugEnabled) {
-            log.debug("AAD OpenID JWK Config: {}", jwkConfigStr)
-        }
-
-        return JSONObject(jwkConfigStr)
-    }
-
-    private fun makePemCertificate(key: JSONObject): String {
-        val x5c = key.getJSONArray("x5c").getString(0)
-        val certParts = x5c.split("(?<=\\G.{64})".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-
-        var keyStr = "-----BEGIN CERTIFICATE-----\r\n"
-        keyStr += certParts.joinToString("\r\n")
-        keyStr += "-----END CERTIFICATE-----\r\n"
-
-        if (log.isDebugEnabled) {
-            log.debug("AAD OpenID Key:\n{}", keyStr)
-        }
-        return keyStr
     }
 }
