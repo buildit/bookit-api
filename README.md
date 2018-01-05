@@ -93,6 +93,7 @@ Common maintenance tasks:
 ## Deployment information
 
 ### Deployments
+
 * [Integration](https://integration-bookit-api.buildit.tools)
 * [Staging](https://staging-bookit-api.buildit.tools)
 * [Production](https://bookit-api.buildit.tools)
@@ -112,3 +113,22 @@ Common maintenance tasks:
 ## Contributing
 
 See [Contributing](./CONTRIBUTING.md)
+
+## TODOs & Skeletons
+
+Things that are on lists that should be done eventually:
+* Register the Azure App in Wipro
+    * It's currently registered in builditcontoso which is a 1 year O365 domain (used previously by bookit-web).  It might expire and who knows what happens then
+    * Wipro AD in their wisdom has blocked the ability to create apps - was chasing this down but hit many roadblocks
+* More validations around id_token
+    * We're currently only really validating the nbf and exp (via nimbus jose-jwt library)
+    * We should be all of this https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation
+* Tune JPA queries
+    * We are pretty inefficient when it comes to JPA - when expanding bookings while getting bookables?
+    * Also does queries when serializing (and following ManyToOne relationships) - is this ok or should it be eagerly fetched?
+    * No paging or limiting results - get all will be costly
+    * Still do interval overlaps in app code instead of WHERE clauses
+* Use real database migration tools
+    * Flyway or Liquibase
+    * What we have will only last for so long
+* https://github.com/buildit/bookit-api/pull/29#discussion_r158331469
