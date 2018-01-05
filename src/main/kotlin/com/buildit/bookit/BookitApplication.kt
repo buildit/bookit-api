@@ -1,8 +1,15 @@
 /* Licensed under Apache-2.0 */
 package com.buildit.bookit
 
+import com.buildit.bookit.auth.BookitSecurityContext
 import com.buildit.bookit.auth.JwtAuthenticationFilter
 import com.buildit.bookit.auth.OpenIdAuthenticator
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.jwk.source.ImmutableSecret
+import com.nimbusds.jose.jwk.source.RemoteJWKSet
+import com.nimbusds.jose.proc.JWSKeySelector
+import com.nimbusds.jose.proc.JWSVerificationKeySelector
+import com.nimbusds.jwt.proc.DefaultJWTProcessor
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
@@ -35,8 +42,11 @@ import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger.web.ApiKeyVehicle
 import springfox.documentation.swagger.web.SecurityConfiguration
 import springfox.documentation.swagger2.annotations.EnableSwagger2
+import java.net.URL
 import java.time.Clock
 import java.time.ZoneId
+import java.util.Base64
+import javax.xml.bind.DatatypeConverter
 
 /**
  * Main class (needed for spring boot integration)
@@ -139,9 +149,26 @@ class WebSecurityConfiguration(private val props: BookitProperties) {
             security.authorizeRequests().antMatchers("/v1/ping").permitAll()
             security.authorizeRequests().anyRequest().authenticated()
 
+            // Set up a JWT processor to parse the tokens and then check their signature
+            // and validity time window (bounded by the "iat", "nbf" and "exp" claims)
+            val jwtProcessor = DefaultJWTProcessor<BookitSecurityContext>()
+
+            val azureSelector = JWSVerificationKeySelector(JWSAlgorithm.RS256, RemoteJWKSet<BookitSecurityContext>(URL("https://login.microsoftonline.com/organizations/discovery/v2.0/keys")))
+            val fakeSelector = JWSVerificationKeySelector(JWSAlgorithm.HS256, ImmutableSecret<BookitSecurityContext>(DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secretsecretsecretsecretsecretsecret".toByteArray()))))
+
+            // Configure the JWT processor with a key selector to feed matching public
+            // RSA keys sourced from the JWK set URL
+            val keySelector = JWSKeySelector<BookitSecurityContext> { header, context ->
+                when {
+                    header.algorithm == fakeSelector.expectedJWSAlgorithm && context.allowFakeTokens(props) -> fakeSelector.selectJWSKeys(header, context)
+                    else -> azureSelector.selectJWSKeys(header, context)
+                }
+            }
+            jwtProcessor.jwsKeySelector = keySelector
+
             security.addFilterBefore(
                 JwtAuthenticationFilter(authenticationManager(),
-                    OpenIdAuthenticator(props)),
+                    OpenIdAuthenticator(jwtProcessor)),
                 BasicAuthenticationFilter::class.java)
         }
     }

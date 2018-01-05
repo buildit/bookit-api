@@ -1,9 +1,13 @@
 package com.buildit.bookit.auth
 
 import com.buildit.bookit.Global
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.JWSHeader
+import com.nimbusds.jose.crypto.MACSigner
+import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.PlainJWT
+import com.nimbusds.jwt.SignedJWT
 import com.winterbe.expekt.expect
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
 import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -22,7 +26,7 @@ import javax.xml.bind.DatatypeConverter
  */
 class `Security E2E Tests` {
     private val testRestTemplate = TestRestTemplate(RestTemplateBuilder().rootUri(Global.URI).build())
-    private val SECRET = DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secret".toByteArray()))
+    private val signer = MACSigner(DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secretsecretsecretsecretsecretsecret".toByteArray())))
 
     @BeforeEach
     fun `clear interceptors`() {
@@ -61,9 +65,10 @@ class `Security E2E Tests` {
         @Test
         fun `no signature`() {
             testRestTemplate.restTemplate.interceptors.add(ClientHttpRequestInterceptor { request, body, execution ->
-                val jwt = Jwts.builder()
-                    .setSubject("fakeuser")
-                    .compact()
+                val claimSet = JWTClaimsSet.Builder()
+                    .subject("fakeuser")
+                    .build()
+                val jwt = PlainJWT(claimSet).serialize()
                 request.headers["Authorization"] = "Bearer $jwt"
                 execution.execute(request, body)
             })
@@ -76,13 +81,13 @@ class `Security E2E Tests` {
         @Test
         fun `invalid signature`() {
             testRestTemplate.restTemplate.interceptors.add(ClientHttpRequestInterceptor { request, body, execution ->
-                val jwt = Jwts.builder()
-                    .setSubject("fakeuser")
-                    .signWith(SignatureAlgorithm.HS256, SECRET)
-                    .compact()
-                    .dropLast(1)
+                val claimSet = JWTClaimsSet.Builder()
+                    .subject("fakeuser")
+                    .build()
+                val jwt = SignedJWT(JWSHeader(JWSAlgorithm.HS256), claimSet)
+                jwt.sign(signer)
 
-                request.headers["Authorization"] = "Bearer $jwt"
+                request.headers["Authorization"] = "Bearer ${jwt.serialize().dropLast(1)}"
                 execution.execute(request, body)
             })
 
@@ -94,13 +99,14 @@ class `Security E2E Tests` {
         @Test
         fun `expired`() {
             testRestTemplate.restTemplate.interceptors.add(ClientHttpRequestInterceptor { request, body, execution ->
-                val jwt = Jwts.builder()
-                    .setSubject("fakeuser")
-                    .setExpiration(Date(System.currentTimeMillis() - 3600000))
-                    .signWith(SignatureAlgorithm.HS256, SECRET)
-                    .compact()
+                val claimSet = JWTClaimsSet.Builder()
+                    .subject("fakeuser")
+                    .expirationTime(Date(System.currentTimeMillis() - 3600000))
+                    .build()
+                val jwt = SignedJWT(JWSHeader(JWSAlgorithm.HS256), claimSet)
+                jwt.sign(signer)
 
-                request.headers["Authorization"] = "Bearer $jwt"
+                request.headers["Authorization"] = "Bearer ${jwt.serialize()}"
                 execution.execute(request, body)
             })
 
@@ -112,13 +118,14 @@ class `Security E2E Tests` {
         @Test
         fun `not-before in future`() {
             testRestTemplate.restTemplate.interceptors.add(ClientHttpRequestInterceptor { request, body, execution ->
-                val jwt = Jwts.builder()
-                    .setSubject("fakeuser")
-                    .setNotBefore(Date(System.currentTimeMillis() + 3600000))
-                    .signWith(SignatureAlgorithm.HS256, SECRET)
-                    .compact()
+                val claimSet = JWTClaimsSet.Builder()
+                    .subject("fakeuser")
+                    .notBeforeTime(Date(System.currentTimeMillis() + 3600000))
+                    .build()
+                val jwt = SignedJWT(JWSHeader(JWSAlgorithm.HS256), claimSet)
+                jwt.sign(signer)
 
-                request.headers["Authorization"] = "Bearer $jwt"
+                request.headers["Authorization"] = "Bearer ${jwt.serialize()}"
                 execution.execute(request, body)
             })
 
@@ -130,13 +137,12 @@ class `Security E2E Tests` {
         @Test
         fun `bad token behaves as anonymous on selected endpoints`() {
             testRestTemplate.restTemplate.interceptors.add(ClientHttpRequestInterceptor { request, body, execution ->
-                val jwt = Jwts.builder()
-                    .setSubject("fakeuser")
-                    .signWith(SignatureAlgorithm.HS256, SECRET)
-                    .compact()
-                    .drop(1)
-
-                request.headers["Authorization"] = "Bearer $jwt"
+                val claimSet = JWTClaimsSet.Builder()
+                    .subject("fakeuser")
+                    .build()
+                val jwt = SignedJWT(JWSHeader(JWSAlgorithm.HS256), claimSet)
+                jwt.sign(signer)
+                request.headers["Authorization"] = "Bearer ${jwt.serialize().drop(1)}"
                 execution.execute(request, body)
             })
 
