@@ -39,6 +39,7 @@ data class BookingRequest(
     val end: LocalDateTime?
 )
 
+@Suppress("UnnecessaryAbstractClass")
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
 abstract class Auditable {
