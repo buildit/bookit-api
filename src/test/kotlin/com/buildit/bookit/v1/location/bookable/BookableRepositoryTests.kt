@@ -37,7 +37,7 @@ class BookableRepositoryTests @Autowired constructor(
     @Test
     fun findByLocation() {
         val bookables = bookableRepo.findByLocation(nyc)
-        expect(bookables).size(7)
+        expect(bookables.size).to.be.equal(7)
         expect(bookables).to.contain(red)
     }
 }
