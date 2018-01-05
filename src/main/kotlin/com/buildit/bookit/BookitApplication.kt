@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.core.annotation.Order
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
@@ -43,6 +44,7 @@ import java.time.ZoneId
  */
 @SpringBootApplication
 @EnableConfigurationProperties(BookitProperties::class)
+@EnableJpaAuditing
 @EntityScan(
     basePackageClasses = [BookitApplication::class, Jsr310JpaConverters.ZoneIdConverter::class]
 )
