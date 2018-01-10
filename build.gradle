@@ -158,7 +158,7 @@ afterEvaluate {
         violationRules {
             rule {
                 limit {
-                    minimum = 0.80
+                    minimum = 0.75
                 }
             }
         }
