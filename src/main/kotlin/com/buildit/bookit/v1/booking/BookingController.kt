@@ -3,7 +3,6 @@ package com.buildit.bookit.v1.booking
 import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.dto.Booking
 import com.buildit.bookit.v1.booking.dto.BookingRequest
-import com.buildit.bookit.v1.booking.dto.interval
 import com.buildit.bookit.v1.location.bookable.BookableRepository
 import com.buildit.bookit.v1.location.bookable.InvalidBookable
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import org.threeten.extra.Interval
 import springfox.documentation.annotations.ApiIgnore
 import java.net.URI
 import java.time.Clock
@@ -52,6 +50,10 @@ class BookingNotFound : RuntimeException("Booking not found")
 
 @ResponseStatus(value = HttpStatus.CONFLICT)
 class BookableNotAvailable : RuntimeException("Bookable is not available.  Please select another time")
+
+// these are needed to avoid overflow issues w/ java 8 local datetime min/max translating to timestamp
+val minLocalDateTime = LocalDateTime.of(1900, 1, 1, 0, 0)
+val maxLocalDateTime = LocalDateTime.of(3000, 1, 1, 0, 0)
 
 /**
  * Endpoint to manage bookings
@@ -83,19 +85,20 @@ class BookingController(private val bookingRepository: BookingRepository,
             throw EndBeforeStartException()
         }
 
-        val allBookings = bookingRepository.findAll().toList()
-        if (start == LocalDate.MIN && end == LocalDate.MAX)
+        if (start == LocalDate.MIN && end == LocalDate.MAX) {
+            val allBookings = bookingRepository.findAll().toList()
             return allBookings.map { maskSubjectIfOtherUser(it, user) }
+        }
 
-        return allBookings
-            .filter { booking ->
-                val timezone = booking.bookable.location.timeZone
-                val desiredInterval = Interval.of(
-                    start.atStartOfDay(timezone).toInstant(),
-                    end.atStartOfDay(timezone).toInstant()
-                )
-                desiredInterval.overlaps(booking.interval(timezone))
-            }
+        return bookingRepository.findByOverlap(
+            when (start) {
+                LocalDate.MIN -> minLocalDateTime
+                else -> start.atStartOfDay()
+            },
+            when (end) {
+                LocalDate.MAX -> LocalDateTime.of(3000, 1, 1, 0, 0)
+                else -> end.atStartOfDay()
+            })
             .map { maskSubjectIfOtherUser(it, user) }
     }
 
@@ -167,19 +170,7 @@ class BookingController(private val bookingRepository: BookingRepository,
             throw EndBeforeStartException()
         }
 
-        val interval = Interval.of(
-            startDateTimeTruncated.atZone(location.timeZone).toInstant(),
-            endDateTimeTruncated.atZone(location.timeZone).toInstant()
-        )
-
-        val unavailable = bookingRepository.findByBookable(bookable)
-            .any {
-                interval.overlaps(
-                    Interval.of(
-                        it.start.atZone(location.timeZone).toInstant(),
-                        it.end.atZone(location.timeZone).toInstant()))
-            }
-
+        val unavailable = bookingRepository.findByBookableAndOverlap(bookable, startDateTimeTruncated, endDateTimeTruncated).any()
         if (unavailable) {
             throw BookableNotAvailable()
         }
