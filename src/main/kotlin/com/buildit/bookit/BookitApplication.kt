@@ -46,8 +46,6 @@ import java.net.URL
 import java.time.Clock
 import java.time.ZoneId
 import java.util.Base64
-import java.util.TimeZone
-import javax.annotation.PostConstruct
 import javax.xml.bind.DatatypeConverter
 
 /**
@@ -61,12 +59,6 @@ import javax.xml.bind.DatatypeConverter
 class BookitApplication {
     @Bean
     fun defaultClock(): Clock = Clock.systemUTC()
-
-    // https://moelholm.com/2016/11/09/spring-boot-controlling-timezones-with-hibernate/
-    @PostConstruct
-    fun started() {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
-    }
 }
 
 /**

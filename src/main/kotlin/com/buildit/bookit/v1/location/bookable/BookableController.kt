@@ -3,8 +3,7 @@ package com.buildit.bookit.v1.location.bookable
 import com.buildit.bookit.auth.UserPrincipal
 import com.buildit.bookit.v1.booking.BookingRepository
 import com.buildit.bookit.v1.booking.EndBeforeStartException
-import com.buildit.bookit.v1.booking.maxLocalDateTime
-import com.buildit.bookit.v1.booking.minLocalDateTime
+import com.buildit.bookit.v1.booking.dto.interval
 import com.buildit.bookit.v1.location.bookable.dto.Bookable
 import com.buildit.bookit.v1.location.bookable.dto.BookableResource
 import com.buildit.bookit.v1.location.dto.Location
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import org.threeten.extra.Interval
 import springfox.documentation.annotations.ApiIgnore
 import java.time.LocalDate
 
@@ -80,6 +80,7 @@ class BookableController(private val bookableRepository: BookableRepository, val
         expand: List<String>? = emptyList()
     ): Collection<BookableResource> {
         val location = locationId ?: throw LocationNotFound()
+        val timeZone = location.timeZone
         val start = startDateInclusive ?: LocalDate.MIN
         val end = endDateExclusive ?: LocalDate.MAX
 
@@ -87,19 +88,17 @@ class BookableController(private val bookableRepository: BookableRepository, val
             throw EndBeforeStartException()
         }
 
+        val desiredInterval = Interval.of(
+            start.atStartOfDay(timeZone).toInstant(),
+            end.atStartOfDay(timeZone).toInstant()
+        )
+
         return bookableRepository.findByLocation(location)
             .map { bookable ->
                 val bookings = when {
                     "bookings" in expand ?: emptyList() ->
-                        bookingRepository.findByBookableAndOverlap(bookable,
-                            when (start) {
-                                LocalDate.MIN -> minLocalDateTime
-                                else -> start.atStartOfDay()
-                            },
-                            when (end) {
-                                LocalDate.MAX -> maxLocalDateTime
-                                else -> end.atStartOfDay()
-                            })
+                        bookingRepository.findByBookable(bookable)
+                            .filter { desiredInterval.overlaps(it.interval(timeZone)) }
                             .map { maskSubjectIfOtherUser(it, user) }
                     else -> emptyList()
                 }

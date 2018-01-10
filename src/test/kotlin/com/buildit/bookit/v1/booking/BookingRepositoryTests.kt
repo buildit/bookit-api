@@ -28,26 +28,16 @@ class BookingRepositoryTests @Autowired constructor(
     private val start = LocalDateTime.parse("2017-04-21T10:00")
     private val end = LocalDateTime.parse("2017-04-21T11:00")
     private val bookable = bookableRepo.findAll().first()
-    private val anotherBookable = bookableRepo.findAll().last()
-    private lateinit var booking: Booking
-    private lateinit var anotherBooking: Booking
+
     lateinit var creatingUser: User
 
     @BeforeEach
-    fun setup() {
+    fun createUser() {
         creatingUser = userRepo.save(User("external-userid-guid", "Test", "User"))
-
-        booking = bookingRepo.save(
-            Booking(bookable, "Subject", start, end, creatingUser)
-        )
-        anotherBooking = bookingRepo.save(
-            Booking(anotherBookable, "Another", start, end, creatingUser)
-        )
     }
 
     @Test
     fun getAllBookingsNoBookings() {
-        bookingRepo.delete(listOf(booking, anotherBooking))
         val bookings = bookingRepo.findAll()?.toList()
 
         expect(bookings).has.size(0)
@@ -90,121 +80,18 @@ class BookingRepositoryTests @Autowired constructor(
 
     @Test
     fun getAllBookings1Booking() {
+        val booking = bookingRepo.save(
+            Booking(
+                bookable,
+                "My Inserted",
+                start,
+                end,
+                creatingUser
+            )
+        )
+
         val bookings = bookingRepo.findAll()?.toList()
 
         expect(bookings).to.contain(booking)
-        expect(bookings).to.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByOverlapAll() {
-        val bookings = bookingRepo.findByOverlap(LocalDateTime.of(1900, 1, 1, 12, 0), LocalDateTime.of(3000, 1, 1, 12, 0))
-
-        expect(bookings).to.contain(booking)
-        expect(bookings).to.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByOverlapStart() {
-        val bookings = bookingRepo.findByOverlap(start.minusMinutes(30), end.minusMinutes(30))
-
-        expect(bookings).to.contain(booking)
-        expect(bookings).to.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByOverlapEnd() {
-        val bookings = bookingRepo.findByOverlap(start.plusMinutes(30), end.plusMinutes(30))
-
-        expect(bookings).to.contain(booking)
-        expect(bookings).to.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByOverlapTooSoon() {
-        val bookings = bookingRepo.findByOverlap(start.minusHours(2), end.minusHours(2))
-
-        expect(bookings).to.not.contain(booking)
-        expect(bookings).to.not.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByOverlapTooLate() {
-        val bookings = bookingRepo.findByOverlap(start.plusHours(2), end.plusHours(2))
-
-        expect(bookings).to.not.contain(booking)
-        expect(bookings).to.not.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByOverlapStartExclusive() {
-        val bookings = bookingRepo.findByOverlap(start.minusHours(1), end.minusHours(1))
-
-        expect(bookings).to.not.contain(booking)
-        expect(bookings).to.not.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByOverlapEndExclusive() {
-        val bookings = bookingRepo.findByOverlap(start.plusHours(1), end.plusHours(1))
-
-        expect(bookings).to.not.contain(booking)
-        expect(bookings).to.not.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByBookableAndOverlapAll() {
-        val bookings = bookingRepo.findByBookableAndOverlap(bookable, LocalDateTime.of(1900, 1, 1, 12, 0), LocalDateTime.of(3000, 1, 1, 12, 0))
-
-        expect(bookings).to.contain(booking)
-        expect(bookings).to.not.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByBookableAndOverlapStart() {
-        val bookings = bookingRepo.findByBookableAndOverlap(bookable, start.minusMinutes(30), end.minusMinutes(30))
-
-        expect(bookings).to.contain(booking)
-        expect(bookings).to.not.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByBookableAndOverlapEnd() {
-        val bookings = bookingRepo.findByBookableAndOverlap(bookable, start.plusMinutes(30), end.plusMinutes(30))
-
-        expect(bookings).to.contain(booking)
-        expect(bookings).to.not.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByBookableAndOverlapTooSoon() {
-        val bookings = bookingRepo.findByBookableAndOverlap(bookable, start.minusHours(2), end.minusHours(2))
-
-        expect(bookings).to.not.contain(booking)
-        expect(bookings).to.not.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByBookableAndOverlapTooLate() {
-        val bookings = bookingRepo.findByBookableAndOverlap(bookable, start.plusHours(2), end.plusHours(2))
-
-        expect(bookings).to.not.contain(booking)
-        expect(bookings).to.not.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByBookableAndOverlapStartExclusive() {
-        val bookings = bookingRepo.findByBookableAndOverlap(bookable, start.minusHours(1), end.minusHours(1))
-
-        expect(bookings).to.not.contain(booking)
-        expect(bookings).to.not.contain(anotherBooking)
-    }
-
-    @Test
-    fun findByBookableAndOverlapEndExclusive() {
-        val bookings = bookingRepo.findByBookableAndOverlap(bookable, start.plusHours(1), end.plusHours(1))
-
-        expect(bookings).to.not.contain(booking)
-        expect(bookings).to.not.contain(anotherBooking)
     }
 }

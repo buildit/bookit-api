@@ -93,16 +93,9 @@ class BookingControllerUnitTests {
             fun setup() {
                 bookingRepo = mock {
                     on { findAll() }.doReturn(
-                        listOf(bookingToday, bookingTomorrow, bookingTodayDifferentBookable, bookingYesterday)
-                    )
-                    on { findByOverlap(today.atStartOfDay(), today.plusDays(1).atStartOfDay()) }.doReturn(
-                        listOf(bookingToday, bookingTodayDifferentBookable)
-                    )
-                    on { findByOverlap(minLocalDateTime, today.plusDays(1).atStartOfDay()) }.doReturn(
-                        listOf(bookingToday, bookingTodayDifferentBookable, bookingYesterday)
-                    )
-                    on { findByOverlap(today.atStartOfDay(), maxLocalDateTime) }.doReturn(
-                        listOf(bookingToday, bookingTodayDifferentBookable, bookingTomorrow)
+                        listOf(
+                            bookingToday, bookingTomorrow, bookingTodayDifferentBookable, bookingYesterday
+                        )
                     )
                 }
                 bookingController = BookingController(bookingRepo, bookableRepo, mock {}, mock {}, mock {})
@@ -206,10 +199,8 @@ class BookingControllerUnitTests {
             fun setup() {
                 val bookingRepository = mock<BookingRepository> {
                     on { save(expectedBooking) }.doReturn(expectedBooking)
-                    on { findByBookableAndOverlap(nycBookable1, start.minusMinutes(30), end.minusMinutes(30)) }.doReturn(listOf(
-                        Booking(nycBookable1, "Before", start.minusHours(1), end.minusHours(1), bookingUser, "guid1")
-                    ))
-                    on { findByBookableAndOverlap(nycBookable1, start.plusMinutes(30), end.plusMinutes(30)) }.doReturn(listOf(
+                    on { findByBookable(nycBookable1) }.doReturn(listOf(
+                        Booking(nycBookable1, "Before", start.minusHours(1), end.minusHours(1), bookingUser, "guid1"),
                         Booking(nycBookable1, "After", start.plusHours(1), end.plusHours(1), bookingUser, "guid2")
                     ))
                 }
