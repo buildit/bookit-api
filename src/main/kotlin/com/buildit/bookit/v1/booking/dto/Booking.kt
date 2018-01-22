@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.annotations.ApiModelProperty
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.validator.constraints.NotBlank
-import org.threeten.extra.Interval
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -53,12 +51,11 @@ data class Booking(
     @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2") @Column(length = 36)
     val id: String? = null
 ) {
-    val startTimezoneAbbreviation get() = this.start.atZone(bookable.location.timeZone).format(DateTimeFormatter.ofPattern("zzz"))
+    val startTimezoneAbbreviation
+        get() = this.start.atZone(bookable.location.timeZone).format(
+            DateTimeFormatter.ofPattern(
+                "zzz"
+            )
+        )
     val endTimezoneAbbreviation get() = this.end.atZone(bookable.location.timeZone).format(DateTimeFormatter.ofPattern("zzz"))
 }
-
-fun Booking.interval(timeZone: ZoneId): Interval =
-    Interval.of(
-        this.start.atZone(timeZone).toInstant(),
-        this.end.atZone(timeZone).toInstant())
-
