@@ -65,4 +65,3 @@ class PingControllerMockMvcTests @Autowired constructor(
             .andExpect(jsonPath("$.user").doesNotExist())
     }
 }
-

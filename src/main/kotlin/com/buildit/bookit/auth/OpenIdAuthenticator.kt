@@ -21,7 +21,10 @@ class OpenIdAuthenticator(private val jwtProcessor: JWTProcessor<BookitSecurityC
     private val log = LoggerFactory.getLogger(this::class.java)
 
     @Suppress("TooGenericExceptionCaught")
-    override fun getAuthentication(jwtToken: String, request: HttpServletRequest): UsernamePasswordAuthenticationToken? {
+    override fun getAuthentication(
+        jwtToken: String,
+        request: HttpServletRequest
+    ): UsernamePasswordAuthenticationToken? {
         val user: JWTClaimsSet? = try {
             jwtProcessor.process(jwtToken, BookitSecurityContext(request))
         } catch (e: Throwable) {
@@ -31,11 +34,16 @@ class OpenIdAuthenticator(private val jwtProcessor: JWTProcessor<BookitSecurityC
 
         if (user != null) {
             log.info("Request token verification success: $user")
-            return UsernamePasswordAuthenticationToken(UserPrincipal(user.getStringClaim("oid") ?: user.subject, user.getStringClaim("given_name") ?: "", user.getStringClaim("family_name") ?: user.getStringClaim("name") ?: user.subject), null, emptyList())
+            return UsernamePasswordAuthenticationToken(
+                UserPrincipal(
+                    user.getStringClaim("oid") ?: user.subject,
+                    user.getStringClaim("given_name") ?: "",
+                    user.getStringClaim("family_name") ?: user.getStringClaim("name") ?: user.subject
+                ), null, emptyList()
+            )
         }
 
         log.info("Request token verification failure.")
         return null
     }
 }
-

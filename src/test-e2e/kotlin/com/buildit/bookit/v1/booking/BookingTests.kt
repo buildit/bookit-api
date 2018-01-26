@@ -140,7 +140,8 @@ class `Booking E2E Tests` {
 
             @Test
             fun `get single booking - another users booking masks`() {
-                val response = response?.headers?.location?.let { get(it.toString(), Global.ANOTHER_USER_REST_TEMPLATE) }
+                val response =
+                    response?.headers?.location?.let { get(it.toString(), Global.ANOTHER_USER_REST_TEMPLATE) }
                 JSONAssert.assertEquals(otherUserExpectedBooking, response?.body, JSONCompareMode.LENIENT)
             }
 
@@ -150,7 +151,8 @@ class `Booking E2E Tests` {
             }
         }
 
-        private fun get(url: String, template: TestRestTemplate = Global.REST_TEMPLATE) = template.getForEntity(url, String::class.java)
+        private fun get(url: String, template: TestRestTemplate = Global.REST_TEMPLATE) =
+            template.getForEntity(url, String::class.java)
     }
 
     @Nested
@@ -413,7 +415,8 @@ class `Booking E2E Tests` {
 
             @Test
             fun `should not be able to delete another users bookings`() {
-                val result = Global.REST_TEMPLATE.exchange(response?.headers?.location, HttpMethod.DELETE, null, Any::class.java)
+                val result =
+                    Global.REST_TEMPLATE.exchange(response?.headers?.location, HttpMethod.DELETE, null, Any::class.java)
 
                 expect(result.statusCode).to.be.equal(FORBIDDEN)
             }

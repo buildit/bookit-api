@@ -13,10 +13,12 @@ import java.time.ZoneId
 class BookingTests {
     @Test
     fun `returns timezone offset abbreviation`() {
-        val booking = Booking(Bookable(Location("NYC", ZoneId.of("America/New_York")), "bookable", Disposition()), "Subject",
+        val booking = Booking(
+            Bookable(Location("NYC", ZoneId.of("America/New_York")), "bookable", Disposition()), "Subject",
             LocalDateTime.of(2018, 1, 1, 12, 0),
             LocalDateTime.of(2018, 6, 1, 12, 0),
-            User("foo", "bar", "baz"))
+            User("foo", "bar", "baz")
+        )
         expect(booking.startTimezoneAbbreviation).to.equal("EST")
         expect(booking.endTimezoneAbbreviation).to.equal("EDT")
     }

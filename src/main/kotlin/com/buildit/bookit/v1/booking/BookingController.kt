@@ -52,7 +52,9 @@ class BookingNotFound : RuntimeException("Booking not found")
 class BookableNotAvailable : RuntimeException("Bookable is not available.  Please select another time")
 
 // these are needed to avoid overflow issues w/ java 8 local datetime min/max translating to timestamp
+@Suppress("MagicNumber")
 val minLocalDateTime = LocalDateTime.of(1900, 1, 1, 0, 0)
+@Suppress("MagicNumber")
 val maxLocalDateTime = LocalDateTime.of(3000, 1, 1, 0, 0)
 
 /**
@@ -61,11 +63,12 @@ val maxLocalDateTime = LocalDateTime.of(3000, 1, 1, 0, 0)
 @RestController
 @RequestMapping("/v1/booking")
 @Transactional
-class BookingController(private val bookingRepository: BookingRepository,
-                        private val bookableRepository: BookableRepository,
-                        private val userService: UserService,
-                        private val messageSource: MessageSource,
-                        private val clock: Clock
+class BookingController(
+    private val bookingRepository: BookingRepository,
+    private val bookableRepository: BookableRepository,
+    private val userService: UserService,
+    private val messageSource: MessageSource,
+    private val clock: Clock
 ) {
     @GetMapping
     @Transactional(readOnly = true)
@@ -96,9 +99,10 @@ class BookingController(private val bookingRepository: BookingRepository,
                 else -> start.atStartOfDay()
             },
             when (end) {
-                LocalDate.MAX -> LocalDateTime.of(3000, 1, 1, 0, 0)
+                LocalDate.MAX -> maxLocalDateTime
                 else -> end.atStartOfDay()
-            })
+            }
+        )
             .map { maskSubjectIfOtherUser(it, user) }
     }
 
@@ -132,7 +136,9 @@ class BookingController(private val bookingRepository: BookingRepository,
     @PostMapping()
     fun createBooking(@Valid @RequestBody bookingRequest: BookingRequest, errors: BindingResult? = null, @AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<Booking> {
         if (errors?.hasErrors() == true) {
-            val errorMessage = errors.allErrors.joinToString(",", transform = { messageSource.getMessage(it, LocaleContextHolder.getLocale()) })
+            val errorMessage = errors.allErrors.joinToString(
+                ",",
+                transform = { messageSource.getMessage(it, LocaleContextHolder.getLocale()) })
 
             throw InvalidBookingRequest(errorMessage)
         }
@@ -160,7 +166,12 @@ class BookingController(private val bookingRepository: BookingRepository,
             .body(booking)
     }
 
-    private fun validateBooking(location: Location, startDateTimeTruncated: LocalDateTime, endDateTimeTruncated: LocalDateTime, bookable: Bookable) {
+    private fun validateBooking(
+        location: Location,
+        startDateTimeTruncated: LocalDateTime,
+        endDateTimeTruncated: LocalDateTime,
+        bookable: Bookable
+    ) {
         val now = LocalDateTime.now(clock.withZone(location.timeZone))
         if (!startDateTimeTruncated.isAfter(now)) {
             throw StartInPastException()
@@ -170,7 +181,8 @@ class BookingController(private val bookingRepository: BookingRepository,
             throw EndBeforeStartException()
         }
 
-        val unavailable = bookingRepository.findByBookableAndOverlap(bookable, startDateTimeTruncated, endDateTimeTruncated).any()
+        val unavailable =
+            bookingRepository.findByBookableAndOverlap(bookable, startDateTimeTruncated, endDateTimeTruncated).any()
         if (unavailable) {
             throw BookableNotAvailable()
         }

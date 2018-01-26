@@ -10,6 +10,6 @@ class UserService(val userRepository: UserRepository) {
      * Obtains the Bookit user representa
      */
     fun register(principal: UserPrincipal): User =
-        userRepository.findByExternalId(principal.subject) ?:
-            userRepository.save(User(principal.subject, principal.givenName, principal.familyName))
+        userRepository.findByExternalId(principal.subject)
+                ?: userRepository.save(User(principal.subject, principal.givenName, principal.familyName))
 }

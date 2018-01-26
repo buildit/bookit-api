@@ -40,7 +40,8 @@ class BookingControllerUnitTests {
     private val userPrincipal = UserPrincipal("foo", "bar", "baz")
     private val anotherUserPrincipal = UserPrincipal("yet", "another", "user")
     private val bookingUser = User("foo", "bar", "baz", "user-guid")
-    private val bookingToday = Booking(nycBookable1, "Booking today", today.atTime(9, 15), today.atTime(10, 15), bookingUser, "guid1")
+    private val bookingToday =
+        Booking(nycBookable1, "Booking today", today.atTime(9, 15), today.atTime(10, 15), bookingUser, "guid1")
 
     @BeforeEach
     fun setup() {
@@ -57,7 +58,8 @@ class BookingControllerUnitTests {
             private lateinit var bookingRepo: BookingRepository
 
             private val bookingToday =
-                Booking(nycBookable1,
+                Booking(
+                    nycBookable1,
                     "Booking today",
                     today.atTime(9, 15),
                     today.atTime(10, 15),
@@ -65,7 +67,8 @@ class BookingControllerUnitTests {
                     "guid1"
                 )
             private val bookingTomorrow =
-                Booking(nycBookable1,
+                Booking(
+                    nycBookable1,
                     "Booking tomorrow",
                     today.plusDays(1).atTime(9, 15),
                     today.plusDays(1).atTime(10, 15),
@@ -73,7 +76,8 @@ class BookingControllerUnitTests {
                     "guid2"
                 )
             private val bookingTodayDifferentBookable =
-                Booking(nycBookable2,
+                Booking(
+                    nycBookable2,
                     "Booking today, different bookable",
                     today.atTime(11, 0),
                     today.atTime(11, 30),
@@ -81,7 +85,8 @@ class BookingControllerUnitTests {
                     "guid3"
                 )
             private val bookingYesterday =
-                Booking(nycBookable1,
+                Booking(
+                    nycBookable1,
                     "Booking yesterday",
                     today.minusDays(1).atTime(9, 15),
                     today.minusDays(1).atTime(10, 15),
@@ -133,18 +138,22 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `fails when end before start`() {
-                    assertThat({
-                        bookingController.getAllBookings(userPrincipal, today, today.minusDays(1))
-                    },
-                        throws<EndBeforeStartException>())
+                    assertThat(
+                        {
+                            bookingController.getAllBookings(userPrincipal, today, today.minusDays(1))
+                        },
+                        throws<EndBeforeStartException>()
+                    )
                 }
 
                 @Test
                 fun `fails when start == end`() {
-                    assertThat({
-                        bookingController.getAllBookings(userPrincipal, today, today)
-                    },
-                        throws<EndBeforeStartException>())
+                    assertThat(
+                        {
+                            bookingController.getAllBookings(userPrincipal, today, today)
+                        },
+                        throws<EndBeforeStartException>()
+                    )
                 }
 
                 @Test
@@ -173,21 +182,28 @@ class BookingControllerUnitTests {
 
                 @Test
                 fun `getBooking() for existing booking returns that booking`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking(bookingToday, userPrincipal)
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking(
+                        bookingToday,
+                        userPrincipal
+                    )
                     expect(booking.id).to.be.equal("guid1")
                     expect(booking.subject).to.be.equal(bookingToday.subject)
                 }
 
                 @Test
                 fun `getBooking() for existing booking returns that booking - different user masks`() {
-                    val booking = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking(bookingToday, anotherUserPrincipal)
+                    val booking = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking(
+                        bookingToday,
+                        anotherUserPrincipal
+                    )
                     expect(booking.id).to.be.equal("guid1")
                     expect(booking.subject).to.be.equal(MASKED_STRING)
                 }
 
                 @Test
                 fun `getBooking() for nonexistent booking throws exception`() {
-                    fun action() = BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking(null, userPrincipal)
+                    fun action() =
+                        BookingController(bookingRepo, mock {}, mock {}, mock {}, clock).getBooking(null, userPrincipal)
                     assertThat({ action() }, throws<BookingNotFound>())
                 }
             }
@@ -206,12 +222,29 @@ class BookingControllerUnitTests {
             fun setup() {
                 val bookingRepository = mock<BookingRepository> {
                     on { save(expectedBooking) }.doReturn(expectedBooking)
-                    on { findByBookableAndOverlap(nycBookable1, start.minusMinutes(30), end.minusMinutes(30)) }.doReturn(listOf(
-                        Booking(nycBookable1, "Before", start.minusHours(1), end.minusHours(1), bookingUser, "guid1")
-                    ))
-                    on { findByBookableAndOverlap(nycBookable1, start.plusMinutes(30), end.plusMinutes(30)) }.doReturn(listOf(
-                        Booking(nycBookable1, "After", start.plusHours(1), end.plusHours(1), bookingUser, "guid2")
-                    ))
+                    on {
+                        findByBookableAndOverlap(
+                            nycBookable1,
+                            start.minusMinutes(30),
+                            end.minusMinutes(30)
+                        )
+                    }.doReturn(
+                        listOf(
+                            Booking(
+                                nycBookable1,
+                                "Before",
+                                start.minusHours(1),
+                                end.minusHours(1),
+                                bookingUser,
+                                "guid1"
+                            )
+                        )
+                    )
+                    on { findByBookableAndOverlap(nycBookable1, start.plusMinutes(30), end.plusMinutes(30)) }.doReturn(
+                        listOf(
+                            Booking(nycBookable1, "After", start.plusHours(1), end.plusHours(1), bookingUser, "guid2")
+                        )
+                    )
                 }
 
                 userService = mock {
@@ -254,7 +287,8 @@ class BookingControllerUnitTests {
                     nycBookable1.id,
                     "MyRequest",
                     start.minusMinutes(30),
-                    end.minusMinutes(30))
+                    end.minusMinutes(30)
+                )
 
                 fun action() = bookingController.createBooking(request, userPrincipal = userPrincipal)
                 assertThat({ action() }, throws<BookableNotAvailable>())
@@ -266,7 +300,8 @@ class BookingControllerUnitTests {
                     nycBookable1.id,
                     "MyRequest",
                     start.plusMinutes(30),
-                    end.plusMinutes(30))
+                    end.plusMinutes(30)
+                )
 
                 fun action() = bookingController.createBooking(request, userPrincipal = userPrincipal)
                 assertThat({ action() }, throws<BookableNotAvailable>())

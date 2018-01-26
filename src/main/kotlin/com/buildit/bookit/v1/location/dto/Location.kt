@@ -15,12 +15,14 @@ import javax.persistence.Id
  * Location response
  */
 @Entity
-data class Location(@Column(unique = true, nullable = false)
-                    val name: String,
-                    @Column(nullable = false)
-                    val timeZone: ZoneId,
-                    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2") @Column(length = 36)
-                    val id: String? = null) {
+data class Location(
+    @Column(unique = true, nullable = false)
+    val name: String,
+    @Column(nullable = false)
+    val timeZone: ZoneId,
+    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2") @Column(length = 36)
+    val id: String? = null
+) {
     val timezoneDisplayName get() = this.timeZone.getDisplayName(TextStyle.FULL, Locale.ENGLISH)
 }
 

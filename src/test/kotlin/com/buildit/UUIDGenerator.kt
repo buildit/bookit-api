@@ -7,4 +7,3 @@ fun main(args: Array<String>) {
         println(UUID.randomUUID().toString())
     }
 }
-

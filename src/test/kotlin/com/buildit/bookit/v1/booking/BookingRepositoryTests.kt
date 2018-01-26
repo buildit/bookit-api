@@ -98,7 +98,8 @@ class BookingRepositoryTests @Autowired constructor(
 
     @Test
     fun findByOverlapAll() {
-        val bookings = bookingRepo.findByOverlap(LocalDateTime.of(1900, 1, 1, 12, 0), LocalDateTime.of(3000, 1, 1, 12, 0))
+        val bookings =
+            bookingRepo.findByOverlap(LocalDateTime.of(1900, 1, 1, 12, 0), LocalDateTime.of(3000, 1, 1, 12, 0))
 
         expect(bookings).to.contain(booking)
         expect(bookings).to.contain(anotherBooking)
@@ -154,7 +155,11 @@ class BookingRepositoryTests @Autowired constructor(
 
     @Test
     fun findByBookableAndOverlapAll() {
-        val bookings = bookingRepo.findByBookableAndOverlap(bookable, LocalDateTime.of(1900, 1, 1, 12, 0), LocalDateTime.of(3000, 1, 1, 12, 0))
+        val bookings = bookingRepo.findByBookableAndOverlap(
+            bookable,
+            LocalDateTime.of(1900, 1, 1, 12, 0),
+            LocalDateTime.of(3000, 1, 1, 12, 0)
+        )
 
         expect(bookings).to.contain(booking)
         expect(bookings).to.not.contain(anotherBooking)

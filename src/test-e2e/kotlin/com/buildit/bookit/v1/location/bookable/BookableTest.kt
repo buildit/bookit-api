@@ -28,7 +28,10 @@ class `Bookable E2E Tests` {
     @Test
     fun `get 1 bookable`() {
         // act
-        val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable/aab6d676-d3cb-4b9b-b285-6e63058aeda8", String::class.java)
+        val response = Global.REST_TEMPLATE.getForEntity(
+            "/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable/aab6d676-d3cb-4b9b-b285-6e63058aeda8",
+            String::class.java
+        )
 
         // assert
         val expectedResponse = """
@@ -95,7 +98,10 @@ class `Bookable E2E Tests` {
     @Test
     fun `get all bookables`() {
         // act
-        val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable", String::class.java)
+        val response = Global.REST_TEMPLATE.getForEntity(
+            "/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable",
+            String::class.java
+        )
 
         // assert
         JSONAssert.assertEquals(allBookables, response.body, JSONCompareMode.LENIENT)
@@ -105,7 +111,10 @@ class `Bookable E2E Tests` {
     inner class `Search for bookables` {
         @Test
         fun `should require start before end`() {
-            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?start=$today&end=${today.minusDays(1)}", String::class.java)
+            val response = Global.REST_TEMPLATE.getForEntity(
+                "/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?start=$today&end=${today.minusDays(1)}",
+                String::class.java
+            )
 
             expect(response.statusCode).to.equal(HttpStatus.BAD_REQUEST)
         }
@@ -113,7 +122,10 @@ class `Bookable E2E Tests` {
         @Test
         fun `should find available bookable`() {
             // act
-            val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?start=$today&end=$today&expand=bookings", String::class.java)
+            val response = Global.REST_TEMPLATE.getForEntity(
+                "/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?start=$today&end=$today&expand=bookings",
+                String::class.java
+            )
 
             // assert
             JSONAssert.assertEquals(allBookables, response.body, JSONCompareMode.LENIENT)
@@ -134,13 +146,17 @@ class `Bookable E2E Tests` {
                                 "end": "$inTwoMinutes"
                             }
                             """
-                createResponse = Global.REST_TEMPLATE.postForEntity("/v1/booking", goodRequest.toEntity(), String::class.java)
+                createResponse =
+                        Global.REST_TEMPLATE.postForEntity("/v1/booking", goodRequest.toEntity(), String::class.java)
             }
 
             @Test
             fun `should find bookable with bookings`() {
                 // act
-                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?expand=bookings", String::class.java)
+                val response = Global.REST_TEMPLATE.getForEntity(
+                    "/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?expand=bookings",
+                    String::class.java
+                )
 
                 // assert
                 val expectedResponse = """
@@ -196,7 +212,10 @@ class `Bookable E2E Tests` {
             @Test
             fun `should find bookable with no bookings on different day`() {
                 // act
-                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?start=${today.plusDays(1)}&expand=bookings", String::class.java)
+                val response = Global.REST_TEMPLATE.getForEntity(
+                    "/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?start=${today.plusDays(1)}&expand=bookings",
+                    String::class.java
+                )
 
                 // assert
                 JSONAssert.assertEquals(allBookables, response.body, JSONCompareMode.LENIENT)
@@ -223,13 +242,20 @@ class `Bookable E2E Tests` {
                                 "end": "$inTwoMinutes"
                             }
                             """
-                createResponse = Global.ANOTHER_USER_REST_TEMPLATE.postForEntity("/v1/booking", goodRequest.toEntity(), String::class.java)
+                createResponse = Global.ANOTHER_USER_REST_TEMPLATE.postForEntity(
+                    "/v1/booking",
+                    goodRequest.toEntity(),
+                    String::class.java
+                )
             }
 
             @Test
             fun `should hide booking details`() {
                 // act
-                val response = Global.REST_TEMPLATE.getForEntity("/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?expand=bookings", String::class.java)
+                val response = Global.REST_TEMPLATE.getForEntity(
+                    "/v1/location/b1177996-75e2-41da-a3e9-fcdd75d1ab31/bookable?expand=bookings",
+                    String::class.java
+                )
 
                 // assert
                 val expectedResponse = """

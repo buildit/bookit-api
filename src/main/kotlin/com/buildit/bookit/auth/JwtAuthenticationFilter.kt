@@ -9,14 +9,17 @@ import javax.servlet.http.HttpServletResponse
 
 internal class JwtAuthenticationFilter(
     authManager: AuthenticationManager,
-    private val jwtAuthenticator: JwtAuthenticator) : BasicAuthenticationFilter(authManager) {
+    private val jwtAuthenticator: JwtAuthenticator
+) : BasicAuthenticationFilter(authManager) {
 
     private val tokenPrefix: String = "Bearer "
     private val tokenHeader: String = "Authorization"
 
-    override fun doFilterInternal(req: HttpServletRequest,
-                                  res: HttpServletResponse,
-                                  chain: FilterChain) {
+    override fun doFilterInternal(
+        req: HttpServletRequest,
+        res: HttpServletResponse,
+        chain: FilterChain
+    ) {
         val header = req.getHeader(tokenHeader)
 
         if (header == null || !header.startsWith(tokenPrefix)) {

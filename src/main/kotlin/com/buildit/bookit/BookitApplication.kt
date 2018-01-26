@@ -91,21 +91,45 @@ class SwaggerConfiguration {
         )
         .ignoredParameterTypes(AuthenticationPrincipal::class.java, Errors::class.java)
         .directModelSubstitute(ZoneId::class.java, String::class.java)
-        .securitySchemes(listOf(
-            BasicAuth("spring"),
-            OAuthBuilder()
-                .name("oauth")
-                .grantTypes(listOf(ImplicitGrant(LoginEndpoint("https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize"), "id_token")))
-                .scopes(listOf(AuthorizationScope("openid", ""), AuthorizationScope("profile", ""), AuthorizationScope("user.read", "")))
-                .build()
-        ))
+        .securitySchemes(
+            listOf(
+                BasicAuth("spring"),
+                OAuthBuilder()
+                    .name("oauth")
+                    .grantTypes(
+                        listOf(
+                            ImplicitGrant(
+                                LoginEndpoint("https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize"),
+                                "id_token"
+                            )
+                        )
+                    )
+                    .scopes(
+                        listOf(
+                            AuthorizationScope("openid", ""),
+                            AuthorizationScope("profile", ""),
+                            AuthorizationScope("user.read", "")
+                        )
+                    )
+                    .build()
+            )
+        )
         .select()
         .apis(RequestHandlerSelectors.basePackage(BookitApplication::class.java.`package`.name))
         .build()
 
     @Bean
     fun securityInfo(): SecurityConfiguration =
-        SecurityConfiguration("9a8b8181-afb1-48f8-a839-a895d39f9db0", "", "realm", "9a8b8181-afb1-48f8-a839-a895d39f9db0", "apiKey", ApiKeyVehicle.HEADER, "api_key", " ")
+        SecurityConfiguration(
+            "9a8b8181-afb1-48f8-a839-a895d39f9db0",
+            "",
+            "realm",
+            "9a8b8181-afb1-48f8-a839-a895d39f9db0",
+            "apiKey",
+            ApiKeyVehicle.HEADER,
+            "api_key",
+            " "
+        )
 }
 
 /**
@@ -130,56 +154,75 @@ class WebMvcConfiguration {
 @Configuration
 class WebSecurityConfiguration(private val props: BookitProperties) {
     @Bean
-    fun securityConfigurer() = @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER) object : WebSecurityConfigurerAdapter() {
-        override fun configure(security: HttpSecurity) {
-            security.cors()
-            security.httpBasic()
-            // we are using token based authentication. csrf is not required.
-            security.csrf().disable()
-            security.sessionManagement().sessionCreationPolicy(STATELESS)
-            if (props.requireSsl == true)
-                security.requiresChannel().anyRequest().requiresSecure()
+    fun securityConfigurer() =
+        @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER) object : WebSecurityConfigurerAdapter() {
+            override fun configure(security: HttpSecurity) {
+                security.cors()
+                security.httpBasic()
+                // we are using token based authentication. csrf is not required.
+                security.csrf().disable()
+                security.sessionManagement().sessionCreationPolicy(STATELESS)
+                if (props.requireSsl == true)
+                    security.requiresChannel().anyRequest().requiresSecure()
 
-            security.authorizeRequests().antMatchers(
-                "/",
-                "/index.html",
-                // these are just swagger stuffs
-                "/swagger-ui.html",
-                "/swagger-resources/**",
-                "/webjars/springfox-swagger-ui/**",
-                "/api-docs/**",
-                "/v2/api-docs",
-                "/configuration/ui",
-                "/configuration/security"
-            ).permitAll()
+                security.authorizeRequests().antMatchers(
+                    "/",
+                    "/index.html",
+                    // these are just swagger stuffs
+                    "/swagger-ui.html",
+                    "/swagger-resources/**",
+                    "/webjars/springfox-swagger-ui/**",
+                    "/api-docs/**",
+                    "/v2/api-docs",
+                    "/configuration/ui",
+                    "/configuration/security"
+                ).permitAll()
 
-            // we only host RESTful API and every services are protected.
-            security.authorizeRequests().antMatchers("/v1/ping").permitAll()
-            security.authorizeRequests().anyRequest().authenticated()
+                // we only host RESTful API and every services are protected.
+                security.authorizeRequests().antMatchers("/v1/ping").permitAll()
+                security.authorizeRequests().anyRequest().authenticated()
 
-            // Set up a JWT processor to parse the tokens and then check their signature
-            // and validity time window (bounded by the "iat", "nbf" and "exp" claims)
-            val jwtProcessor = DefaultJWTProcessor<BookitSecurityContext>()
+                // Set up a JWT processor to parse the tokens and then check their signature
+                // and validity time window (bounded by the "iat", "nbf" and "exp" claims)
+                val jwtProcessor = DefaultJWTProcessor<BookitSecurityContext>()
 
-            val azureSelector = JWSVerificationKeySelector(JWSAlgorithm.RS256, RemoteJWKSet<BookitSecurityContext>(URL("https://login.microsoftonline.com/organizations/discovery/v2.0/keys")))
-            val fakeSelector = JWSVerificationKeySelector(JWSAlgorithm.HS256, ImmutableSecret<BookitSecurityContext>(DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secretsecretsecretsecretsecretsecret".toByteArray()))))
+                val azureSelector = JWSVerificationKeySelector(
+                    JWSAlgorithm.RS256,
+                    RemoteJWKSet<BookitSecurityContext>(URL("https://login.microsoftonline.com/organizations/discovery/v2.0/keys"))
+                )
+                val fakeSelector = JWSVerificationKeySelector(
+                    JWSAlgorithm.HS256,
+                    ImmutableSecret<BookitSecurityContext>(
+                        DatatypeConverter.parseBase64Binary(
+                            Base64.getEncoder().encodeToString(
+                                "secretsecretsecretsecretsecretsecret".toByteArray()
+                            )
+                        )
+                    )
+                )
 
-            // Configure the JWT processor with a key selector to feed matching public
-            // RSA keys sourced from the JWK set URL
-            val keySelector = JWSKeySelector<BookitSecurityContext> { header, context ->
-                when {
-                    header.algorithm == fakeSelector.expectedJWSAlgorithm && context.allowFakeTokens(props) -> fakeSelector.selectJWSKeys(header, context)
-                    else -> azureSelector.selectJWSKeys(header, context)
+                // Configure the JWT processor with a key selector to feed matching public
+                // RSA keys sourced from the JWK set URL
+                val keySelector = JWSKeySelector<BookitSecurityContext> { header, context ->
+                    when {
+                        header.algorithm == fakeSelector.expectedJWSAlgorithm && context.allowFakeTokens(props) -> fakeSelector.selectJWSKeys(
+                            header,
+                            context
+                        )
+                        else -> azureSelector.selectJWSKeys(header, context)
+                    }
                 }
-            }
-            jwtProcessor.jwsKeySelector = keySelector
+                jwtProcessor.jwsKeySelector = keySelector
 
-            security.addFilterBefore(
-                JwtAuthenticationFilter(authenticationManager(),
-                    OpenIdAuthenticator(jwtProcessor)),
-                BasicAuthenticationFilter::class.java)
+                security.addFilterBefore(
+                    JwtAuthenticationFilter(
+                        authenticationManager(),
+                        OpenIdAuthenticator(jwtProcessor)
+                    ),
+                    BasicAuthenticationFilter::class.java
+                )
+            }
         }
-    }
 }
 
 /**
@@ -190,4 +233,3 @@ class WebSecurityConfiguration(private val props: BookitProperties) {
 fun main(args: Array<String>) {
     SpringApplication.run(BookitApplication::class.java, *args)
 }
-

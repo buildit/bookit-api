@@ -14,14 +14,16 @@ import javax.persistence.Id
 import javax.persistence.ManyToOne
 
 @Entity
-data class Bookable(@ManyToOne(optional = false) @NaturalId
-                    val location: Location,
-                    @Column(nullable = false) @NaturalId
-                    val name: String,
-                    @Embedded
-                    val disposition: Disposition = Disposition(),
-                    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2") @Column(length = 36)
-                    val id: String? = null)
+data class Bookable(
+    @ManyToOne(optional = false) @NaturalId
+    val location: Location,
+    @Column(nullable = false) @NaturalId
+    val name: String,
+    @Embedded
+    val disposition: Disposition = Disposition(),
+    @Id @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2") @Column(length = 36)
+    val id: String? = null
+)
 
 @Embeddable
 data class Disposition(
@@ -36,4 +38,3 @@ data class BookableResource(
     val bookable: Bookable,
     val bookings: Collection<Booking> = emptyList()
 )
-

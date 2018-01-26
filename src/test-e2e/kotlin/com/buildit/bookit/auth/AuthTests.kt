@@ -26,7 +26,8 @@ import javax.xml.bind.DatatypeConverter
  */
 class `Security E2E Tests` {
     private val testRestTemplate = TestRestTemplate(RestTemplateBuilder().rootUri(Global.URI).build())
-    private val signer = MACSigner(DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secretsecretsecretsecretsecretsecret".toByteArray())))
+    private val signer =
+        MACSigner(DatatypeConverter.parseBase64Binary(Base64.getEncoder().encodeToString("secretsecretsecretsecretsecretsecret".toByteArray())))
 
     @BeforeEach
     fun `clear interceptors`() {

@@ -47,7 +47,8 @@ class BookableController(private val bookableRepository: BookableRepository, val
     // current workaround below from https://github.com/springfox/springfox/issues/2053
     @ApiImplicitParams(
         ApiImplicitParam(name = "locationId", required = true, dataTypeClass = String::class, paramType = "path"),
-        ApiImplicitParam(name = "bookableId", required = true, dataTypeClass = String::class, paramType = "path"))
+        ApiImplicitParam(name = "bookableId", required = true, dataTypeClass = String::class, paramType = "path")
+    )
     fun getBookable(
         @PathVariable("locationId") @ApiParam(type = "java.lang.String") @ApiIgnore location: Location?,
         @PathVariable("bookableId") @ApiParam(type = "java.lang.String") @ApiIgnore bookable: Bookable?
@@ -91,7 +92,8 @@ class BookableController(private val bookableRepository: BookableRepository, val
             .map { bookable ->
                 val bookings = when {
                     "bookings" in expand ?: emptyList() ->
-                        bookingRepository.findByBookableAndOverlap(bookable,
+                        bookingRepository.findByBookableAndOverlap(
+                            bookable,
                             when (start) {
                                 LocalDate.MIN -> minLocalDateTime
                                 else -> start.atStartOfDay()
@@ -99,7 +101,8 @@ class BookableController(private val bookableRepository: BookableRepository, val
                             when (end) {
                                 LocalDate.MAX -> maxLocalDateTime
                                 else -> end.atStartOfDay()
-                            })
+                            }
+                        )
                             .map { maskSubjectIfOtherUser(it, user) }
                     else -> emptyList()
                 }

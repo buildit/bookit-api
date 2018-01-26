@@ -66,12 +66,14 @@ class BookingControllerMockMvcTests @Autowired constructor(
         private val location = Location("NYC", NYC_TZ, "guid")
         private val bookable = Bookable(location, "Foo", Disposition(), "guid")
 
-        private val booking = Booking(bookable,
+        private val booking = Booking(
+            bookable,
             "The Booking",
             startDateTime,
             endDateTime,
             user,
-            "guid")
+            "guid"
+        )
     }
 
     @Autowired

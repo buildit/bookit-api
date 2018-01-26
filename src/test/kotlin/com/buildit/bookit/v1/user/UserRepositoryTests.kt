@@ -15,7 +15,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class UserRepositoryTests @Autowired constructor(val userRepo: UserRepository
+class UserRepositoryTests @Autowired constructor(
+    val userRepo: UserRepository
 ) {
 
     @Test

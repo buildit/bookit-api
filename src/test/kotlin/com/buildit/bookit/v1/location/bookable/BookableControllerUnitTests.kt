@@ -42,7 +42,8 @@ class BookableControllerUnitTests {
     inner class `v1|location|bookable` {
         @Nested
         inner class `get single bookable` {
-            @Nested inner class `that is known` {
+            @Nested
+            inner class `that is known` {
                 @Test
                 fun `should return bookable1`() {
                     val bookable = bookableController.getBookable(nyc, nycBookable1)
@@ -89,16 +90,25 @@ class BookableControllerUnitTests {
 
                 @Test
                 fun `requires startDate before endDate`() {
-                    assertThat({
-                        bookableController.getAllBookables(nyc, userPrincipal, today, today.minusDays(1), expandBookings)
-                    },
-                        throws<EndBeforeStartException>())
+                    assertThat(
+                        {
+                            bookableController.getAllBookables(
+                                nyc,
+                                userPrincipal,
+                                today,
+                                today.minusDays(1),
+                                expandBookings
+                            )
+                        },
+                        throws<EndBeforeStartException>()
+                    )
                 }
 
                 @Test
                 fun `finds an available bookable - no bookings`() {
                     expect(
-                        bookableController.getAllBookables(nyc, userPrincipal, today, today, expandBookings))
+                        bookableController.getAllBookables(nyc, userPrincipal, today, today, expandBookings)
+                    )
                         .to.contain(BookableResource(nycBookable1, emptyList()))
                 }
 
@@ -106,7 +116,8 @@ class BookableControllerUnitTests {
                 inner class `with bookings` {
 
                     private val bookingToday =
-                        Booking(nycBookable1,
+                        Booking(
+                            nycBookable1,
                             "Booking 1",
                             today.atTime(9, 15),
                             today.atTime(10, 15),
@@ -114,7 +125,8 @@ class BookableControllerUnitTests {
                             "guid1"
                         )
                     private val anotherUsersBookingToday =
-                        Booking(nycBookable1,
+                        Booking(
+                            nycBookable1,
                             "Booking Another",
                             today.atTime(12, 0),
                             today.atTime(12, 30),
@@ -123,7 +135,8 @@ class BookableControllerUnitTests {
                         )
                     private val anotherUsersBookingTodayMasked = anotherUsersBookingToday.copy(subject = "**********")
                     private val bookingToday2 =
-                        Booking(nycBookable1,
+                        Booking(
+                            nycBookable1,
                             "Booking 2",
                             today.atTime(11, 0),
                             today.atTime(11, 30),
@@ -131,7 +144,8 @@ class BookableControllerUnitTests {
                             "guid2"
                         )
                     private val bookingTodayDifferentBookable =
-                        Booking(nycBookable2,
+                        Booking(
+                            nycBookable2,
                             "Booking 3, different bookable",
                             today.atTime(11, 0),
                             today.atTime(11, 30),
@@ -139,7 +153,8 @@ class BookableControllerUnitTests {
                             "guid3"
                         )
                     private val bookingYesterday =
-                        Booking(nycBookable1,
+                        Booking(
+                            nycBookable1,
                             "Booking 4, yesterday",
                             today.minusDays(1).atTime(11, 0),
                             today.minusDays(1).atTime(11, 30),
@@ -147,7 +162,8 @@ class BookableControllerUnitTests {
                             "guid4"
                         )
                     private val bookingTomorrow =
-                        Booking(nycBookable1,
+                        Booking(
+                            nycBookable1,
                             "Booking 5, tomorrow",
                             today.plusDays(1).atTime(11, 0),
                             today.plusDays(1).atTime(11, 30),
@@ -158,41 +174,94 @@ class BookableControllerUnitTests {
                     @Test
                     fun `finds bookable - with bookings from all users`() {
                         val bookingRepo = mock<BookingRepository> {
-                            on { findByBookableAndOverlap(nycBookable1, today.atStartOfDay(), today.plusDays(1).atStartOfDay()) }.doReturn(listOf(bookingToday, bookingToday2, anotherUsersBookingToday))
-                            on { findByBookableAndOverlap(nycBookable2, today.atStartOfDay(), today.plusDays(1).atStartOfDay()) }.doReturn(listOf(bookingTodayDifferentBookable))
+                            on {
+                                findByBookableAndOverlap(
+                                    nycBookable1,
+                                    today.atStartOfDay(),
+                                    today.plusDays(1).atStartOfDay()
+                                )
+                            }.doReturn(listOf(bookingToday, bookingToday2, anotherUsersBookingToday))
+                            on {
+                                findByBookableAndOverlap(
+                                    nycBookable2,
+                                    today.atStartOfDay(),
+                                    today.plusDays(1).atStartOfDay()
+                                )
+                            }.doReturn(listOf(bookingTodayDifferentBookable))
                         }
 
                         val controller = BookableController(bookableRepo, bookingRepo)
 
-                        val bookables = controller.getAllBookables(nyc, userPrincipal, today, today.plusDays(1), expandBookings)
-                        expect(bookables).to.contain(BookableResource(nycBookable1, listOf(bookingToday, bookingToday2, anotherUsersBookingTodayMasked)))
-                        expect(bookables).to.contain(BookableResource(nycBookable2, listOf(bookingTodayDifferentBookable)))
+                        val bookables =
+                            controller.getAllBookables(nyc, userPrincipal, today, today.plusDays(1), expandBookings)
+                        expect(bookables).to.contain(
+                            BookableResource(
+                                nycBookable1,
+                                listOf(bookingToday, bookingToday2, anotherUsersBookingTodayMasked)
+                            )
+                        )
+                        expect(bookables).to.contain(
+                            BookableResource(
+                                nycBookable2,
+                                listOf(bookingTodayDifferentBookable)
+                            )
+                        )
                     }
 
                     @Test
                     fun `endDate defaults to end of time`() {
                         val bookingRepo = mock<BookingRepository> {
-                            on { findByBookableAndOverlap(nycBookable1, today.atStartOfDay(), maxLocalDateTime) }.doReturn(listOf(bookingToday, bookingToday2, anotherUsersBookingToday, bookingTomorrow))
-                            on { findByBookableAndOverlap(nycBookable2, today.atStartOfDay(), maxLocalDateTime) }.doReturn(listOf(bookingTodayDifferentBookable))
+                            on {
+                                findByBookableAndOverlap(
+                                    nycBookable1,
+                                    today.atStartOfDay(),
+                                    maxLocalDateTime
+                                )
+                            }.doReturn(listOf(bookingToday, bookingToday2, anotherUsersBookingToday, bookingTomorrow))
+                            on {
+                                findByBookableAndOverlap(
+                                    nycBookable2,
+                                    today.atStartOfDay(),
+                                    maxLocalDateTime
+                                )
+                            }.doReturn(listOf(bookingTodayDifferentBookable))
                         }
 
                         val controller = BookableController(bookableRepo, bookingRepo)
 
                         expect(
-                            controller.getAllBookables(nyc, userPrincipal, today, expand = expandBookings))
-                            .to.contain(BookableResource(nycBookable1, listOf(bookingToday, bookingToday2, anotherUsersBookingTodayMasked, bookingTomorrow)))
+                            controller.getAllBookables(nyc, userPrincipal, today, expand = expandBookings)
+                        )
+                            .to.contain(
+                            BookableResource(
+                                nycBookable1,
+                                listOf(bookingToday, bookingToday2, anotherUsersBookingTodayMasked, bookingTomorrow)
+                            )
+                        )
                     }
 
                     @Test
                     fun `startDate defaults to beginning of time`() {
                         val bookingRepo = mock<BookingRepository> {
-                            on { findByBookableAndOverlap(nycBookable1, minLocalDateTime, today.atStartOfDay()) }.doReturn(listOf(bookingYesterday))
+                            on {
+                                findByBookableAndOverlap(
+                                    nycBookable1,
+                                    minLocalDateTime,
+                                    today.atStartOfDay()
+                                )
+                            }.doReturn(listOf(bookingYesterday))
                         }
 
                         val controller = BookableController(bookableRepo, bookingRepo)
 
                         expect(
-                            controller.getAllBookables(nyc, userPrincipal, endDateExclusive = today, expand = expandBookings))
+                            controller.getAllBookables(
+                                nyc,
+                                userPrincipal,
+                                endDateExclusive = today,
+                                expand = expandBookings
+                            )
+                        )
                             .to.contain(BookableResource(nycBookable1, listOf(bookingYesterday)))
                     }
 
@@ -203,7 +272,14 @@ class BookableControllerUnitTests {
                         val controller = BookableController(bookableRepo, bookingRepo)
 
                         expect(
-                            controller.getAllBookables(nyc, userPrincipal, today.plusDays(2), today.plusDays(3), expandBookings))
+                            controller.getAllBookables(
+                                nyc,
+                                userPrincipal,
+                                today.plusDays(2),
+                                today.plusDays(3),
+                                expandBookings
+                            )
+                        )
                             .to.contain(BookableResource(nycBookable1, emptyList()))
                     }
                 }
