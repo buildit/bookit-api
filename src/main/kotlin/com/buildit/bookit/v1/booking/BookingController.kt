@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import springfox.documentation.annotations.ApiIgnore
 import java.net.URI
 import java.time.Clock
 import java.time.LocalDate
@@ -107,22 +106,13 @@ class BookingController(
     }
 
     @GetMapping("/{id}")
-    // use implicit params until springfox 2.8.0 released
-    // https://github.com/springfox/springfox/commit/1606caf4a421470ccb9b7592b465979dcb4c5ce1
-    // https://github.com/springfox/springfox/issues/2107
-    // current workaround below from https://github.com/springfox/springfox/issues/2053
     @ApiImplicitParam(name = "id", required = true, dataTypeClass = String::class, paramType = "path")
     @Transactional(readOnly = true)
-    fun getBooking(@PathVariable("id") @ApiParam(type = "java.lang.String") @ApiIgnore booking: Booking?, @AuthenticationPrincipal user: UserPrincipal?): Booking =
+    fun getBooking(@PathVariable("id") @ApiParam(type = "java.lang.String") booking: Booking?, @AuthenticationPrincipal user: UserPrincipal?): Booking =
         booking?.let { maskSubjectIfOtherUser(it, user) } ?: throw BookingNotFound()
 
     @DeleteMapping("/{id}")
-    // use implicit params until springfox 2.8.0 released
-    // https://github.com/springfox/springfox/commit/1606caf4a421470ccb9b7592b465979dcb4c5ce1
-    // https://github.com/springfox/springfox/issues/2107
-    // current workaround below from https://github.com/springfox/springfox/issues/2053
-    @ApiImplicitParam(name = "id", required = true, dataTypeClass = String::class, paramType = "path")
-    fun deleteBooking(@PathVariable("id") @ApiParam(type = "java.lang.String") @ApiIgnore booking: Booking?, @AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<Unit> =
+    fun deleteBooking(@PathVariable("id") @ApiParam(type = "java.lang.String") booking: Booking?, @AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<Unit> =
         when {
             booking == null -> ResponseEntity.noContent().build()
             booking.user.externalId != userPrincipal.subject -> ResponseEntity.status(HttpStatus.FORBIDDEN).build()

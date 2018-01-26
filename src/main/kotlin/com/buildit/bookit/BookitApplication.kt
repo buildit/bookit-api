@@ -39,8 +39,8 @@ import springfox.documentation.service.ImplicitGrant
 import springfox.documentation.service.LoginEndpoint
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
-import springfox.documentation.swagger.web.ApiKeyVehicle
 import springfox.documentation.swagger.web.SecurityConfiguration
+import springfox.documentation.swagger.web.SecurityConfigurationBuilder
 import springfox.documentation.swagger2.annotations.EnableSwagger2
 import java.net.URL
 import java.time.Clock
@@ -120,16 +120,13 @@ class SwaggerConfiguration {
 
     @Bean
     fun securityInfo(): SecurityConfiguration =
-        SecurityConfiguration(
-            "9a8b8181-afb1-48f8-a839-a895d39f9db0",
-            "",
-            "realm",
-            "9a8b8181-afb1-48f8-a839-a895d39f9db0",
-            "apiKey",
-            ApiKeyVehicle.HEADER,
-            "api_key",
-            " "
-        )
+        SecurityConfigurationBuilder.builder()
+            .clientId("9a8b8181-afb1-48f8-a839-a895d39f9db0")
+            .clientSecret("")
+            .realm("realm")
+            .appName("9a8b8181-afb1-48f8-a839-a895d39f9db0")
+            .scopeSeparator(" ")
+            .build()
 }
 
 /**
