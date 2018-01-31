@@ -26,7 +26,7 @@ class LocationRepositoryTests @Autowired constructor(
         val locations = locationRepo.findAll()?.toList()
 
         // assert
-        expect(locations).has.size(2)
+        expect(locations).has.size(3)
         expect(locations).to.contain(
             Location(
                 "NYC",
