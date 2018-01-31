@@ -6,6 +6,13 @@ INSERT INTO location (id, name, time_zone) VALUES ('b1177996-75e2-41da-a3e9-fcdd
 ON DUPLICATE KEY UPDATE name = name;
 INSERT INTO location (id, name, time_zone) VALUES ('43ec3f7d-348d-427f-8c13-102ca0362a62', 'LON', 'Europe/London')
 ON DUPLICATE KEY UPDATE name = name;
+INSERT INTO location (id, name, time_zone) VALUES ('439c3fe8-124f-4a44-8f97-662a5d8334d3', 'DEN', 'America/Denver')
+ON DUPLICATE KEY UPDATE name = name;
+
+INSERT INTO bookable (id, location_id, name, closed, reason)
+VALUES ('3db27fe2-ad9f-44ca-bcb8-c30829007563', '439c3fe8-124f-4a44-8f97-662a5d8334d3', 'Suite 2170', FALSE, '')
+ON DUPLICATE KEY UPDATE name = name;
+
 
 INSERT INTO bookable (id, location_id, name, closed, reason)
 VALUES ('aab6d676-d3cb-4b9b-b285-6e63058aeda8', 'b1177996-75e2-41da-a3e9-fcdd75d1ab31', 'Red Room', FALSE, '')
