@@ -38,7 +38,7 @@ buildscript {
 }
 
 plugins {
-    id 'org.springframework.boot' version '1.5.9.RELEASE'
+    id 'org.springframework.boot' version '1.5.10.RELEASE'
     id 'org.jetbrains.kotlin.jvm' version '1.2.21'
     id 'org.jetbrains.kotlin.plugin.spring' version '1.2.21'
     id "org.jetbrains.kotlin.plugin.jpa" version "1.2.21"
