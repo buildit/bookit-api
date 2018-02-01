@@ -26,6 +26,11 @@ class `Location E2E Tests` {
                                 "id": "43ec3f7d-348d-427f-8c13-102ca0362a62",
                                 "name": "LON",
                                 "timeZone": "Europe/London"
+                            },
+                            {
+                                "id": "439c3fe8-124f-4a44-8f97-662a5d8334d3",
+                                "name": "DEN",
+                                "timeZone": "America/Denver"
                             }
                         ]
                     """.trimIndent()
