@@ -23,7 +23,7 @@ buildscript {
     ext['threeten.version'] = '1.2'
     ext['ktlint.version'] = '0.15.0'
     ext['nimbus-jose-jwt.version'] = '5.3'
-    ext['detekt.version'] = '1.0.0.RC6-2'
+    ext['detekt.version'] = '1.0.0.RC6-3'
 
     repositories {
         mavenCentral()
@@ -44,7 +44,7 @@ plugins {
     id "org.jetbrains.kotlin.plugin.jpa" version "1.2.30"
     id 'org.jmailen.kotlinter' version '1.8.1'
 //    id 'com.gorylenko.gradle-git-properties' version '1.4.17'
-    id "io.gitlab.arturbosch.detekt" version "1.0.0.RC6-2"
+    id "io.gitlab.arturbosch.detekt" version "1.0.0.RC6-3"
 }
 
 repositories {
