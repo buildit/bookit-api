@@ -8,17 +8,17 @@ buildscript {
     ext['jackson.version'] = '2.9.4'
     ext['mariadb.version'] = '2.2.2'
     ext['h2.version'] = '1.4.196'
+    ext['junit-jupiter.version'] = '5.1.0'
+    ext['junit-platform.version'] = '1.1.0'
+    ext['mockito.version'] = '2.15.0'
 
     // these are our additions (some become defaults in spring boot 2.x)
     ext['kotlin.version'] = '1.2.30'
-    ext['junit-jupiter.version'] = '5.1.0'
-    ext['junit-platform.version'] = '1.1.0'
     ext['expekt.version'] = '0.5.0'
-    ext['hamkrest.version'] = '1.4.2.0'
+    ext['hamkrest.version'] = '1.4.2.2'
     ext['springfox.version'] = '2.8.0'
     ext['mockito-kotlin.version'] = '1.5.0'
-    ext['mockito.version'] = '2.8.9'
-    ext['jacoco.version'] = '0.7.9'
+    ext['jacoco.version'] = '0.8.0'
     ext['threeten.version'] = '1.2'
     ext['ktlint.version'] = '0.18.0'
     ext['nimbus-jose-jwt.version'] = '5.3'
@@ -78,7 +78,6 @@ idea {
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
         jvmTarget = "1.8"
-        // Kotlin 1.2
         allWarningsAsErrors = true
     }
 }
