@@ -48,6 +48,7 @@ plugins {
 
 repositories {
     maven { url 'https://jitpack.io' }
+    mavenCentral()
 }
 
 
@@ -72,6 +73,19 @@ sourceSets {
 idea {
     module {
         testSourceDirs += files('src/test-e2e/kotlin')
+    }
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        allWarningsAsErrors = true
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        allWarningsAsErrors = true
     }
 }
 
