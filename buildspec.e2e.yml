@@ -16,10 +16,10 @@ phases:
   post_build:
     commands:
       - aws s3 cp --recursive --acl public-read ./build/reports ${REPORTS_BUCKET}/
-#cache:
-#  paths:
-#    - '/root/.gradle/**/*'
-#    - '/root/.gradle/wrapper/**/*'
-#    - '/root/.gradle/caches/**/*'
-#    - '/var/cache/apt/**/*'
-#    - '.gradle/**/*'
+cache:
+  paths:
+    - '/root/.gradle/**/*'
+    - '/root/.gradle/wrapper/**/*'
+    - '/root/.gradle/caches/**/*'
+    - '/var/cache/apt/**/*'
+    - '.gradle/**/*'
