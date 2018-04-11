@@ -12,12 +12,14 @@ phases:
       - add-apt-repository ppa:openjdk-r/ppa
       - apt-get update -y
       - apt-get install -y openjdk-8-jdk
+      - update-ca-certificates -f
   pre_build:
     commands:
       - $(aws ecr get-login --region us-east-1 --no-include-email)
       - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)-${CODEBUILD_BUILD_ID##*:}"
   build:
     commands:
+      - java -version
       - chmod +x ./gradlew
       - ./gradlew -Dorg.gradle.daemon=false build
       - docker build --tag "${REPOSITORY_URI}:${TAG}" .
