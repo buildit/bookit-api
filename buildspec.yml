@@ -30,10 +30,10 @@ phases:
 artifacts:
   files:
     - build.json
-cache:
-  paths:
-    - '/root/.gradle/**/*'
-    - '/root/.gradle/wrapper/**/*'
-    - '/root/.gradle/caches/**/*'
-    - '/var/cache/apt/**/*'
-    - '.gradle/**/*'
+#cache:
+#  paths:
+#    - '/root/.gradle/**/*'
+#    - '/root/.gradle/wrapper/**/*'
+#    - '/root/.gradle/caches/**/*'
+#    - '/var/cache/apt/**/*'
+#    - '.gradle/**/*'
