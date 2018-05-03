@@ -16,6 +16,7 @@ class BookitSecurityContext(private val request: HttpServletRequest) : SecurityC
     private val log = LoggerFactory.getLogger(this::class.java)
     fun allowFakeTokens(props: BookitProperties): Boolean {
         val isNotProdRequest = listOf("localhost", "integration").any { request.serverName.startsWith(it) }
+        log.info("Request server name: $request.serverName")
         log.info("Is non-prod request: $isNotProdRequest")
         log.info("props.allowTestTokens: ${props.allowTestTokens}")
 
