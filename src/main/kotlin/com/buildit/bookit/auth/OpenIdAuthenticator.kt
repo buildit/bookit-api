@@ -15,14 +15,10 @@ interface JwtAuthenticator {
 class BookitSecurityContext(private val request: HttpServletRequest) : SecurityContext {
     private val log = LoggerFactory.getLogger(this::class.java)
     fun allowFakeTokens(props: BookitProperties): Boolean {
-        val isNotProdRequest = listOf("localhost", "integration").any { request.serverName.startsWith(it) }
-        log.info("Request server name: ${request.serverName}")
-        log.info("Is non-prod request: $isNotProdRequest")
-        log.info("props.allowTestTokens: ${props.allowTestTokens}")
-
-        val allowFakeTokens = props.allowTestTokens ?: isNotProdRequest
-        log.info("Allowing fake tokens:  $allowFakeTokens")
-
+        val subdomain = request.serverName.split('.')[0]
+        val isNonProdEnvironment = listOf("localhost", "integration").any { subdomain.contains(it) }
+        val allowFakeTokens = props.allowTestTokens ?: isNonProdEnvironment
+        if (allowFakeTokens) log.info("props.allowTestTokens: ${props.allowTestTokens}, non-prod environment: $isNonProdEnvironment")
         return allowFakeTokens
     }
 }
@@ -35,8 +31,6 @@ class OpenIdAuthenticator(private val jwtProcessor: JWTProcessor<BookitSecurityC
         jwtToken: String,
         request: HttpServletRequest
     ): UsernamePasswordAuthenticationToken? {
-        log.info("Received token:  $jwtToken")
-
         val user: JWTClaimsSet? = try {
             jwtProcessor.process(jwtToken, BookitSecurityContext(request))
         } catch (e: Throwable) {

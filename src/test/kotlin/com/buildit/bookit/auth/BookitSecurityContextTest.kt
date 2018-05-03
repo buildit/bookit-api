@@ -15,7 +15,7 @@ internal class BookitSecurityContextTest {
     }
 
     @Test
-    fun `disallow fake tokens if propetry set to false`() {
+    fun `disallow fake tokens if property set to false`() {
         val props = BookitProperties(false)
         expect(BookitSecurityContext(request).allowFakeTokens(props)).to.equal(false)
     }
@@ -41,9 +41,37 @@ internal class BookitSecurityContextTest {
     }
 
     @Test
-    fun `allow fake tokens if server is not integration or localhost`() {
+    fun `allow fake tokens if subdomain contains integration (embedded)`() {
+        val props = BookitProperties(null)
+        request.serverName = "my-integration.foo.com"
+        expect(BookitSecurityContext(request).allowFakeTokens(props)).to.equal(true)
+    }
+
+    @Test
+    fun `disallow fake tokens if integration is not in subdomain (embedded)`() {
+        val props = BookitProperties(null)
+        request.serverName = "host.integration.com"
+        expect(BookitSecurityContext(request).allowFakeTokens(props)).to.equal(false)
+    }
+
+    @Test
+    fun `disallow fake tokens if server is not integration or localhost`() {
         val props = BookitProperties(null)
         request.serverName = "someproductionserver.foo.com"
+        expect(BookitSecurityContext(request).allowFakeTokens(props)).to.equal(false)
+    }
+
+    @Test
+    fun `disallow fake tokens even though server is integration (property takes precedence)`() {
+        val props = BookitProperties(false)
+        request.serverName = "integration.foo.com"
+        expect(BookitSecurityContext(request).allowFakeTokens(props)).to.equal(false)
+    }
+
+    @Test
+    fun `disallow fake tokens if even if integration is in subdomain (property takes precedence)`() {
+        val props = BookitProperties(false)
+        request.serverName = "my-integration.foo.com"
         expect(BookitSecurityContext(request).allowFakeTokens(props)).to.equal(false)
     }
 }
