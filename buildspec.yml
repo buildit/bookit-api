@@ -15,7 +15,7 @@ phases:
       - update-ca-certificates -f
   pre_build:
     commands:
-      - $(aws ecr get-login --region us-east-1 --no-include-email)
+      - $(aws ecr get-login --region ${AWS_REGION} --no-include-email)
       - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)-${CODEBUILD_BUILD_ID##*:}"
   build:
     commands:
