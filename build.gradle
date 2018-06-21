@@ -37,9 +37,9 @@ buildscript {
 
 plugins {
     id 'org.springframework.boot' version '1.5.12.RELEASE'
-    id 'org.jetbrains.kotlin.jvm' version '1.2.41'
-    id 'org.jetbrains.kotlin.plugin.spring' version '1.2.41'
-    id 'org.jetbrains.kotlin.plugin.jpa' version '1.2.41'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.50'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.2.50'
+    id 'org.jetbrains.kotlin.plugin.jpa' version '1.2.50'
     id 'org.jmailen.kotlinter' version '1.8.1'
 //    id 'com.gorylenko.gradle-git-properties' version '1.4.17'
     id 'io.gitlab.arturbosch.detekt' version '1.0.0.RC6-3'
