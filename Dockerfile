@@ -1,6 +1,9 @@
-# TODO figure out how to change to oracle JRE
-# FROM frolvlad/alpine-oraclejdk8:slim
 FROM openjdk:8-jre-alpine
+ENV BOOKIT_DATABASE_USER admin
+ENV BOOKIT_DATABASE_URL jdbc:mariadb:aurora://aurora.bookit.internal/bookit
+ENV BOOKIT_DATABASE_DIALECT org.hibernate.dialect.MySQL55Dialect
+ENV BOOKIT_REQUIRE_SSL true
+
 RUN apk update && apk upgrade && \
   apk add --no-cache openssl ca-certificates
 
